@@ -1,79 +1,47 @@
-﻿const users = [
-  ["A", "Ahmed Hassan", "Student", "Active"],
-  ["M", "Mariam Ali", "ATTL Member", "Active"],
-  ["O", "Omar Khaled", "Teacher", "Active"],
-  ["S", "Sara Mohamed", "Student", "Pending"],
-];
+"use client";
 
-export default function AdminUsersPage() {
-  return (
-    <div className="space-y-6">
-      <section className="rounded-[32px] border border-white/80 bg-white/65 p-7 backdrop-blur-[30px]">
-        <p className="text-[10px] uppercase tracking-[.2em] text-blue-500">
-          Administration
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-.05em]">
-          Users
-        </h1>
-        <p className="mt-3 text-sm text-black/40">
-          Search, review and manage School OS accounts.
-        </p>
-      </section>
+import { useEffect, useMemo, useState } from "react";
 
-      <section className="rounded-[28px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl">
-        <div className="mb-5 flex flex-col gap-3 md:flex-row">
-          <input
-            placeholder="Search users..."
-            className="h-11 flex-1 rounded-[14px] border border-black/5 bg-white/70 px-4 text-xs outline-none placeholder:text-black/25"
-          />
+type User = {
+  id:string; name:string; email:string; role:string; isActive:boolean; gradeLevel:string|null; className:string|null; xp:number; level:number;
+};
 
-          <button className="rounded-[14px] bg-black px-5 text-[10px] text-white">
-            Add User
-          </button>
-        </div>
+const roles=["STUDENT","ATTL_MEMBER","TRACK_LEAD","TEACHER","ADMIN","SUPER_ADMIN"];
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[650px] text-left">
-            <thead>
-              <tr className="border-b border-black/5 text-[9px] uppercase tracking-wider text-black/25">
-                <th className="pb-4">User</th>
-                <th className="pb-4">Role</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4">Action</th>
-              </tr>
-            </thead>
+export default function AdminUsersPage(){
+ const [users,setUsers]=useState<User[]>([]);
+ const [query,setQuery]=useState("");
+ const [busy,setBusy]=useState("");
+ const [message,setMessage]=useState("");
 
-            <tbody>
-              {users.map(([avatar, name, role, status]) => (
-                <tr key={name} className="border-b border-black/5 last:border-0">
-                  <td className="py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black text-[10px] text-white">
-                        {avatar}
-                      </div>
-                      <span className="text-xs font-medium">{name}</span>
-                    </div>
-                  </td>
+ async function load(){const res=await fetch("/api/admin/users",{cache:"no-store"});const data=await res.json();if(res.ok)setUsers(data.users??[]);else setMessage(data.error??"Unable to load users.");}
+ useEffect(()=>{load();},[]);
 
-                  <td className="py-4 text-[10px] text-black/45">{role}</td>
+ const filtered=useMemo(()=>users.filter(u=>[u.name,u.email,u.role,u.schoolId??""].join(" ").toLowerCase().includes(query.toLowerCase())),[users,query]);
 
-                  <td className="py-4">
-                    <span className="rounded-full bg-green-500/10 px-3 py-1 text-[9px] text-green-600">
-                      {status}
-                    </span>
-                  </td>
+ async function update(id:string, patch:Partial<User>){
+  setBusy(id);setMessage("");
+  const res=await fetch(`/api/admin/users/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(patch)});
+  const data=await res.json();setMessage(res.ok?"User updated.":(data.error??"Could not update user."));
+  if(res.ok) await load(); setBusy("");
+ }
 
-                  <td className="py-4">
-                    <button className="text-[10px] text-blue-500">
-                      Manage →
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-  );
+ return <div className="space-y-6">
+  <section className="relative overflow-hidden rounded-[32px] bg-black p-7 text-white md:p-8"><div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-blue-500/25 blur-[110px]"/><div className="relative"><p className="text-[9px] uppercase tracking-[.2em] text-white/35">Administration</p><h1 className="mt-2 text-3xl font-semibold tracking-[-.05em] md:text-5xl">Users</h1><p className="mt-3 max-w-xl text-sm text-white/40">Manage accounts, roles and active status from the protected Admin OS.</p></div></section>
+
+  <section className="rounded-[30px] border border-white/80 bg-white/60 p-5 backdrop-blur-2xl">
+   <div className="flex flex-col gap-3 md:flex-row"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search name, email or role..." className="h-11 flex-1 rounded-[14px] border border-black/5 bg-white/75 px-4 text-xs outline-none"/><span className="rounded-[14px] bg-black px-4 py-3 text-center text-[9px] font-semibold text-white">{filtered.length} users</span></div>
+   {message&&<div className="mt-3 rounded-[14px] bg-black/[.03] px-4 py-3 text-[10px] text-black/50">{message}</div>}
+   <div className="mt-5 space-y-2">
+    {filtered.map(user=><article key={user.id} className="rounded-[20px] border border-black/[.04] bg-white/60 p-4">
+      <div className="grid gap-4 lg:grid-cols-[1.4fr_.7fr_.5fr_.7fr] lg:items-center">
+       <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-xs font-semibold text-white">{user.name.trim().charAt(0).toUpperCase()}</div><div><p className="text-xs font-semibold">{user.name}</p><p className="mt-1 text-[9px] text-black/30">{user.email}</p></div></div>
+       <select value={user.role} disabled={busy===user.id} onChange={e=>update(user.id,{role:e.target.value})} className="h-10 rounded-[13px] border border-black/5 bg-white px-3 text-[9px] outline-none">{roles.map(role=><option key={role}>{role}</option>)}</select>
+       <span className={user.isActive?"rounded-full bg-green-500/10 px-3 py-2 text-center text-[8px] font-semibold text-green-600":"rounded-full bg-black/[.04] px-3 py-2 text-center text-[8px] text-black/35"}>{user.isActive?"Active":"Disabled"}</span>
+       <button disabled={busy===user.id} onClick={()=>update(user.id,{isActive:!user.isActive})} className="rounded-[13px] bg-black/[.04] px-3 py-2.5 text-[9px] font-semibold text-black/50 transition hover:bg-black hover:text-white disabled:opacity-40">{busy===user.id?"Saving...":user.isActive?"Disable":"Activate"}</button>
+      </div>
+    </article>)}
+   </div>
+  </section>
+ </div>
 }
