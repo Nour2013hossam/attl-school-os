@@ -1,0 +1,15 @@
+/dashboard
+/dashboard/student/profile
+/dashboard/student/identity
+/dashboard/student/timeline
+/dashboard/student/activity
+/dashboard/student/achievements
+/dashboard/student/xp
+/dashboard/student/level
+/dashboard/student/goals
+/dashboard/student/interests
+/dashboard/student/portfolio
+/dashboard/notifications
+/dashboard/messages
+/dashboard/search
+/dashboard/calendar
