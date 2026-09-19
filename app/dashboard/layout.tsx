@@ -43,7 +43,7 @@ export default async function DashboardLayout({
         <div className="my-3 h-px shrink-0 bg-black/[0.05]" />
 
         <div className="relative min-h-0 flex-1 overflow-hidden">
-          <DashboardNav />
+          <DashboardNav role={session?.user?.role ?? "STUDENT"} />
         </div>
 
         <div className="group relative mt-3 shrink-0 overflow-hidden rounded-[23px] bg-black p-4 text-white shadow-xl">
