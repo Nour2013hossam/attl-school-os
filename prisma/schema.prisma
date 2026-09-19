@@ -118,6 +118,7 @@ model User {
   goals                Goal[]
   skills               UserSkill[]
   auditLogs            AuditLog[]                  @relation("ActorAudit")
+  preferences          UserPreference?
   reviewedApplications AttlApplication[]            @relation("ApplicationReviewer")
   createdChallenges    Challenge[]                 @relation("ChallengeCreator")
 
@@ -672,6 +673,20 @@ model UserSkill {
   skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
 
   @@unique([userId, skillId])
+}
+
+model UserPreference {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  language             String   @default("en")
+  theme                String   @default("system")
+  emailNotifications   Boolean  @default(true)
+  pushNotifications    Boolean  @default(true)
+  profileVisible       Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {
