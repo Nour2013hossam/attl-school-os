@@ -1,308 +1,200 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
-const profileStats = [
-  { label: "Level", value: "01", href: "/dashboard/student/level" },
-  { label: "XP", value: "0", href: "/dashboard/student/xp" },
-  { label: "Projects", value: "0", href: "/dashboard/projects/my-projects" },
-  { label: "Achievements", value: "0", href: "/dashboard/student/achievements" },
-];
-
-const profileSections = [
-  {
-    title: "Identity",
-    description: "Your school identity, basic information and profile details.",
-    href: "/dashboard/student/identity",
-    icon: "◎",
-  },
-  {
-    title: "Interests",
-    description: "Areas you care about and want to explore.",
-    href: "/dashboard/student/interests",
-    icon: "✦",
-  },
-  {
-    title: "Skills",
-    description: "Technical and soft skills you're developing.",
-    href: "/dashboard/skills/my-skills",
-    icon: "◇",
-  },
-  {
-    title: "Portfolio",
-    description: "Showcase your projects, achievements and work.",
-    href: "/dashboard/student/portfolio",
-    icon: "▣",
-  },
-];
+type Me = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  gradeLevel: string | null;
+  className: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+  xp: number;
+  level: number;
+  studentProfile?: {
+    interests: string[];
+    portfolioUrl: string | null;
+  } | null;
+};
 
 export default function StudentProfilePage() {
+  const [user, setUser] = useState<Me | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/me")
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load profile");
+        return response.json();
+      })
+      .then((payload) => setUser(payload.user))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const completion = useMemo(() => {
+    if (!user) return 0;
+    const checks = [
+      Boolean(user.name),
+      Boolean(user.email),
+      Boolean(user.gradeLevel),
+      Boolean(user.className),
+      Boolean(user.bio),
+      Boolean(user.studentProfile?.interests?.length),
+      Boolean(user.studentProfile?.portfolioUrl),
+    ];
+    return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="rounded-[24px] border border-white/80 bg-white/60 px-6 py-4 text-[10px] text-black/40 backdrop-blur-xl">
+          Loading your profile...
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <section className="rounded-[30px] bg-black p-8 text-white">
+        <h1 className="text-2xl font-semibold">Profile unavailable</h1>
+        <p className="mt-2 text-sm text-white/45">
+          Please sign in again to load your School OS profile.
+        </p>
+        <Link
+          href="/login"
+          className="mt-6 inline-flex rounded-[15px] bg-white px-5 py-3 text-[9px] font-semibold text-black"
+        >
+          Back to sign in
+        </Link>
+      </section>
+    );
+  }
+
+  const initial = user.name.trim().charAt(0).toUpperCase() || "A";
+
   return (
     <div className="space-y-6">
+      <section className="relative overflow-hidden rounded-[32px] bg-black p-6 text-white shadow-[0_25px_80px_rgba(0,0,0,.12)] md:p-8">
+        <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-blue-500/25 blur-[110px]" />
+        <div className="absolute bottom-[-130px] left-[30%] h-72 w-72 rounded-full bg-cyan-400/10 blur-[110px]" />
 
-      {/* Header */}
-      <section className="relative overflow-hidden rounded-[32px] border border-white/80 bg-white/65 p-6 shadow-[0_25px_70px_rgba(20,30,50,0.07)] backdrop-blur-2xl md:p-8">
-
-        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-400/15 blur-[90px]" />
-
-        <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-
+        <div className="relative flex flex-col gap-7 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-5">
-            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-[28px] bg-black text-2xl font-semibold text-white shadow-xl">
-              A
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-[28px] bg-white text-2xl font-semibold text-black shadow-xl">
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt=""
+                  className="h-full w-full rounded-[28px] object-cover"
+                />
+              ) : (
+                initial
+              )}
             </div>
 
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-[-0.05em]">
-                  Student Profile
-                </h1>
-
-                <span className="rounded-full bg-blue-500/10 px-2.5 py-1 text-[8px] font-semibold uppercase tracking-[0.15em] text-blue-600">
-                  Level 01
+                <span className="rounded-full bg-blue-400/10 px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[.15em] text-blue-300">
+                  {user.role}
+                </span>
+                <span className="rounded-full bg-white/5 px-3 py-1.5 text-[8px] text-white/40">
+                  Level {user.level}
                 </span>
               </div>
 
-              <p className="mt-2 text-sm text-black/40">
-                Your personal space inside ATTL School OS.
+              <h1 className="mt-3 text-3xl font-semibold tracking-[-.06em]">
+                {user.name}
+              </h1>
+
+              <p className="mt-2 text-sm text-white/40">{user.email}</p>
+              <p className="mt-2 text-[10px] text-white/25">
+                {user.gradeLevel ?? "Grade not set"} · {user.className ?? "Class not set"}
               </p>
-
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="rounded-full bg-black/[0.035] px-3 py-1.5 text-[9px] text-black/40">
-                  Student
-                </span>
-
-                <span className="rounded-full bg-black/[0.035] px-3 py-1.5 text-[9px] text-black/40">
-                  ATTL School OS
-                </span>
-              </div>
             </div>
           </div>
 
           <Link
             href="/dashboard/settings/account"
-            className="rounded-[16px] bg-black px-5 py-3 text-center text-[10px] font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
+            className="rounded-[16px] bg-white px-5 py-3 text-center text-[9px] font-semibold text-black transition hover:bg-white/90"
           >
-            Edit Profile
+            Edit account
           </Link>
-
         </div>
       </section>
 
-      {/* Stats */}
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {profileStats.map((stat) => (
+        {[
+          ["Level", String(user.level), "/dashboard/student/level"],
+          ["XP", String(user.xp), "/dashboard/student/xp"],
+          ["Profile", `${completion}%`, "/dashboard/student/profile"],
+          ["Interests", String(user.studentProfile?.interests?.length ?? 0), "/dashboard/student/interests"],
+        ].map(([label, value, href]) => (
           <Link
-            key={stat.label}
-            href={stat.href}
-            className="group rounded-[23px] border border-white/80 bg-white/60 p-5 shadow-[0_12px_35px_rgba(20,30,50,0.04)] backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:bg-white/85"
+            key={label}
+            href={href}
+            className="rounded-[23px] border border-white/80 bg-white/60 p-5 backdrop-blur-2xl transition hover:-translate-y-1 hover:bg-white"
           >
-            <p className="text-[9px] uppercase tracking-[0.18em] text-black/30">
-              {stat.label}
-            </p>
-
-            <p className="mt-3 text-3xl font-semibold tracking-[-0.05em]">
-              {stat.value}
-            </p>
-
-            <p className="mt-2 text-[9px] text-black/30 group-hover:text-blue-600">
-              Open →
-            </p>
+            <p className="text-[8px] uppercase tracking-[.18em] text-black/30">{label}</p>
+            <p className="mt-3 text-2xl font-semibold tracking-[-.05em]">{value}</p>
           </Link>
         ))}
       </section>
 
-      {/* Profile completion */}
-      <section className="grid gap-4 lg:grid-cols-[1fr_320px]">
-
-        <div className="rounded-[28px] border border-white/80 bg-white/60 p-6 shadow-[0_15px_45px_rgba(20,30,50,0.05)] backdrop-blur-2xl">
-
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.2em] text-black/30">
-                Profile
-              </p>
-
-              <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em]">
-                Complete your identity
-              </h2>
-
-              <p className="mt-2 max-w-lg text-[11px] leading-5 text-black/40">
-                A complete profile helps your School OS personalize your
-                academic, learning and development experience.
-              </p>
-            </div>
-
-            <span className="text-2xl font-semibold tracking-[-0.05em]">
-              20%
-            </span>
-          </div>
-
-          <div className="mt-6 h-2 overflow-hidden rounded-full bg-black/[0.06]">
-            <div className="h-full w-[20%] rounded-full bg-black" />
-          </div>
+      <section className="grid gap-4 lg:grid-cols-[1.15fr_.85fr]">
+        <div className="rounded-[30px] border border-white/80 bg-white/60 p-6 backdrop-blur-2xl">
+          <p className="text-[9px] font-semibold uppercase tracking-[.2em] text-black/30">
+            Identity
+          </p>
+          <h2 className="mt-1 text-xl font-semibold tracking-[-.04em]">Your School OS profile</h2>
+          <p className="mt-2 text-[10px] leading-5 text-black/35">
+            {user.bio || "Add a short bio from Account Settings to personalize your profile."}
+          </p>
 
           <div className="mt-6 grid gap-2 sm:grid-cols-2">
             {[
-              ["Basic identity", true],
-              ["Interests", false],
-              ["Skills", false],
-              ["Portfolio", false],
-            ].map(([label, complete]) => (
-              <div
-                key={String(label)}
-                className="flex items-center justify-between rounded-[17px] bg-black/[0.025] px-4 py-3"
-              >
-                <span className="text-[10px] font-medium">
-                  {String(label)}
-                </span>
-
-                <span
-                  className={
-                    complete
-                      ? "text-[10px] font-semibold text-blue-600"
-                      : "text-[10px] text-black/25"
-                  }
-                >
-                  {complete ? "Complete" : "Not started"}
-                </span>
+              ["School email", user.email],
+              ["Grade", user.gradeLevel ?? "Not set"],
+              ["Class", user.className ?? "Not set"],
+              ["Portfolio", user.studentProfile?.portfolioUrl ? "Connected" : "Not connected"],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-[18px] bg-black/[.025] p-4">
+                <p className="text-[8px] uppercase tracking-[.15em] text-black/25">{label}</p>
+                <p className="mt-2 text-[10px] font-semibold">{value}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* XP card */}
-        <div className="relative overflow-hidden rounded-[28px] bg-black p-6 text-white shadow-[0_20px_60px_rgba(0,0,0,0.12)]">
-
-          <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-blue-500/25 blur-[50px]" />
-
-          <div className="relative">
-            <p className="text-[9px] uppercase tracking-[0.2em] text-white/30">
-              Progress
-            </p>
-
-            <h2 className="mt-2 text-xl font-semibold tracking-[-0.04em]">
-              Level 01
-            </h2>
-
-            <p className="mt-2 text-[10px] leading-5 text-white/35">
-              Keep learning and building to earn XP.
-            </p>
-
-            <div className="mt-7">
-              <div className="flex justify-between text-[9px] text-white/30">
-                <span>0 XP</span>
-                <span>100 XP</span>
-              </div>
-
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full w-[4%] rounded-full bg-white" />
-              </div>
-            </div>
-
-            <Link
-              href="/dashboard/student/xp"
-              className="mt-7 flex items-center justify-between rounded-[16px] bg-white px-4 py-3 text-[10px] font-semibold text-black transition hover:bg-white/90"
-            >
-              View XP
-              <span>→</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Profile modules */}
-      <section>
-        <div className="mb-4 px-1">
-          <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-black/30">
-            Profile Workspace
-          </p>
-
-          <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em]">
-            Explore your profile
+        <div className="rounded-[30px] bg-black p-6 text-white">
+          <p className="text-[9px] uppercase tracking-[.2em] text-white/30">Progress</p>
+          <h2 className="mt-2 text-xl font-semibold tracking-[-.04em]">
+            Complete your profile
           </h2>
-        </div>
-
-        <div className="grid gap-3 md:grid-cols-2">
-          {profileSections.map((section) => (
-            <Link
-              key={section.title}
-              href={section.href}
-              className="group relative overflow-hidden rounded-[25px] border border-white/80 bg-white/60 p-5 shadow-[0_12px_35px_rgba(20,30,50,0.04)] backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/85"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-black text-white shadow-lg">
-                  {section.icon}
-                </div>
-
-                <span className="text-black/20 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-blue-600">
-                  →
-                </span>
-              </div>
-
-              <h3 className="mt-5 text-sm font-semibold">
-                {section.title}
-              </h3>
-
-              <p className="mt-2 max-w-md text-[10px] leading-5 text-black/40">
-                {section.description}
-              </p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Timeline preview */}
-      <section className="rounded-[28px] border border-white/80 bg-white/60 p-6 shadow-[0_15px_45px_rgba(20,30,50,0.05)] backdrop-blur-2xl">
-
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[9px] uppercase tracking-[0.2em] text-black/30">
-              Journey
-            </p>
-
-            <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em]">
-              Your School OS journey
-            </h2>
+          <div className="mt-7">
+            <div className="flex items-center justify-between text-[9px] text-white/35">
+              <span>Profile completion</span>
+              <span>{completion}%</span>
+            </div>
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full rounded-full bg-white transition-all duration-700" style={{ width: `${completion}%` }} />
+            </div>
           </div>
 
           <Link
-            href="/dashboard/student/timeline"
-            className="rounded-full bg-black/[0.035] px-3 py-2 text-[9px] text-black/40 transition hover:bg-black hover:text-white"
+            href="/dashboard/settings/account"
+            className="mt-7 flex items-center justify-between rounded-[16px] bg-white px-4 py-3 text-[9px] font-semibold text-black"
           >
-            View timeline
+            Complete profile
+            <span>→</span>
           </Link>
         </div>
-
-        <div className="mt-6 flex items-center gap-3 overflow-x-auto pb-2">
-          {[
-            ["01", "Joined School OS"],
-            ["02", "Complete profile"],
-            ["03", "Build a project"],
-            ["04", "Join ATTL"],
-          ].map(([number, title], index) => (
-            <div
-              key={number}
-              className="flex min-w-[180px] items-center gap-3 rounded-[18px] bg-black/[0.025] p-3"
-            >
-              <div
-                className={
-                  index === 0
-                    ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black text-[9px] font-semibold text-white"
-                    : "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 text-[9px] font-semibold text-black/30"
-                }
-              >
-                {number}
-              </div>
-
-              <span className="text-[10px] font-medium text-black/55">
-                {title}
-              </span>
-            </div>
-          ))}
-        </div>
       </section>
-
     </div>
   );
 }
