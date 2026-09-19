@@ -20,7 +20,8 @@
     "@prisma/client": "6.19.3",
     "bcryptjs": "3.0.3",
     "next-auth": "5.0.0-beta.32",
-    "zod": "4.6.5"
+    "zod": "4.6.5",
+    "node-xlsx": "0.24.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
