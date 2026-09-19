@@ -173,6 +173,26 @@ const sections = [
     ],
   },
   {
+    label: "Admin",
+    items: [
+      { label: "Overview", href: "/dashboard/admin/overview", icon: "⌘" },
+      { label: "Users", href: "/dashboard/admin/users", icon: "●" },
+      { label: "Students", href: "/dashboard/admin/students", icon: "♙" },
+      { label: "Teachers", href: "/dashboard/admin/teachers", icon: "♙" },
+      { label: "Roles", href: "/dashboard/admin/roles", icon: "◇" },
+      { label: "Permissions", href: "/dashboard/admin/permissions", icon: "◈" },
+      { label: "Applications", href: "/dashboard/admin/applications", icon: "□" },
+      { label: "Grades", href: "/dashboard/admin/grades", icon: "◆" },
+      { label: "Projects", href: "/dashboard/admin/projects", icon: "▣" },
+      { label: "Competitions", href: "/dashboard/admin/competitions", icon: "★" },
+      { label: "Events", href: "/dashboard/admin/events", icon: "◷" },
+      { label: "Analytics", href: "/dashboard/admin/analytics", icon: "▥" },
+      { label: "Audit Logs", href: "/dashboard/admin/audit-logs", icon: "◌" },
+      { label: "Security", href: "/dashboard/admin/security", icon: "◇" },
+      { label: "System", href: "/dashboard/admin/system", icon: "⚙" },
+    ],
+  },
+  {
     label: "Settings",
     items: [
       { label: "Account", href: "/dashboard/settings/account", icon: "●" },
@@ -191,8 +211,18 @@ const sections = [
   },
 ];
 
-export function DashboardNav() {
+export function DashboardNav({ role = "STUDENT" }: { role?: string }) {
   const pathname = usePathname();
+
+  const visibleSections = sections.filter((section) => {
+    if (section.label === "ATTL") {
+      return ["ATTL_MEMBER", "TRACK_LEAD", "ADMIN", "SUPER_ADMIN"].includes(role);
+    }
+    if (section.label === "Admin") {
+      return ["ADMIN", "SUPER_ADMIN"].includes(role);
+    }
+    return true;
+  });
 
   const [openSections, setOpenSections] = useState<string[]>(["Workspace"]);
 
@@ -226,7 +256,7 @@ export function DashboardNav() {
     <nav className="h-full min-h-0 overflow-y-auto pr-1 overscroll-contain dashboard-sidebar-scroll">
       <div className="space-y-2 pb-8">
 
-        {sections.map((section) => {
+        {visibleSections.map((section) => {
           const open = openSections.includes(section.label);
 
           const hasActiveItem = section.items.some(
