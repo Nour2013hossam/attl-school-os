@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ATTL School OS
 
-## Getting Started
+ATTL (Al Thagr Technical Lab) School OS is a full-stack Next.js application for academics, projects, learning, competitions, innovation, community, mentorship and ATTL operations.
 
-First, run the development server:
+## Stack
+
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- PostgreSQL
+- Prisma ORM 6
+- Auth.js credentials authentication
+- Zod validation
+- bcrypt password hashing
+
+## Local setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Copy environment variables:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+3. Set `DATABASE_URL` and `AUTH_SECRET`.
+
+4. Generate Prisma Client:
+
+```bash
+npm run db:generate
+```
+
+5. Apply the schema:
+
+```bash
+npm run db:push
+```
+
+6. Seed development data:
+
+```bash
+npm run db:seed
+```
+
+7. Start the app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Development accounts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The seed creates:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `student@attl.school`
+- `admin@attl.school`
 
-## Learn More
+Both use the password supplied through `SEED_PASSWORD`. Change it before sharing a deployed environment.
 
-To learn more about Next.js, take a look at the following resources:
+## Backend architecture
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `prisma/schema.prisma` — relational School OS data model.
+- `prisma/seed.ts` — development seed data.
+- `lib/prisma.ts` — Prisma singleton.
+- `lib/authz.ts` — server-side authorization.
+- `auth.ts` — Auth.js credentials provider and session callbacks.
+- `proxy.ts` — protected dashboard routing.
+- `app/api/**` — server Route Handlers.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Connected API domains
 
-## Deploy on Vercel
+Authentication, registration, current-user profile, schedule, grades/results, assignments, projects, notifications, events, competitions, ATTL applications, innovation ideas, goals and database health are now backed by server-side APIs.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The frontend contains a larger route inventory by design. Remaining pages can be connected progressively to these domain models without changing their public URLs.
