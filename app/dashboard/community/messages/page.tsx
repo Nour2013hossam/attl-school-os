@@ -1,50 +1,13 @@
-﻿import { PageShell } from "@/components/shared/page-shell";
+import { LiveWorkspace } from "@/components/shared/live-workspace";
 
 export default function Page() {
   return (
-    <PageShell
-      eyebrow="Community"
+    <LiveWorkspace
+      eyebrow="Communication"
       title="Messages"
-      description="A dedicated workspace inside ATTL School OS for managing your Messages experience."
-      icon="◇"
-      stats={[
-        { label: "Progress", value: "68%" },
-        { label: "Active", value: "12" },
-        { label: "Completed", value: "24" },
-        { label: "XP", value: "1,240" },
-      ]}
-      cards={[
-        {
-          title: "Overview",
-          description: "Get a clear view of your current progress and important information.",
-          icon: "◈",
-        },
-        {
-          title: "Continue",
-          description: "Pick up where you left off and continue your current journey.",
-          icon: "→",
-        },
-        {
-          title: "Explore",
-          description: "Discover new opportunities, resources, projects and activities.",
-          icon: "✦",
-        },
-        {
-          title: "Recent Activity",
-          description: "Review the latest activity connected to this section.",
-          icon: "◌",
-        },
-        {
-          title: "Progress",
-          description: "Track development, milestones and achievements over time.",
-          icon: "↗",
-        },
-        {
-          title: "Insights",
-          description: "Understand patterns and useful insights from your activity.",
-          icon: "◎",
-        },
-      ]}
+      description="Authenticated message threads and direct communication inside School OS."
+      icon="✉"
+      api="/api/messages"
     />
   );
 }
