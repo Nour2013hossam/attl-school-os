@@ -173,6 +173,21 @@ const sections = [
     ],
   },
   {
+    label: "Teacher",
+    items: [
+      { label: "Teacher Overview", href: "/dashboard/teacher/overview", icon: "⌘" },
+      { label: "Schedule", href: "/dashboard/teacher/schedule", icon: "◷" },
+      { label: "Classes", href: "/dashboard/teacher/classes", icon: "▤" },
+      { label: "Students", href: "/dashboard/teacher/students", icon: "●" },
+      { label: "Gradebook", href: "/dashboard/teacher/gradebook", icon: "◆" },
+      { label: "Attendance", href: "/dashboard/teacher/attendance", icon: "✓" },
+      { label: "Assignments", href: "/dashboard/teacher/assignments", icon: "□" },
+      { label: "Exams", href: "/dashboard/teacher/exams", icon: "△" },
+      { label: "Reports", href: "/dashboard/teacher/reports", icon: "▥" },
+      { label: "Messages", href: "/dashboard/teacher/messages", icon: "✉" },
+    ],
+  },
+  {
     label: "Admin",
     items: [
       { label: "Overview", href: "/dashboard/admin/overview", icon: "⌘" },
@@ -220,6 +235,9 @@ export function DashboardNav({ role = "STUDENT" }: { role?: string }) {
     }
     if (section.label === "Admin") {
       return ["ADMIN", "SUPER_ADMIN"].includes(role);
+    }
+    if (section.label === "Teacher") {
+      return role === "TEACHER";
     }
     return true;
   });
