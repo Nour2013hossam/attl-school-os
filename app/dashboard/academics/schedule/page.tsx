@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type ClassItem = {
   time: string;
@@ -183,9 +183,46 @@ const upcoming = [
 
 export default function SchedulePage() {
   const [selectedDay, setSelectedDay] = useState("THU");
+  const [liveSchedule, setLiveSchedule] = useState<Record<string, ClassItem[]> | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/schedule", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load live schedule.");
+        return response.json();
+      })
+      .then((payload) => {
+        const grouped: Record<string, ClassItem[]> = {};
+        for (const item of payload.items ?? []) {
+          const key = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"][Math.max(0, item.dayOfWeek - 1)];
+          if (!key) continue;
+          const toTime = (minutes: number) => {
+            const hour = Math.floor(minutes / 60).toString().padStart(2, "0");
+            const minute = (minutes % 60).toString().padStart(2, "0");
+            return `${hour}:${minute}`;
+          };
+          const entry: ClassItem = {
+            time: toTime(item.startMinute),
+            end: toTime(item.endMinute),
+            subject: item.subject.name,
+            code: item.subject.code,
+            teacher: item.teacher?.name ?? "Assigned teacher",
+            room: item.room ?? "Room TBD",
+            kind: item.kind === "Lab" ? "Lab" : "Class",
+          };
+          grouped[key] = [...(grouped[key] ?? []), entry];
+        }
+        setLiveSchedule(grouped);
+      })
+      .catch(() => setLiveSchedule(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const activeSchedule = liveSchedule ?? schedule;
   const selectedClasses = useMemo(
-    () => schedule[selectedDay] ?? [],
-    [selectedDay]
+    () => activeSchedule[selectedDay] ?? [],
+    [activeSchedule, selectedDay]
   );
 
   return (
@@ -345,9 +382,11 @@ export default function SchedulePage() {
               Schedule note
             </p>
             <p className="mt-2 text-[10px] leading-5 text-black/35">
-              This timetable is a frontend preview. Live room, teacher,
-              substitution and attendance data will come from the School OS
-              backend later.
+              {loading
+                ? "Loading the live School OS timetable..."
+                : liveSchedule
+                  ? "Connected to the School OS schedule API."
+                  : "Live schedule is unavailable, so the page is showing preview data."}
             </p>
           </div>
         </div>
