@@ -9,7 +9,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [user, projects, goals, achievements, upcomingAssignments, upcomingEvents, upcomingCompetitions] = await Promise.all([
+  const [user, projects, goals, achievements, upcomingAssignments, upcomingEvents, upcomingCompetitions, recentProjects, nextEvents, nextCompetitions, attlMembers] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: { id: true, name: true, email: true, role: true, xp: true, level: true, gradeLevel: true, className: true, avatarUrl: true },
@@ -36,6 +36,39 @@ export async function GET() {
     }),
     prisma.event.count({ where: { startsAt: { gte: new Date() } } }),
     prisma.competition.count({ where: { deadlineAt: { gte: new Date() } } }),
+    prisma.project.findMany({
+      where: { visibility: { in: ["school", "public"] } },
+      orderBy: { updatedAt: "desc" },
+      take: 6,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        progress: true,
+        visibility: true,
+        owner: { select: { name: true, avatarUrl: true } },
+        _count: { select: { members: true, tasks: true } },
+      },
+    }),
+    prisma.event.findMany({
+      where: { startsAt: { gte: new Date() } },
+      orderBy: { startsAt: "asc" },
+      take: 6,
+      select: { id: true, title: true, description: true, startsAt: true, endsAt: true, location: true, capacity: true, _count: { select: { registrations: true } } },
+    }),
+    prisma.competition.findMany({
+      where: { OR: [{ deadlineAt: { gte: new Date() } }, { deadlineAt: null }] },
+      orderBy: [{ deadlineAt: "asc" }, { startsAt: "asc" }],
+      take: 6,
+      select: { id: true, title: true, description: true, organizer: true, startsAt: true, deadlineAt: true, location: true },
+    }),
+    prisma.user.findMany({
+      where: { isActive: true, role: { in: ["ATTL_MEMBER", "TRACK_LEAD"] } },
+      orderBy: { name: "asc" },
+      take: 8,
+      select: { id: true, name: true, role: true, avatarUrl: true, gradeLevel: true },
+    }),
   ]);
 
   return NextResponse.json({
@@ -49,5 +82,9 @@ export async function GET() {
       upcomingCompetitions,
     },
     goals,
+    recentProjects,
+    nextEvents,
+    nextCompetitions,
+    attlMembers,
   });
 }
