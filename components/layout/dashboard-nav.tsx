@@ -198,6 +198,7 @@ const sections = [
       { label: "Permissions", href: "/dashboard/admin/permissions", icon: "◈" },
       { label: "Applications", href: "/dashboard/admin/applications", icon: "□" },
       { label: "Grades", href: "/dashboard/admin/grades", icon: "◆" },
+      { label: "Result Release", href: "/dashboard/admin/results-release", icon: "◉" },
       { label: "Projects", href: "/dashboard/admin/projects", icon: "▣" },
       { label: "Competitions", href: "/dashboard/admin/competitions", icon: "★" },
       { label: "Events", href: "/dashboard/admin/events", icon: "◷" },
