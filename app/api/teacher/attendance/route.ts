@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole, AttendanceStatus } from "@prisma/client";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const attendanceSchema = z.object({
   userId: z.string().min(1),
@@ -21,6 +22,7 @@ async function requireTeacher() {
 export async function GET() {
   const session = await requireTeacher();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await hasPermission(session.user.id, session.user.role, "academics.attendance.write"))) return NextResponse.json({ error: "You do not have permission to access attendance management." }, { status: 403 });
 
   const [records, subjects] = await Promise.all([
     prisma.attendanceRecord.findMany({
