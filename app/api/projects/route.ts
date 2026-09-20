@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { projectSchema } from "@/lib/validation";
+import { hasPermission } from "@/lib/permissions";
 
 export async function GET() {
   const session = await auth();
@@ -33,6 +34,10 @@ export async function POST(request: Request) {
 
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!(await hasPermission(session.user.id, session.user.role, "projects.create"))) {
+    return NextResponse.json({ error: "You do not have permission to create projects." }, { status: 403 });
   }
 
   try {
