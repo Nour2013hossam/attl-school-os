@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import xlsx from "node-xlsx";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { UserRole } from "@prisma/client";
+import { hasPermission } from "@/lib/permissions";
+import { rateLimit } from "@/lib/rate-limit";
 
 type ImportRow = {
   studentId: string;
@@ -82,9 +83,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role)) {
+  if (!(await hasPermission(session.user.id, session.user.role, "academics.grades.write"))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
+  const limit = rateLimit("grade-import:" + session.user.id, 10, 60 * 60 * 1000);
+  if (!limit.allowed) return NextResponse.json({ error: "Grade import limit reached. Try again later." }, { status: 429 });
 
   const mode =
     new URL(request.url).searchParams.get("mode") === "commit"
