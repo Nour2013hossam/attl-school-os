@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
-import { hasPermission } from "@/lib/permissions";
+import { hasAnyPermission } from "@/lib/permissions";
 
 export async function GET() {
   const session = await auth();
@@ -12,7 +12,7 @@ export async function GET() {
   }
 
 
-  if (!(await hasPermission(session.user.id, session.user.role, "users.read"))) return NextResponse.json({ error: "You do not have permission to view users." }, { status: 403 });
+  if (!(await hasAnyPermission(session.user.id, session.user.role, ["users.read", "xp.manage"]))) return NextResponse.json({ error: "You do not have permission to view users." }, { status: 403 });
 
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
