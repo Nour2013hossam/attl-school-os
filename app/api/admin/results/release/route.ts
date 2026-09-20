@@ -18,7 +18,7 @@ async function requireAdmin() {
     return null;
   }
 
-  if (![UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role)) {
+  if (!([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role)) {
     return null;
   }
 
