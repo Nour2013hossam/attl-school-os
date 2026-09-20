@@ -1,13 +1,4 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Admin OS"
-      title="Analytics"
-      description="Review aggregate School OS activity."
-      icon="▥"
-      api="/api/dashboard"
-    />
-  );
-}
+"use client";
+import { useEffect, useState } from "react";
+type Stats={students:number;teachers:number;attlMembers:number;pendingReviews:number;activeProjects:number;upcomingEvents:number;upcomingCompetitions:number;activeUsers:number};
+export default function AdminAnalyticsPage(){const [stats,setStats]=useState<Stats|null>(null);useEffect(()=>{fetch("/api/admin/overview",{cache:"no-store"}).then(r=>r.json()).then(d=>setStats(d.stats??null));},[]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Admin OS</p><h1 className="mt-3 text-3xl font-semibold tracking-[-.05em] md:text-5xl">School analytics</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-white/40">Live operational metrics pulled directly from the School OS database.</p></section><section className="grid grid-cols-2 gap-3 md:grid-cols-4">{[["Active users",stats?.activeUsers],["Students",stats?.students],["Teachers",stats?.teachers],["ATTL members",stats?.attlMembers],["Pending reviews",stats?.pendingReviews],["Active projects",stats?.activeProjects],["Upcoming events",stats?.upcomingEvents],["Upcoming competitions",stats?.upcomingCompetitions]].map(([label,value])=><div key={String(label)} className="rounded-[23px] border border-white/80 bg-white/65 p-5 backdrop-blur-2xl"><p className="text-[8px] uppercase tracking-[.17em] text-black/25">{label}</p><p className="mt-3 text-2xl font-semibold">{value??"—"}</p></div>)}</section><section className="rounded-[28px] border border-white/80 bg-white/65 p-6 backdrop-blur-2xl"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Operational view</p><h2 className="mt-1 text-xl font-semibold">Live system snapshot</h2><div className="mt-6 grid gap-3 md:grid-cols-2"><div className="rounded-[20px] bg-black p-5 text-white"><p className="text-[8px] uppercase tracking-[.15em] text-white/30">People</p><p className="mt-3 text-3xl font-semibold">{stats ? stats.students + stats.teachers + stats.attlMembers : "—"}</p><p className="mt-2 text-[10px] text-white/35">Tracked student, teacher and ATTL-member accounts.</p></div><div className="rounded-[20px] bg-white p-5"><p className="text-[8px] uppercase tracking-[.15em] text-black/25">Upcoming activity</p><p className="mt-3 text-3xl font-semibold">{stats ? stats.upcomingEvents + stats.upcomingCompetitions : "—"}</p><p className="mt-2 text-[10px] text-black/35">Upcoming events and competitions currently in the database.</p></div></div></section></div>}
