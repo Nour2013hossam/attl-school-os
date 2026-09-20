@@ -12,7 +12,7 @@ export async function GET() {
   const [user, projects, goals, achievements, upcomingAssignments, upcomingEvents, upcomingCompetitions] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, name: true, email: true, role: true, xp: true, level: true, gradeLevel: true, className: true },
+      select: { id: true, name: true, email: true, role: true, xp: true, level: true, gradeLevel: true, className: true, avatarUrl: true },
     }),
     prisma.project.count({
       where: {
