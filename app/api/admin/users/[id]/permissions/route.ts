@@ -5,11 +5,9 @@ import { UserRole } from "@prisma/client";
 import { PERMISSION_CATALOG } from "@/lib/roles";
 import { getEffectivePermissions, hasPermission } from "@/lib/permissions";
 
-const adminRoles=[UserRole.ADMIN,UserRole.SUPER_ADMIN];
-
 async function requireAdmin() {
   const session=await auth();
-  if(!session?.user?.id || !adminRoles.includes(session.user.role)) return null;
+  if(!session?.user?.id) return null;
   return session.user;
 }
 
