@@ -8,6 +8,7 @@ export default function Page() {
       description="Your technical skill development workspace."
       icon="⌘"
       api="/api/skills"
+      actions={[{ label: "Skill Map", href: "/dashboard/skills/skill-map" }, { label: "Assessments", href: "/dashboard/skills/assessments" }]}
     />
   );
 }
