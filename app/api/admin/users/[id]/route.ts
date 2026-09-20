@@ -24,23 +24,22 @@ export async function PATCH(
   }
 
   const rawBody = await request.json();
+  const roleRequested = rawBody.role !== undefined;
+  const userManagementRequested =
+    rawBody.isActive !== undefined ||
+    rawBody.gradeLevel !== undefined ||
+    rawBody.className !== undefined;
 
-  if (rawBody.role !== undefined && !(await hasPermission(session.user.id, session.user.role, "roles.assign"))) {
+  if (roleRequested && !(await hasPermission(session.user.id, session.user.role, "roles.assign"))) {
     return NextResponse.json({ error: "You do not have permission to assign roles." }, { status: 403 });
   }
 
-  const userFieldUpdate =
-    rawBody.isActive !== undefined ||
-    rawBody.gradeLevel !== undefined ||
-    rawBody.className !== undefined ||
-    rawBody.role !== undefined;
-
-  if (userFieldUpdate && !(await hasPermission(session.user.id, session.user.role, "users.manage")) && rawBody.role === undefined) {
+  if (userManagementRequested && !(await hasPermission(session.user.id, session.user.role, "users.manage"))) {
     return NextResponse.json({ error: "You do not have permission to manage users." }, { status: 403 });
   }
 
-  if (rawBody.role === undefined && !(await hasPermission(session.user.id, session.user.role, "users.manage"))) {
-    return NextResponse.json({ error: "You do not have permission to manage users." }, { status: 403 });
+  if (!roleRequested && !userManagementRequested) {
+    return NextResponse.json({ error: "No manageable fields were provided." }, { status: 400 });
   }
 
   if (id === session.user.id && rawBody.role && rawBody.role !== UserRole.SUPER_ADMIN) {
