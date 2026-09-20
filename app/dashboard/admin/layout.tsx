@@ -14,6 +14,7 @@ export default async function AdminLayout({
   }
 
   const canEnterAdmin = await hasAnyPermission(session.user.id, session.user.role, [
+    "admin.access",
     "users.read",
     "roles.read",
     "permissions.read",
@@ -23,6 +24,7 @@ export default async function AdminLayout({
     "audit.read",
     "security.manage",
     "system.manage",
+    "school.manage",
   ]);
 
   if (!canEnterAdmin) redirect("/dashboard");
