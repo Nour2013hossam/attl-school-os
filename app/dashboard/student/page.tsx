@@ -115,7 +115,7 @@ export default function StudentProfilePage() {
               ["Achievements", data?.stats.achievements ?? "—", "/dashboard/student/achievements"],
               ["Active goals", data?.stats.activeGoals ?? "—", "/dashboard/student/goals"],
             ].map(([label, value, href]) => (
-              <Link key={label} href={href} className="rounded-2xl bg-black/[.035] p-4 transition hover:bg-white">
+              <Link key={label} href={String(href)} className="rounded-2xl bg-black/[.035] p-4 transition hover:bg-white">
                 <p className="text-[9px] text-black/30">{label}</p>
                 <p className="mt-2 text-xl font-semibold">{value}</p>
               </Link>
@@ -131,7 +131,7 @@ export default function StudentProfilePage() {
           ["Opportunities", data?.stats.upcomingCompetitions ?? "—", "competitions", "/dashboard/competitions/upcoming"],
           ["Portfolio", data?.stats.projects ?? "—", "projects connected", "/dashboard/student/portfolio"],
         ].map(([title, value, text, href]) => (
-          <Link key={title} href={href} className="rounded-[24px] border border-white/80 bg-white/65 p-5 backdrop-blur-2xl transition hover:-translate-y-1 hover:bg-white">
+          <Link key={title} href={String(href)} className="rounded-[24px] border border-white/80 bg-white/65 p-5 backdrop-blur-2xl transition hover:-translate-y-1 hover:bg-white">
             <p className="text-[8px] uppercase tracking-[.16em] text-black/30">{title}</p>
             <p className="mt-3 text-3xl font-semibold tracking-[-.06em]">{value}</p>
             <p className="mt-2 text-[9px] text-black/30">{text} →</p>
