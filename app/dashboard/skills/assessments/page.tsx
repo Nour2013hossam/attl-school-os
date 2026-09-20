@@ -8,6 +8,7 @@ export default function Page() {
       description="Measure and update your skills with structured assessments."
       icon="✓"
       api="/api/skills"
+      actions={[{ label: "My Skills", href: "/dashboard/skills/my-skills" }, { label: "Growth", href: "/dashboard/skills/growth" }]}
     />
   );
 }
