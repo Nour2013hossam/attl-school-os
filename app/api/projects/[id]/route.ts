@@ -32,6 +32,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   const { id } = await context.params;
 
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await hasPermission(session.user.id, session.user.role, "projects.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const project = await prisma.project.findUnique({
     where: { id },
