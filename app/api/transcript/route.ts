@@ -7,9 +7,11 @@ export async function GET() {
   const session = await auth();
 
   if (!session?.user?.id) {
-    return NextResponse.js
-  if (!(await hasPermission(session.user.id, session.user.role, "academics.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-on({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!(await hasPermission(session.user.id, session.user.role, "academics.read"))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const grades = await prisma.grade.findMany({
