@@ -231,6 +231,42 @@ const sections = [
 export function DashboardNav({ role = "STUDENT" }: { role?: string }) {
   const pathname = usePathname();
   const { language } = usePreferences();
+  const [permissions, setPermissions] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    fetch("/api/me/permissions", { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => setPermissions(data?.permissions ?? {}))
+      .catch(() => {});
+  }, []);
+
+  const requiredPermission = (href: string) => {
+    const rules: Record<string,string> = {
+      "/dashboard/projects/create":"projects.create",
+      "/dashboard/projects/tasks":"projects.tasks.manage",
+      "/dashboard/projects/teams":"projects.members.manage",
+      "/dashboard/innovation/submit":"innovation.submit",
+      "/dashboard/challenges/create":"challenges.manage",
+      "/dashboard/attl/applications":"attl.review",
+      "/dashboard/attl/recruitment":"attl.review",
+      "/dashboard/attl/tracks":"attl.tracks.manage",
+      "/dashboard/attl/team":"attl.team.manage",
+      "/dashboard/attl/members":"attl.team.manage",
+      "/dashboard/mentorship/mentors":"mentorship.request",
+      "/dashboard/admin/users":"users.manage",
+      "/dashboard/admin/roles":"roles.assign",
+      "/dashboard/admin/permissions":"permissions.manage",
+      "/dashboard/admin/audit-logs":"audit.read",
+      "/dashboard/admin/security":"security.manage",
+      "/dashboard/admin/system":"system.manage",
+      "/dashboard/admin/results-release":"results.release",
+      "/dashboard/admin/grades":"academics.grades.write",
+      "/dashboard/teacher/gradebook":"academics.grades.write",
+      "/dashboard/teacher/attendance":"academics.attendance.write",
+      "/dashboard/teacher/assignments":"academics.assignments.manage"
+    };
+    return rules[href];
+  };
 
   const visibleSections = sections.filter((section) => {
     if (section.label === "ATTL") {
@@ -335,7 +371,10 @@ export function DashboardNav({ role = "STUDENT" }: { role?: string }) {
               >
                 <div className="min-h-0 overflow-hidden pt-1">
                   <div className="space-y-1 pl-2">
-                    {section.items.map((item) => {
+                    {section.items.filter((item) => {
+                      const permission = requiredPermission(item.href);
+                      return !permission || permissions[permission] !== false;
+                    }).map((item) => {
                       const active =
                         pathname === item.href ||
                         (item.href !== "/dashboard" &&
