@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { usePreferences } from "@/components/providers/preferences-provider";
 
 type Goal = {
   id: string;
@@ -16,6 +17,7 @@ type Goal = {
 const filters = ["All", "Active", "Completed"];
 
 export default function StudentGoalsPage() {
+  const { can, permissionsReady } = usePreferences();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [filter, setFilter] = useState("All");
   const [title, setTitle] = useState("");
@@ -46,6 +48,24 @@ export default function StudentGoalsPage() {
   const overall = goals.length
     ? Math.round(goals.reduce((sum, goal) => sum + goal.progress, 0) / goals.length)
     : 0;
+
+  async function updateGoal(id: string, progress: number) {
+    const response = await fetch("/api/goals", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, progress }),
+    });
+    if (response.ok) await loadGoals();
+  }
+
+  async function deleteGoal(id: string) {
+    const response = await fetch("/api/goals", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (response.ok) await loadGoals();
+  }
 
   async function createGoal(event: FormEvent) {
     event.preventDefault();
@@ -91,17 +111,17 @@ export default function StudentGoalsPage() {
             </p>
           </div>
 
-          <button
+          {permissionsReady && can("goals.manage") && <button
             type="button"
             onClick={() => setShowCreate((value) => !value)}
             className="rounded-[16px] bg-white px-5 py-3 text-[9px] font-semibold text-black"
           >
             {showCreate ? "Close" : "+ Create goal"}
-          </button>
+          </button>}
         </div>
       </section>
 
-      {showCreate && (
+      {showCreate && permissionsReady && can("goals.manage") && (
         <section className="rounded-[30px] border border-white/80 bg-white/60 p-6 backdrop-blur-2xl">
           <form onSubmit={createGoal} className="grid gap-4 md:grid-cols-2">
             <div>
@@ -181,6 +201,12 @@ export default function StudentGoalsPage() {
               <span>{goal.targetDate ? `Target ${new Date(goal.targetDate).toLocaleDateString()}` : "No target date"}</span>
               <span>{goal.completedAt ? "Done" : "In progress"}</span>
             </div>
+            {permissionsReady && can("goals.manage") && (
+              <div className="mt-4 flex gap-2">
+                <button type="button" onClick={() => updateGoal(goal.id, Math.min(100, goal.progress + 25))} className="rounded-[12px] bg-black px-3 py-2 text-[8px] text-white">+25%</button>
+                <button type="button" onClick={() => deleteGoal(goal.id)} className="rounded-[12px] bg-red-500/10 px-3 py-2 text-[8px] font-semibold text-red-600">Delete</button>
+              </div>
+            )}
           </article>
         ))}
 
