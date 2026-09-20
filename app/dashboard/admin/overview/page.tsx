@@ -1,4 +1,18 @@
-﻿import Link from "next/link";
+﻿"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+type AdminStats = {
+  students: number;
+  teachers: number;
+  attlMembers: number;
+  pendingReviews: number;
+  activeProjects: number;
+  upcomingEvents: number;
+  upcomingCompetitions: number;
+  activeUsers: number;
+};
 
 const modules = [
   ["Users", "Manage every account in the school.", "/dashboard/admin/users", "◎"],
@@ -18,6 +32,18 @@ const modules = [
 ];
 
 export default function AdminOverviewPage() {
+  const [stats, setStats] = useState<AdminStats | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/overview", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load admin overview.");
+        return response.json();
+      })
+      .then((payload) => setStats(payload.stats))
+      .catch(() => setStats(null));
+  }, []);
+
   return (
     <div className="space-y-6">
       <section className="rounded-[34px] bg-black p-8 text-white shadow-[0_35px_100px_rgba(0,0,0,.2)]">
@@ -50,17 +76,17 @@ export default function AdminOverviewPage() {
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
-          ["Students", "1,248"],
-          ["Teachers", "86"],
-          ["ATTL Members", "24"],
-          ["Pending Reviews", "17"],
+          ["Students", stats?.students],
+          ["Teachers", stats?.teachers],
+          ["ATTL Members", stats?.attlMembers],
+          ["Pending Reviews", stats?.pendingReviews],
         ].map(([label, value]) => (
           <div
             key={label}
             className="rounded-[24px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"
           >
             <p className="text-[9px] text-black/30">{label}</p>
-            <p className="mt-2 text-2xl font-semibold">{value}</p>
+            <p className="mt-2 text-2xl font-semibold">{value ?? "—"}</p>
           </div>
         ))}
       </section>
