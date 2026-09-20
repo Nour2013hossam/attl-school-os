@@ -14,12 +14,18 @@ const PreferenceContext = createContext<{
   theme: Theme;
   setLanguage: (language: Language) => void;
   setTheme: (theme: Theme) => void;
+  permissions: Record<string, boolean>;
+  permissionsReady: boolean;
+  can: (permission: string) => boolean;
 }>({
   preferences: defaults,
   language: "en",
   theme: "system",
   setLanguage: () => {},
   setTheme: () => {},
+  permissions: {},
+  permissionsReady: false,
+  can: () => false,
 });
 
 function applyTheme(theme:Theme){
@@ -77,6 +83,8 @@ function translatePage(language: Language) {
 export function PreferencesProvider({children}:{children:React.ReactNode}){
  const[preferences,setPreferences]=useState<Preferences>(defaults);
  const[ready,setReady]=useState(false);
+ const[permissions,setPermissions]=useState<Record<string,boolean>>({});
+ const[permissionsReady,setPermissionsReady]=useState(false);
 
  useEffect(()=>{
    const stored=localStorage.getItem("attl-preferences");
@@ -114,7 +122,8 @@ export function PreferencesProvider({children}:{children:React.ReactNode}){
    await fetch("/api/settings",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(next)}).catch(()=>{});
  }
 
- const value=useMemo(()=>({preferences,language:preferences.language,theme:preferences.theme,setLanguage:(v:Language)=>void update({language:v}),setTheme:(v:Theme)=>void update({theme:v})}),[preferences]);
+ const can=(permission:string)=>permissions[permission]===true;
+ const value=useMemo(()=>({preferences,language:preferences.language,theme:preferences.theme,setLanguage:(v:Language)=>void update({language:v}),setTheme:(v:Theme)=>void update({theme:v}),permissions,permissionsReady,can}),[preferences,permissions,permissionsReady]);
  return <PreferenceContext.Provider value={value}>{children}</PreferenceContext.Provider>;
 }
 
