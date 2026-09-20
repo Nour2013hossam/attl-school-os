@@ -8,6 +8,7 @@ export default function Page() {
       description="Review incoming ATTL applications and their current workflow state."
       icon="◎"
       api="/api/attl/applications"
+      actions={[{ label: "Recruitment", href: "/dashboard/attl/recruitment" }, { label: "ATTL team", href: "/dashboard/attl/team" }]}
     />
   );
 }
