@@ -8,6 +8,7 @@ export default function Page() {
       description="Review the evolution of your skills."
       icon="◷"
       api="/api/skills"
+      actions={[{ label: "Growth", href: "/dashboard/skills/growth" }, { label: "My Skills", href: "/dashboard/skills/my-skills" }]}
     />
   );
 }
