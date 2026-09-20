@@ -2,14 +2,40 @@ import { prisma } from "@/lib/prisma";
 import type { UserRole } from "@prisma/client";
 import { PERMISSION_MATRIX, PERMISSION_CATALOG } from "@/lib/roles";
 
+function permissionMatches(granted: string, requested: string) {
+  if (granted === "*" || granted === requested) return true;
+
+  const grantedAliases = new Set([
+    granted,
+    granted.replace(/:/g, "."),
+    granted.replace(/\./g, ":"),
+  ]);
+  const requestedAliases = new Set([
+    requested,
+    requested.replace(/:/g, "."),
+    requested.replace(/\./g, ":"),
+  ]);
+
+  for (const grantedKey of grantedAliases) {
+    for (const requestedKey of requestedAliases) {
+      if (grantedKey === requestedKey) return true;
+
+      if (grantedKey.endsWith(".*") && requestedKey.startsWith(grantedKey.slice(0, -1))) {
+        return true;
+      }
+
+      if (grantedKey.endsWith(":*") && requestedKey.startsWith(grantedKey.slice(0, -1))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 function roleAllows(role: UserRole, key: string) {
   const permissions = PERMISSION_MATRIX[role] ?? [];
-  return permissions.some((permission) => {
-    if (permission === "*") return true;
-    if (permission === key) return true;
-    if (permission.endsWith(":*")) return key.startsWith(permission.slice(0, -1));
-    return false;
-  });
+  return permissions.some((permission) => permissionMatches(permission, key));
 }
 
 async function getCustomRolePermissions(userId: string) {
