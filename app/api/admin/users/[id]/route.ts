@@ -23,9 +23,6 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (![UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
   if (!(await hasPermission(session.user.id, session.user.role, "users.manage"))) return NextResponse.json({ error: "You do not have permission to manage users." }, { status: 403 });
 
   const rawBody = await request.json();
