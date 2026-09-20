@@ -31,7 +31,7 @@ export async function GET(){
 export async function POST(request:Request){
  const s=await admin(); if(!s)return NextResponse.json({error:"Forbidden"},{status:403});
  const parsed=schema.safeParse(await request.json()); if(!parsed.success)return NextResponse.json({error:"Invalid custom role."},{status:400});
- const keys=new Set(PERMISSION_CATALOG.map(([key])=>key));
+ const keys=new Set<string>(PERMISSION_CATALOG.map(([key])=>key));
  const permissionKeys=parsed.data.permissionKeys.filter(k=>keys.has(k));
  try{
   const role=await prisma.$transaction(async(tx)=>{
