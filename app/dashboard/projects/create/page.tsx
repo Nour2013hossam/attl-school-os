@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { usePreferences } from "@/components/providers/preferences-provider";
 
 export default function CreateProjectPage() {
   const [title,setTitle]=useState("");
