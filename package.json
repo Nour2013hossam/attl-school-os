@@ -11,7 +11,8 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "next": "16.3.5",
@@ -34,5 +35,8 @@
     "typescript": "^5",
     "prisma": "6.19.3",
     "tsx": "4.20.6"
+  },
+  "engines": {
+    "node": ">=22 <23"
   }
 }
