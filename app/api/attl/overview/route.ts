@@ -2,18 +2,13 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
+import { hasPermission } from "@/lib/permissions";
 
-const allowedRoles: UserRole[] = [
-  UserRole.ATTL_MEMBER,
-  UserRole.TRACK_LEAD,
-  UserRole.ADMIN,
-  UserRole.SUPER_ADMIN,
-];
 
 export async function GET() {
   const session = await auth();
 
-  if (!session?.user?.id || !allowedRoles.includes(session.user.role)) {
+  if (!session?.user?.id || !(await hasPermission(session.user.id, session.user.role, "attl.read"))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
