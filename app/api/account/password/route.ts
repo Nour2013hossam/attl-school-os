@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { rateLimit } from "@/lib/rate-limit";
 
 const schema = z.object({
   currentPassword: z.string().min(1),
@@ -12,6 +13,9 @@ const schema = z.object({
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const limit = rateLimit("password:"+session.user.id, 8, 15 * 60 * 1000);
+  if (!limit.allowed) return NextResponse.json({ error: "Too many password change attempts. Try again later." }, { status: 429 });
 
   const parsed = schema.safeParse(await request.json());
   if (!parsed.success) return NextResponse.json({ error: "New password must be 8–128 characters." }, { status: 400 });
