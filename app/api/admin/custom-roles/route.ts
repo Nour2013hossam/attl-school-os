@@ -14,7 +14,7 @@ const schema=z.object({
 
 async function admin(){
   const s=await auth();
-  if(!s?.user?.id || ![UserRole.ADMIN,UserRole.SUPER_ADMIN].includes(s.user.role)) return null;
+  if(!s?.user?.id) return null;
   if(!(await hasPermission(s.user.id,s.user.role,"roles.manage"))) return null;
   return s.user;
 }
