@@ -88,6 +88,8 @@ model User {
   xp              Int       @default(0)
   level           Int       @default(1)
   isActive        Boolean   @default(true)
+  attlMembershipActive Boolean @default(false)
+  attlActivatedAt DateTime?
   emailVerifiedAt DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -534,6 +536,9 @@ model AttlApplication {
   answers       Json?
   reviewerId    String?
   reviewerNotes String?
+  interviewAt DateTime?
+  interviewResult String?
+  interviewNotes String?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
 
