@@ -13,7 +13,7 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  if (![UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role)) {
+  if (!([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role)) {
     redirect("/dashboard");
   }
 
