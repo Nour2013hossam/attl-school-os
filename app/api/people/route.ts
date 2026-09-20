@@ -7,7 +7,7 @@ import { rateLimit } from "@/lib/rate-limit";
 export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!(await hasPermission(session.user.id, session.user.role, "messages.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await hasPermission(session.user.id, session.user.role, "community.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const limit = rateLimit("people:"+session.user.id, 60, 60*1000);
   if (!limit.allowed) return NextResponse.json({ error: "Too many requests." }, { status: 429 });
