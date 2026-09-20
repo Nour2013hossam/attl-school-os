@@ -8,6 +8,7 @@ export default function Page() {
       description="Review School OS project activity."
       icon="▣"
       api="/api/projects"
+      actions={[{ label: "All projects", href: "/dashboard/projects/all" }, { label: "Analytics", href: "/dashboard/admin/analytics" }]}
     />
   );
 }
