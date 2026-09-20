@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const assignmentSchema = z.object({
   subjectId: z.string().min(1),
@@ -17,6 +18,7 @@ export async function GET() {
   if (!session?.user?.id || session.user.role !== UserRole.TEACHER) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  if (!(await hasPermission(session.user.id, session.user.role, "academics.assignments.manage"))) return NextResponse.json({ error: "You do not have permission to manage assignments." }, { status: 403 });
 
   const [assignments, subjects] = await Promise.all([
     prisma.assignment.findMany({
