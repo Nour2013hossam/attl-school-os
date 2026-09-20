@@ -32,6 +32,16 @@ export async function GET() {
   });
 
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+  await prisma.auditLog.create({
+    data: {
+      actorId: session.user.id,
+      action: "PROFILE_UPDATED",
+      entity: "User",
+      entityId: session.user.id,
+      metadata: { fields: Object.keys(parsed.data) },
+    },
+  });
+
   return NextResponse.json({ user });
 }
 
