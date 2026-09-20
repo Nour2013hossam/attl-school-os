@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type DashboardData = {
-  user: { name: string; role: string; xp: number; level: number; gradeLevel: string | null; className: string | null } | null;
+  user: { name: string; role: string; xp: number; level: number; gradeLevel: string | null; className: string | null; avatarUrl: string | null } | null;
   stats: {
     projects: number;
     activeGoals: number;
@@ -64,7 +64,13 @@ export default function DashboardOverview() {
           </div>
 
           <Link href="/dashboard/student/profile" className="group flex items-center gap-4 rounded-[22px] border border-white/10 bg-white/[0.07] p-3 transition hover:bg-white/10">
-            <div className="flex h-14 w-14 items-center justify-center rounded-[18px] bg-white text-sm font-semibold text-black">{initial}</div>
+            <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-[18px] bg-white text-sm font-semibold text-black">
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                initial
+              )}
+            </div>
             <div className="pr-3">
               <p className="text-[9px] uppercase tracking-[.18em] text-white/35">{user?.role ?? "STUDENT"}</p>
               <p className="mt-1 text-sm font-semibold">{user?.gradeLevel ?? "Grade not set"} · {user?.className ?? "Class not set"}</p>
