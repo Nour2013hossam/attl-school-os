@@ -57,12 +57,24 @@ export default function AttlApplicationsPage() {
   }
 
   async function review(id:string,nextStatus:string) {
+    const confirmed =
+      nextStatus !== "ACCEPTED" ||
+      window.confirm("Approve this applicant and make their account an ATTL Member?");
+
+    if (!confirmed) return;
+
     const res=await fetch(`/api/admin/attl/applications/${id}`,{
       method:"PATCH",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({status:nextStatus}),
     });
-    if(res.ok) load();
+
+    if(res.ok) {
+      setStatus(nextStatus === "ACCEPTED"
+        ? "Applicant approved. Their account is now an ATTL Member."
+        : "Application status updated.");
+      load();
+    }
   }
 
   return (
@@ -145,9 +157,16 @@ export default function AttlApplicationsPage() {
                     <p className="text-xs font-semibold">{app.user.name}</p>
                     <p className="mt-1 text-[9px] text-black/30">{app.user.email} · {app.track.name}</p>
                   </div>
-                  <select value={app.status} onChange={e=>review(app.id,e.target.value)} className="h-10 rounded-[13px] border border-black/5 bg-white px-3 text-[9px] outline-none">
-                    {statuses.map(item=><option key={item}>{item}</option>)}
-                  </select>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {app.status === "ACCEPTED" && (
+                      <span className="rounded-full bg-blue-500/10 px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[.12em] text-blue-600">
+                        ATTL Member
+                      </span>
+                    )}
+                    <select value={app.status} onChange={e=>review(app.id,e.target.value)} className="h-10 rounded-[13px] border border-black/5 bg-white px-3 text-[9px] outline-none">
+                      {statuses.map(item=><option key={item}>{item}</option>)}
+                    </select>
+                  </div>
                 </div>
                 {app.reviewerNotes && <p className="mt-3 rounded-[15px] bg-black/[.03] p-3 text-[9px] text-black/40">{app.reviewerNotes}</p>}
               </article>
