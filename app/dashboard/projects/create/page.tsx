@@ -33,7 +33,7 @@ export default function CreateProjectPage() {
         </div>
       </section>
 
-      <section className="rounded-[30px] border border-white/80 bg-white/60 p-6 backdrop-blur-2xl md:p-8">
+      {permissionsReady && can("projects.create") && <section className="rounded-[30px] border border-white/80 bg-white/60 p-6 backdrop-blur-2xl md:p-8">
         <form onSubmit={submit} className="space-y-5">
           <div>
             <label className="mb-2 block text-[9px] uppercase tracking-[.16em] text-black/30">Project title</label>
@@ -57,7 +57,7 @@ export default function CreateProjectPage() {
             <Link href="/dashboard/projects/my-projects" className="rounded-[15px] bg-black/[.04] px-5 py-3 text-[9px] font-semibold text-black/50">View projects</Link>
           </div>
         </form>
-      </section>
+      </section>}
     </div>
   );
 }
