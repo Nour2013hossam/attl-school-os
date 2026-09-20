@@ -15,7 +15,7 @@ const schema = z.object({
 async function requireAdmin() {
   const session = await auth();
   if (!session?.user?.id) return null;
-  if (!(await hasPermission(session.user.id, session.user.role, "system.manage"))) return null;
+  if (!(await hasPermission(session.user.id, session.user.role, "school.manage"))) return null;
   return session.user;
 }
 
