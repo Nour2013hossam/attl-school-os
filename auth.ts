@@ -80,7 +80,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
 
           if (!currentUser || !currentUser.isActive) {
-            return { ...session, user: session.user };
+            session.user.id = "";
+            session.user.role = "STUDENT";
+            session.user.name = null;
+            session.user.email = null;
+            session.user.image = null;
+            return session;
           }
 
           session.user.name = currentUser.name;
