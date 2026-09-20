@@ -1,13 +1,26 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Teacher OS"
-      title="Gradebook"
-      description="Grade records for the subjects you teach."
-      icon="◆"
-      api="/api/teacher/gradebook"
-    />
-  );
+"use client";
+import { FormEvent, useEffect, useState } from "react";
+type Subject={id:string;code:string;name:string};
+type Student={user:{id:string;name:string;schoolId:string|null;email:string;gradeLevel:string|null;className:string|null};subject:Subject};
+type Grade={id:string;assessment:string;score:number;maxScore:number;term:string;published:boolean;user:{id:string;name:string;schoolId:string|null};subject:Subject};
+export default function GradebookPage(){
+ const [subjects,setSubjects]=useState<Subject[]>([]); const [students,setStudents]=useState<Student[]>([]); const [grades,setGrades]=useState<Grade[]>([]);
+ const [form,setForm]=useState({userId:"",subjectId:"",term:"2026-2027",assessment:"",score:"",maxScore:"100",published:false}); const [message,setMessage]=useState(""); const [saving,setSaving]=useState(false);
+ async function load(){ const g=await fetch("/api/teacher/gradebook",{cache:"no-store"}).then(r=>r.json()); const s=await fetch("/api/teacher/students",{cache:"no-store"}).then(r=>r.json()); setGrades(g.grades??[]); setSubjects(g.subjects??[]); setStudents(s.students??[]); if(!form.subjectId&&g.subjects?.[0]) setForm(f=>({...f,subjectId:g.subjects[0].id})); }
+ useEffect(()=>{load();},[]);
+ async function save(e:FormEvent){ e.preventDefault(); setSaving(true); setMessage(""); const res=await fetch("/api/teacher/gradebook",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...form,score:Number(form.score),maxScore:Number(form.maxScore)})}); const data=await res.json(); setMessage(res.ok?"Grade saved.":data.error??"Could not save grade."); setSaving(false); if(res.ok){setForm(f=>({...f,assessment:"",score:""}));load();} }
+ return <div className="space-y-6">
+  <section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Teacher OS</p><h1 className="mt-3 text-3xl font-semibold tracking-[-.05em] md:text-5xl">Gradebook</h1><p className="mt-3 max-w-2xl text-sm text-white/40">Enter and maintain assessment grades for the subjects you teach.</p></section>
+  <section className="rounded-[28px] border border-white/80 bg-white/65 p-5 backdrop-blur-2xl md:p-7"><div className="mb-5"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">New or update grade</p><h2 className="mt-1 text-xl font-semibold">Record an assessment</h2></div>
+   <form onSubmit={save} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <select required value={form.userId} onChange={e=>setForm(f=>({...f,userId:e.target.value}))} className="h-11 rounded-[14px] border border-black/5 bg-white px-3 text-[10px] outline-none"><option value="">Select student</option>{students.map(s=><option key={s.user.id} value={s.user.id}>{s.user.name} {s.user.schoolId ? "· "+s.user.schoolId : ""}</option>)}</select>
+    <select required value={form.subjectId} onChange={e=>setForm(f=>({...f,subjectId:e.target.value}))} className="h-11 rounded-[14px] border border-black/5 bg-white px-3 text-[10px] outline-none"><option value="">Select subject</option>{subjects.map(s=><option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}</select>
+    <input required value={form.assessment} onChange={e=>setForm(f=>({...f,assessment:e.target.value}))} placeholder="Assessment name" className="h-11 rounded-[14px] border border-black/5 bg-white px-3 text-[10px] outline-none"/>
+    <input type="number" min="0" step="0.01" required value={form.score} onChange={e=>setForm(f=>({...f,score:e.target.value}))} placeholder="Score" className="h-11 rounded-[14px] border border-black/5 bg-white px-3 text-[10px] outline-none"/>
+    <input type="number" min="1" step="0.01" required value={form.maxScore} onChange={e=>setForm(f=>({...f,maxScore:e.target.value}))} placeholder="Max score" className="h-11 rounded-[14px] border border-black/5 bg-white px-3 text-[10px] outline-none"/>
+    <label className="flex h-11 items-center gap-2 rounded-[14px] bg-black/[.03] px-3 text-[10px] text-black/50"><input type="checkbox" checked={form.published} onChange={e=>setForm(f=>({...f,published:e.target.checked}))}/>Publish grade</label>
+    <div className="md:col-span-2 xl:col-span-3 flex items-center gap-3"><button disabled={saving} className="rounded-[14px] bg-black px-5 py-3 text-[9px] font-semibold text-white disabled:opacity-40">{saving?"Saving...":"Save grade"}</button>{message&&<span className="text-[10px] text-black/40">{message}</span>}</div>
+   </form></section>
+  <section className="rounded-[28px] border border-white/80 bg-white/65 p-5 backdrop-blur-2xl md:p-7"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Live records</p><h2 className="mt-1 text-xl font-semibold">{grades.length} grades</h2><div className="mt-5 overflow-x-auto"><table className="w-full min-w-[760px] text-left"><thead><tr className="border-b border-black/5 text-[8px] uppercase tracking-[.14em] text-black/25"><th className="px-3 py-3">Student</th><th className="px-3 py-3">Subject</th><th className="px-3 py-3">Assessment</th><th className="px-3 py-3">Score</th><th className="px-3 py-3">Term</th><th className="px-3 py-3">Status</th></tr></thead><tbody>{grades.slice(0,100).map(g=><tr key={g.id} className="border-b border-black/[.04] text-[10px]"><td className="px-3 py-3 font-medium">{g.user.name}</td><td className="px-3 py-3">{g.subject.code}</td><td className="px-3 py-3">{g.assessment}</td><td className="px-3 py-3">{g.score} / {g.maxScore}</td><td className="px-3 py-3">{g.term}</td><td className="px-3 py-3">{g.published?"Published":"Draft"}</td></tr>)}</tbody></table></div></section>
+ </div>;
 }
