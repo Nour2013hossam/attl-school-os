@@ -141,7 +141,7 @@ export const AR_LABELS: Record<string,string> = {
   "Academic Overview":"نظرة عامة أكاديمية",Grades:"الدرجات",Subjects:"المواد",Schedule:"الجدول",Exams:"الاختبارات",Attendance:"الحضور",Results:"النتائج",Transcript:"السجل الأكاديمي",GPA:"المعدل",Assignments:"الواجبات",Deadlines:"المواعيد النهائية",Teachers:"المعلمون","Academic Calendar":"التقويم الأكاديمي",Reports:"التقارير",
   Learning:"التعلم",Courses:"الدورات","My Courses":"دوراتي",Explore:"استكشاف",Lessons:"الدروس",Resources:"المصادر",Roadmaps:"المسارات",Progress:"التقدم",Bookmarks:"المفضلة",Certificates:"الشهادات",Library:"المكتبة",
   Development:"التطوير","Skill Map":"خريطة المهارات","My Skills":"مهاراتي",Assessments:"التقييمات",Growth:"النمو",Recommendations:"التوصيات","Technical Skills":"المهارات التقنية","Soft Skills":"المهارات الشخصية","Skill History":"سجل المهارات",
-  Projects:"المشاريع","All Projects":"كل المشاريع","Create Project":"إنشاء مشروع",,Templates:"القوالب",Teams:"الفرق",Tasks:"المهام",Milestones:"المراحل",Showcase:"المعرض",Analytics:"التحليلات","My Projects":"مشاريعي",
+  Projects:"المشاريع","All Projects":"كل المشاريع","Create Project":"إنشاء مشروع",Templates:"القوالب",Teams:"الفرق",Tasks:"المهام",Milestones:"المراحل",Showcase:"المعرض",Analytics:"التحليلات","My Projects":"مشاريعي",
   Competitions:"المسابقات",Applications:"الطلبات",Upcoming:"القادمة","My Competitions":"مسابقاتي",Archives:"الأرشيف",Challenges:"التحديات",
   ATTL:"ATTL","ATTL Overview":"نظرة عامة على ATTL","Command Center":"مركز القيادة",Team:"الفريق",Members:"الأعضاء",Tracks:"المسارات",Recruitment:"التوظيف",Events:"الفعاليات",Workshops:"ورش العمل",
   Innovation:"الابتكار","Ideas":"الأفكار","Submit Idea":"إرسال فكرة",Experiments:"التجارب",Research:"البحث","Innovation Lab":"مختبر الابتكار",
