@@ -21,7 +21,7 @@ async function getAccess(id: string, userId: string, role: UserRole) {
   const member = project.ownerId === userId || project.members.some((item) => item.userId === userId);
   const canManage =
     project.ownerId === userId ||
-    [UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(role);
+    ([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(role);
 
   return { project, member, canManage };
 }
@@ -49,7 +49,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  return NextResponse.json({ project, canManage: project.ownerId === session.user.id || [UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role) });
+  return NextResponse.json({ project, canManage: project.ownerId === session.user.id || ([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role) });
 }
 
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
