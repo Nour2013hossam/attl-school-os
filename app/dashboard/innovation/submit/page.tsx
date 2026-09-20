@@ -2,8 +2,10 @@
 
 import { FormEvent,useState } from "react";
 import Link from "next/link";
+import { usePreferences } from "@/components/providers/preferences-provider";
 
 export default function SubmitIdeaPage(){
+ const { can, permissionsReady } = usePreferences();
  const [title,setTitle]=useState("");
  const [description,setDescription]=useState("");
  const [status,setStatus]=useState("");
@@ -27,7 +29,7 @@ export default function SubmitIdeaPage(){
     <p className="mt-3 max-w-xl text-sm leading-6 text-white/40">Turn a problem or concept into a tracked innovation record.</p>
    </div>
   </section>
-  <section className="rounded-[30px] border border-white/80 bg-white/60 p-6 backdrop-blur-2xl md:p-8">
+  {permissionsReady && can("innovation.submit") && <section className="rounded-[30px] border border-white/80 bg-white/60 p-6 backdrop-blur-2xl md:p-8">
    <form onSubmit={submit} className="space-y-5">
     <input value={title} onChange={e=>setTitle(e.target.value)} required maxLength={140} placeholder="Idea title" className="h-12 w-full rounded-[16px] border border-black/5 bg-white/80 px-4 text-xs outline-none" />
     <textarea value={description} onChange={e=>setDescription(e.target.value)} required maxLength={5000} rows={7} placeholder="Describe the problem and the idea..." className="w-full rounded-[16px] border border-black/5 bg-white/80 px-4 py-3 text-xs outline-none" />
@@ -37,6 +39,6 @@ export default function SubmitIdeaPage(){
       <Link href="/dashboard/innovation/ideas" className="rounded-[15px] bg-black/[.04] px-5 py-3 text-[9px] font-semibold text-black/50">Back to ideas</Link>
     </div>
    </form>
-  </section>
+  </section>}
  </div>
 }
