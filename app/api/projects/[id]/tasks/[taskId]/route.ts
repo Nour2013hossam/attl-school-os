@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const updateSchema = z.object({
   title: z.string().trim().min(2).max(160).optional(),
@@ -28,6 +29,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     task.project.members.some((m) => m.userId === session.user.id) ||
     [UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role);
   if (!canManage && task.assigneeId !== session.user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (canManage && !(await hasPermission(session.user.id, session.user.role, "projects.tasks.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const parsed = updateSchema.safeParse(await request.json());
   if (!parsed.success) return NextResponse.json({ error: "Invalid task update." }, { status: 400 });
