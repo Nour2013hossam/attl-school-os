@@ -23,9 +23,25 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!(await hasPermission(session.user.id, session.user.role, "users.manage"))) return NextResponse.json({ error: "You do not have permission to manage users." }, { status: 403 });
-
   const rawBody = await request.json();
+
+  if (rawBody.role !== undefined && !(await hasPermission(session.user.id, session.user.role, "roles.assign"))) {
+    return NextResponse.json({ error: "You do not have permission to assign roles." }, { status: 403 });
+  }
+
+  const userFieldUpdate =
+    rawBody.isActive !== undefined ||
+    rawBody.gradeLevel !== undefined ||
+    rawBody.className !== undefined ||
+    rawBody.role !== undefined;
+
+  if (userFieldUpdate && !(await hasPermission(session.user.id, session.user.role, "users.manage")) && rawBody.role === undefined) {
+    return NextResponse.json({ error: "You do not have permission to manage users." }, { status: 403 });
+  }
+
+  if (rawBody.role === undefined && !(await hasPermission(session.user.id, session.user.role, "users.manage"))) {
+    return NextResponse.json({ error: "You do not have permission to manage users." }, { status: 403 });
+  }
 
   if (id === session.user.id && rawBody.role && rawBody.role !== UserRole.SUPER_ADMIN) {
     return NextResponse.json({ error: "The primary Super Admin account cannot lower its own role." }, { status: 400 });
