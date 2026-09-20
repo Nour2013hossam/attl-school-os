@@ -9,7 +9,7 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   "/dashboard/student/goals": "profile.read",
   "/dashboard/student/interests": "profile.read",
   "/dashboard/student/portfolio": "profile.read",
-  "/dashboard/notifications": "profile.read",
+  "/dashboard/notifications": "notifications.read",
   "/dashboard/messages": "messages.read",
   "/dashboard/calendar": "academics.read",
 
