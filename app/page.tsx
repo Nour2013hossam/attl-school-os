@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HomeMembers } from "@/components/home/members-section";
 
 const platformModules = [
   {
@@ -129,6 +130,7 @@ export default function HomePage() {
               ["Platform", "#platform"],
               ["Experience", "#experience"],
               ["Journey", "#journey"],
+              ["Members", "#members"],
               ["Vision", "#vision"],
             ].map(([label, href]) => (
               <a
@@ -427,6 +429,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <HomeMembers />
+
       <section className="px-5 py-20 md:px-8 md:py-28">
         <div className="mx-auto max-w-[1240px] overflow-hidden rounded-[34px] border border-white/90 bg-black text-white shadow-[0_35px_110px_rgba(20,30,50,.2)]">
           <div className="relative p-7 md:p-12">
@@ -480,6 +484,7 @@ export default function HomePage() {
               <a href="#platform" className="hover:text-black">Platform</a>
               <a href="#experience" className="hover:text-black">Experience</a>
               <a href="#journey" className="hover:text-black">Journey</a>
+              <a href="#members" className="hover:text-black">Members</a>
               <a href="#vision" className="hover:text-black">Vision</a>
             </div>
           </div>
