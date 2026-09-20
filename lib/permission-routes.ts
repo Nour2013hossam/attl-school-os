@@ -1,0 +1,78 @@
+export const ROUTE_PERMISSIONS: Record<string, string> = {
+  "/dashboard/student/profile": "profile.read",
+  "/dashboard/student/identity": "profile.read",
+  "/dashboard/student/timeline": "profile.read",
+  "/dashboard/student/activity": "profile.read",
+  "/dashboard/student/achievements": "profile.read",
+  "/dashboard/student/xp": "profile.read",
+  "/dashboard/student/level": "profile.read",
+  "/dashboard/student/goals": "profile.read",
+  "/dashboard/student/interests": "profile.read",
+  "/dashboard/student/portfolio": "profile.read",
+  "/dashboard/notifications": "profile.read",
+  "/dashboard/messages": "messages.read",
+  "/dashboard/calendar": "academics.read",
+
+  "/dashboard/academics": "academics.read",
+  "/dashboard/learning": "learning.read",
+  "/dashboard/skills": "skills.read",
+  "/dashboard/projects/all": "projects.read",
+  "/dashboard/projects/my-projects": "projects.read",
+  "/dashboard/projects/create": "projects.create",
+  "/dashboard/projects/discover": "projects.read",
+  "/dashboard/projects/templates": "projects.read",
+  "/dashboard/projects/teams": "projects.members.manage",
+  "/dashboard/projects/tasks": "projects.tasks.manage",
+  "/dashboard/projects/milestones": "projects.manage",
+  "/dashboard/projects/showcase": "projects.read",
+  "/dashboard/projects/analytics": "projects.manage",
+  "/dashboard/competitions": "competitions.read",
+  "/dashboard/attl/overview": "attl.read",
+  "/dashboard/attl/command-center": "attl.read",
+  "/dashboard/attl/team": "attl.read",
+  "/dashboard/attl/members": "attl.read",
+  "/dashboard/attl/tracks": "attl.tracks.manage",
+  "/dashboard/attl/applications": "attl.review",
+  "/dashboard/attl/recruitment": "attl.review",
+  "/dashboard/attl/projects": "attl.operations",
+  "/dashboard/attl/events": "attl.operations",
+  "/dashboard/attl/workshops": "attl.operations",
+  "/dashboard/attl/resources": "attl.operations",
+  "/dashboard/attl/showcase": "attl.operations",
+  "/dashboard/innovation/submit": "innovation.submit",
+  "/dashboard/innovation": "innovation.submit",
+  "/dashboard/community": "community.read",
+  "/dashboard/mentorship": "mentorship.request",
+  "/dashboard/events": "events.read",
+  "/dashboard/challenges/create": "challenges.manage",
+  "/dashboard/challenges": "challenges.read",
+
+  "/dashboard/teacher": "academics.teaching",
+  "/dashboard/admin/overview": "admin.access",
+  "/dashboard/admin/users": "users.read",
+  "/dashboard/admin/students": "users.read",
+  "/dashboard/admin/teachers": "users.read",
+  "/dashboard/admin/roles": "roles.read",
+  "/dashboard/admin/permissions": "permissions.read",
+  "/dashboard/admin/applications": "attl.review",
+  "/dashboard/admin/grades": "academics.grades.write",
+  "/dashboard/admin/results-release": "results.release",
+  "/dashboard/admin/projects": "projects.manage",
+  "/dashboard/admin/competitions": "competitions.manage",
+  "/dashboard/admin/events": "events.manage",
+  "/dashboard/admin/analytics": "analytics.read",
+  "/dashboard/admin/audit-logs": "audit.read",
+  "/dashboard/admin/security": "security.manage",
+  "/dashboard/admin/system": "system.manage",
+  "/dashboard/admin/school": "school.manage",
+};
+
+export function permissionForRoute(pathname: string) {
+  let best: string | undefined;
+  for (const route of Object.keys(ROUTE_PERMISSIONS)) {
+    if (pathname === route || pathname.startsWith(route + "/")) {
+      if (!best || route.length > best.length) best = route;
+    }
+  }
+  return best ? ROUTE_PERMISSIONS[best] : undefined;
+}
