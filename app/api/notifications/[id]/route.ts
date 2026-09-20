@@ -11,7 +11,6 @@ export async function PATCH(
   const { id } = await context.params;
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!(await hasPermission(session.user.id, session.user.role, "notifications.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  if (!(await hasPermission(session.user.id, session.user.role, "notifications.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const result = await prisma.notification.updateMany({
     where: { id, userId: session.user.id, readAt: null },
