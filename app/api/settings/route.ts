@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const settingsSchema = z.object({
-  language: z.enum(["en"]),
+  language: z.enum(["en","ar"]),
   theme: z.enum(["system", "light", "dark"]),
   emailNotifications: z.boolean(),
   pushNotifications: z.boolean(),
