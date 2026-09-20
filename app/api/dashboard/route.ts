@@ -9,10 +9,10 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [user, projects, goals, achievements, upcomingAssignments, upcomingEvents, upcomingCompetitions, recentProjects, nextEvents, nextCompetitions, attlMembers, featuredCourses, activeChallenges, attlTracks] = await Promise.all([
+  const [user, projects, goals, achievements, upcomingAssignments, upcomingEvents, upcomingCompetitions, recentProjects, nextEvents, nextCompetitions, attlMembers, featuredCourses, activeChallenges, attlTracks, attlApplication] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, name: true, email: true, role: true, xp: true, level: true, gradeLevel: true, className: true, avatarUrl: true },
+      select: { id: true, name: true, email: true, role: true, xp: true, level: true, gradeLevel: true, className: true, avatarUrl: true, attlMembershipActive: true, attlActivatedAt: true },
     }),
     prisma.project.count({
       where: {
@@ -100,6 +100,17 @@ export async function GET() {
       take: 6,
       select: { id: true, name: true, description: true },
     }),
+    prisma.attlApplication.findUnique({
+      where: { userId: session.user.id },
+      select: {
+        id: true,
+        status: true,
+        interviewAt: true,
+        interviewResult: true,
+        reviewerNotes: true,
+        track: { select: { name: true } },
+      },
+    }),
   ]);
 
   return NextResponse.json({
@@ -120,5 +131,6 @@ export async function GET() {
     featuredCourses,
     activeChallenges,
     attlTracks,
+    attlApplication,
   });
 }
