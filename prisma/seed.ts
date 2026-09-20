@@ -48,12 +48,14 @@ async function main() {
 
   const memberOne = await prisma.user.upsert({
     where: { email: "member@attl.school" },
-    update: { passwordHash: studentPassword, isActive: true },
+    update: { passwordHash: studentPassword, isActive: true, role: UserRole.ATTL_MEMBER, attlMembershipActive: true, attlActivatedAt: new Date() },
     create: {
       email: "member@attl.school",
       name: "ATTL Builder",
       passwordHash: studentPassword,
       role: UserRole.ATTL_MEMBER,
+      attlMembershipActive: true,
+      attlActivatedAt: new Date(),
       gradeLevel: "Secondary",
       className: "A2",
       xp: 650,
@@ -64,12 +66,14 @@ async function main() {
 
   await prisma.user.upsert({
     where: { email: "lead@attl.school" },
-    update: { passwordHash: studentPassword, isActive: true },
+    update: { passwordHash: studentPassword, isActive: true, role: UserRole.TRACK_LEAD, attlMembershipActive: true, attlActivatedAt: new Date() },
     create: {
       email: "lead@attl.school",
       name: "ATTL Track Lead",
       passwordHash: studentPassword,
       role: UserRole.TRACK_LEAD,
+      attlMembershipActive: true,
+      attlActivatedAt: new Date(),
       gradeLevel: "Secondary",
       className: "B1",
       xp: 1200,
