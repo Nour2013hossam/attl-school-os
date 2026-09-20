@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hasPermission } from "@/lib/permissions";
-import { hasPermission } from "@/lib/permissions";
 
 export async function POST(_request: Request, context: { params: Promise<{ id: string }> }) {
   const session = await auth();
