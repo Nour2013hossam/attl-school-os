@@ -19,7 +19,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
   const allowed = project.ownerId === session.user.id || project.members.some((m) => m.userId === session.user.id);
-  if (!allowed && ![UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!allowed && !([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   return NextResponse.json({ members: project.members });
 }
@@ -32,7 +32,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const project = await prisma.project.findUnique({ where: { id }, select: { ownerId: true } });
   if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
-  const canManage = project.ownerId === session.user.id || [UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role);
+  const canManage = project.ownerId === session.user.id || ([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role);
   if (!canManage || !(await hasPermission(session.user.id, session.user.role, "projects.members.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const parsed = schema.safeParse(await request.json());
