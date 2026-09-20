@@ -125,6 +125,10 @@ model User {
   reviewedApplications AttlApplication[]            @relation("ApplicationReviewer")
   createdChallenges    Challenge[]                 @relation("ChallengeCreator")
   createdCustomRoles   CustomRole[]                @relation("CustomRoleCreator")
+  courseEnrollments    CourseEnrollment[]
+  lessonProgress       LessonProgress[]
+  bookmarks            Bookmark[]
+  certificates         Certificate[]
 
   @@index([role])
   @@index([email])
@@ -316,6 +320,8 @@ model Course {
   subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   lessons Lesson[]
   resources Resource[]
+  enrollments CourseEnrollment[]
+  certificates Certificate[]
 }
 
 model Lesson {
@@ -328,6 +334,8 @@ model Lesson {
   createdAt DateTime @default(now())
 
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
+  bookmarks Bookmark[]
 
   @@index([courseId, position])
 }
@@ -342,6 +350,67 @@ model Resource {
   createdAt   DateTime @default(now())
 
   course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  bookmarks Bookmark[]
+}
+
+model CourseEnrollment {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId    String
+  status      String   @default("ACTIVE")
+  progress    Int      @default(0)
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  updatedAt   DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId, status])
+}
+
+model LessonProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  completed   Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId, completed])
+}
+
+model Bookmark {
+  id         String    @id @default(cuid())
+  userId     String
+  lessonId   String?
+  resourceId String?
+  createdAt  DateTime  @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson   Lesson?  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  resource Resource? @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId, resourceId])
+  @@index([userId, createdAt])
+}
+
+model Certificate {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId    String
+  code        String   @unique
+  issuedAt    DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId, issuedAt])
 }
 
 model Project {
