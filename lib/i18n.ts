@@ -115,7 +115,6 @@ export const UI_TRANSLATIONS: Record<string, string> = {
   "Joined": "مشترك بها",
   "Applications": "الطلبات",
   "Awards": "الجوائز",
-  "Open": "مفتوحة",
   "Coming Soon": "قريبًا",
   "Registration deadline": "آخر موعد للتسجيل",
   "Explore competition": "استكشف المسابقة",
