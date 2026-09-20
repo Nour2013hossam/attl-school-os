@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { usePreferences, translateLabel } from "@/components/providers/preferences-provider";
 
 const items = [
   {
@@ -33,6 +34,7 @@ const items = [
 
 export function MobileDock() {
   const pathname = usePathname();
+  const { language } = usePreferences();
 
   return (
     <nav className="fixed bottom-4 left-3 right-3 z-50 lg:hidden">
@@ -54,7 +56,7 @@ export function MobileDock() {
               }`}
             >
               <span className="text-sm">{item.icon}</span>
-              <span className="text-[8px] font-medium">{item.label}</span>
+              <span className="text-[8px] font-medium">{translateLabel(item.label, language)}</span>
             </Link>
           );
         })}
