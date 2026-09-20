@@ -83,14 +83,15 @@ export function SettingsHub({ kind }: { kind: Kind }) {
 
       {kind === "academic" && (
         <section className="grid gap-3 md:grid-cols-2">
-          {[
+          {([
             ["Grades", "Review your current academic record.", "/dashboard/academics/grades"],
+
             ["Attendance", "See attendance history and trends.", "/dashboard/academics/attendance"],
             ["Assignments", "Track pending work and submissions.", "/dashboard/academics/assignments"],
             ["Schedule", "Open your current academic timetable.", "/dashboard/academics/schedule"],
             ["Results", "View released results when available.", "/dashboard/academics/results"],
             ["Transcript", "Open your academic transcript.", "/dashboard/academics/transcript"],
-          ].filter(([, , href]) => can("academics.read") || href.includes("settings")).map(([title, text, href]) => (
+          ] as Array<[string, string, string]>).filter(([, , href]) => can("academics.read") || href.includes("settings")).map(([title, text, href]) => (
             <Link key={title} href={href} className="rounded-[23px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white">
               <p className="text-[8px] uppercase tracking-[.18em] text-blue-500">Academic</p>
               <h2 className="mt-2 text-base font-semibold">{title}</h2>
@@ -146,12 +147,12 @@ export function SettingsHub({ kind }: { kind: Kind }) {
 
       {kind === "ai" && (
         <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
-          {[
+          {([
             ["Learning assistant", "A future permission-aware layer for course guidance, summaries and study support.", "/dashboard/learning/explore", "learning.read"],
             ["Project assistant", "A future layer for project planning, task suggestions and progress support.", "/dashboard/projects/all", "projects.read"],
             ["Innovation assistant", "A future layer for idea shaping, research prompts and experiment planning.", "/dashboard/innovation/ideas", "innovation.submit"],
             ["School intelligence", "A future admin layer for operational insights and governed analytics.", "/dashboard/admin/analytics", "analytics.read"],
-          ].filter(([, , , permission]) => can(permission)).map(([title, text, href]) => (
+          ] as Array<[string, string, string, string]>).filter(([, , , permission]) => can(permission)).map(([title, text, href]) => (
             <Link key={title} href={href} className="rounded-[25px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white">
               <p className="text-[8px] uppercase tracking-[.18em] text-blue-500">AI layer</p>
               <h2 className="mt-2 text-base font-semibold">{title}</h2>
