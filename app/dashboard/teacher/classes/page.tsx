@@ -8,6 +8,7 @@ export default function Page() {
       description="Classes and teaching blocks assigned to you."
       icon="▤"
       api="/api/teacher/classes"
+      actions={[{ label: "Students", href: "/dashboard/teacher/students" }, { label: "Assignments", href: "/dashboard/teacher/assignments" }, { label: "Reports", href: "/dashboard/teacher/reports" }]}
     />
   );
 }
