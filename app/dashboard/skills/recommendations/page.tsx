@@ -8,6 +8,7 @@ export default function Page() {
       description="Explore skill directions based on your current profile."
       icon="★"
       api="/api/skills"
+      actions={[{ label: "My Skills", href: "/dashboard/skills/my-skills" }, { label: "Technical", href: "/dashboard/skills/technical" }, { label: "Soft Skills", href: "/dashboard/skills/soft-skills" }]}
     />
   );
 }
