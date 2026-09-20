@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { hasPermission } from "@/lib/permissions";
 
 export async function PATCH(request:Request,context:{params:Promise<{id:string}>}){
  const s=await auth();const{id}=await context.params;if(!s?.user?.id)return NextResponse.json({error:"Unauthorized"},{status:401});
+ if(!(await hasPermission(s.user.id,s.user.role,"learning.read")))return NextResponse.json({error:"Forbidden"},{status:403});
  const body=await request.json();const completed=Boolean(body.completed);
  const lesson=await prisma.lesson.findUnique({where:{id},select:{id:true,courseId:true,course:{select:{id:true,published:true,lessons:{select:{id:true}}}}}});
  if(!lesson?.course?.published)return NextResponse.json({error:"Lesson not available."},{status:404});
