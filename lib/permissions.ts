@@ -58,6 +58,19 @@ async function getCustomRolePermissions(userId: string) {
 export async function hasPermission(userId: string, role: UserRole, key: string) {
   if (role === "SUPER_ADMIN") return true;
 
+  if (
+    role === "STUDENT" &&
+    key !== "attl.apply" &&
+    (key.startsWith("attl.") || key.startsWith("attl:"))
+  ) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { attlMembershipActive: true },
+    });
+
+    if (!user?.attlMembershipActive) return false;
+  }
+
   const override = await prisma.userPermission.findFirst({
     where: { userId, permission: { key } },
     select: { granted: true },
