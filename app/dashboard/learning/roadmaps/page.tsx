@@ -8,6 +8,7 @@ export default function Page() {
       description="Plan a learning path from foundations to real projects."
       icon="↗"
       api="/api/courses"
+      actions={[{ label: "Explore courses", href: "/dashboard/learning/explore" }, { label: "My Courses", href: "/dashboard/learning/my-courses" }]}
     />
   );
 }
