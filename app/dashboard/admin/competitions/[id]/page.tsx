@@ -23,6 +23,7 @@ export default function AdminCompetitionEditPage() {
   const [form, setForm] = useState({ title: "", description: "", organizer: "", startsAt: "", deadlineAt: "", location: "", url: "" });
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!params.id) return;
@@ -66,6 +67,19 @@ export default function AdminCompetitionEditPage() {
     setSaving(false);
   }
 
+  async function removeCompetition() {
+    if (!window.confirm("Delete this competition?")) return;
+    setDeleting(true);
+    const response = await fetch("/api/competitions/" + params.id, { method: "DELETE" });
+    const data = await response.json();
+    if (response.ok) {
+      window.location.href = "/dashboard/admin/competitions";
+      return;
+    }
+    setMessage(data.error ?? "Could not delete competition.");
+    setDeleting(false);
+  }
+
   if (!permissionsReady) return <div className="rounded-[26px] bg-white/60 p-8 text-sm text-black/40">Loading access…</div>;
   if (!can("competitions.manage")) return <div className="rounded-[26px] bg-white/60 p-8 text-sm text-black/40">You do not have permission to manage competitions.</div>;
 
@@ -90,7 +104,7 @@ export default function AdminCompetitionEditPage() {
         {message && <div className="mt-4 rounded-[14px] bg-blue-500/10 px-4 py-3 text-[9px] text-blue-700">{message}</div>}
         <div className="mt-5 flex flex-wrap gap-2">
           <button onClick={save} disabled={saving} className="rounded-[14px] bg-black px-5 py-3 text-[9px] font-semibold text-white disabled:opacity-40">{saving ? "Saving..." : "Save changes"}</button>
-          <Link href="/dashboard/admin/competitions" className="rounded-[14px] bg-black/[.04] px-5 py-3 text-[9px] font-semibold text-black/50">Back to competitions</Link>
+          <button onClick={removeCompetition} disabled={deleting} className="rounded-[14px] bg-red-500/10 px-5 py-3 text-[9px] font-semibold text-red-600 disabled:opacity-40">{deleting ? "Deleting..." : "Delete competition"}</button><Link href="/dashboard/admin/competitions" className="rounded-[14px] bg-black/[.04] px-5 py-3 text-[9px] font-semibold text-black/50">Back to competitions</Link>
         </div>
       </section>
     </div>
