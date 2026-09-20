@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { hasPermission } from "@/lib/permissions";
 
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await hasPermission(session.user.id, session.user.role, "messages.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const threads = await prisma.messageThread.findMany({
     where: { participants: { some: { userId: session.user.id } } },
@@ -21,6 +23,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await hasPermission(session.user.id, session.user.role, "messages.send"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await request.json();
   if (typeof body.userId !== "string" || typeof body.message !== "string" || !body.message.trim()) {
