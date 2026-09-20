@@ -8,6 +8,7 @@ export default function Page() {
       description="Find learning resources connected to your School OS courses."
       icon="▤"
       api="/api/courses"
+      actions={[{ label: "Bookmarks", href: "/dashboard/learning/bookmarks" }, { label: "My Courses", href: "/dashboard/learning/my-courses" }]}
     />
   );
 }
