@@ -52,6 +52,16 @@ export async function POST(request: Request) {
       },
     });
 
+    await prisma.auditLog.create({
+      data: {
+        actorId: user.id,
+        action: "ACCOUNT_CREATED",
+        entity: "User",
+        entityId: user.id,
+        metadata: { source: "registration" },
+      },
+    });
+
     return NextResponse.json({ user }, { status: 201 });
   } catch (error) {
     console.error("Registration error", error);
