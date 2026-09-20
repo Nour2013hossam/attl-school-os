@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const profileSchema = z.object({
   name: z.string().trim().min(2).max(120).optional(),
@@ -19,6 +20,8 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  if (!(await hasPermission(session.user.id, session.user.role, "profile.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -38,6 +41,8 @@ export async function PATCH(request: Request) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  if (!(await hasPermission(session.user.id, session.user.role, "profile.write"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const parsed = profileSchema.safeParse(await request.json());
 
