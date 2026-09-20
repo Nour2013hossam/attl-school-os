@@ -196,6 +196,7 @@ const sections = [
     items: [
       { label: "Overview", href: "/dashboard/admin/overview", icon: "⌘" },
       { label: "Users", href: "/dashboard/admin/users", icon: "●" },
+      { label: "XP Control", href: "/dashboard/admin/xp", icon: "✦" },
       { label: "Students", href: "/dashboard/admin/students", icon: "♙" },
       { label: "Teachers", href: "/dashboard/admin/teachers", icon: "♙" },
       { label: "School", href: "/dashboard/admin/school", icon: "⌂" },
@@ -212,6 +213,7 @@ const sections = [
       { label: "Security", href: "/dashboard/admin/security", icon: "◇" },
       { label: "School Control", href: "/dashboard/admin/school", icon: "⌂" },
       { label: "System", href: "/dashboard/admin/system", icon: "⚙" },
+      { label: "School", href: "/dashboard/admin/school", icon: "⌂" },
     ],
   },
   {
