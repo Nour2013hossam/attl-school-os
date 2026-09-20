@@ -1,13 +1,4 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Mentorship"
-      title="Sessions"
-      description="Review mentorship sessions connected to your requests."
-      icon="◷"
-      api="/api/mentorship/requests"
-    />
-  );
-}
+"use client";
+import{useEffect,useState}from"react";
+type Session={id:string;startsAt:string;endsAt:string;notes:string|null;mentor:{name:string;avatarUrl:string|null};mentee:{name:string;avatarUrl:string|null}};
+export default function SessionsPage(){const[items,setItems]=useState<Session[]>([]);useEffect(()=>{fetch("/api/mentorship/sessions",{cache:"no-store"}).then(r=>r.json()).then(d=>setItems(d.sessions??[]));},[]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Mentorship</p><h1 className="mt-3 text-3xl font-semibold md:text-5xl">Sessions</h1><p className="mt-3 text-sm text-white/40">Your scheduled mentorship sessions.</p></section><section className="grid gap-3 md:grid-cols-2">{items.map(s=><article key={s.id} className="rounded-[25px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.15em] text-blue-600">{new Date(s.startsAt).toLocaleDateString()}</p><h2 className="mt-2 text-lg font-semibold">{new Date(s.startsAt).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})} – {new Date(s.endsAt).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}</h2><p className="mt-3 text-[10px] text-black/40">{s.mentor.name} · {s.mentee.name}</p>{s.notes&&<p className="mt-3 rounded-[15px] bg-black/[.03] p-3 text-[9px] text-black/40">{s.notes}</p>}</article>)}{items.length===0&&<div className="rounded-[24px] border border-dashed border-black/10 p-10 text-center text-[10px] text-black/30 md:col-span-2">No sessions scheduled yet.</div>}</section></div>}
