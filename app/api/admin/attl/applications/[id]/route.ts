@@ -9,6 +9,9 @@ const updateSchema = z.object({
   status: z.nativeEnum(ApplicationStatus).optional(),
   reviewerId: z.string().nullable().optional(),
   reviewerNotes: z.string().max(5000).nullable().optional(),
+  interviewAt: z.coerce.date().nullable().optional(),
+  interviewResult: z.enum(["PENDING", "PASS", "FAIL"]).nullable().optional(),
+  interviewNotes: z.string().max(5000).nullable().optional(),
 });
 
 const reviewerRoles: UserRole[] = [
@@ -45,6 +48,9 @@ export async function PATCH(
       id: true,
       userId: true,
       status: true,
+      interviewAt: true,
+      interviewResult: true,
+      interviewNotes: true,
       track: { select: { name: true } },
       user: { select: { id: true, name: true, email: true, role: true } },
     },
@@ -52,6 +58,12 @@ export async function PATCH(
 
   if (!existing) {
     return NextResponse.json({ error: "Application not found." }, { status: 404 });
+  }
+
+  if (parsed.data.status === ApplicationStatus.ACCEPTED) {
+    if (existing.status !== ApplicationStatus.INTERVIEW || parsed.data.interviewResult !== "PASS") {
+      return NextResponse.json({ error: "Acceptance requires an INTERVIEW stage and a PASS interview result." }, { status: 400 });
+    }
   }
 
   const application = await prisma.$transaction(async (tx) => {
@@ -68,7 +80,7 @@ export async function PATCH(
     if (parsed.data.status === ApplicationStatus.ACCEPTED) {
       await tx.user.update({
         where: { id: existing.userId },
-        data: { role: UserRole.ATTL_MEMBER },
+        data: { role: UserRole.ATTL_MEMBER, attlMembershipActive: true, attlActivatedAt: new Date() },
       });
 
       if (existing.status !== ApplicationStatus.ACCEPTED) {
@@ -81,6 +93,11 @@ export async function PATCH(
           },
         });
       }
+    } else if (parsed.data.status === ApplicationStatus.REJECTED) {
+      await tx.user.update({
+        where: { id: existing.userId },
+        data: { role: UserRole.STUDENT, attlMembershipActive: false, attlActivatedAt: null },
+      });
     } else if (
       parsed.data.status &&
       parsed.data.status !== existing.status
