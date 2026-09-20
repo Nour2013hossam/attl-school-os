@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole, ApplicationStatus, NotificationType } from "@prisma/client";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const updateSchema = z.object({
   status: z.nativeEnum(ApplicationStatus).optional(),
@@ -28,7 +29,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!reviewerRoles.includes(session.user.role)) {
+  if (!reviewerRoles.includes(session.user.role) || !(await hasPermission(session.user.id, session.user.role, "attl.review"))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
