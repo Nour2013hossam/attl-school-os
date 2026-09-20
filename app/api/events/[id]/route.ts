@@ -16,13 +16,14 @@ const schema = z.object({
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const session = await auth();
   const { id } = await context.params;
-  if (!session?.user?.id || !(await hasPermission(session.user.id, session.user.role, "events.read"))) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await hasPermission(session.user.id, session.user.role, "events.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const event = await prisma.event.findUnique({
     where: { id },
-    include: { _count: { select: { registrations: true } } },
+    include: {
+      _count: { select: { registrations: true } },
+      registrations: { orderBy: { createdAt: "desc" }, include: { user: { select: { id: true, name: true, email: true, avatarUrl: true } } } },
+    },
   });
   if (!event) return NextResponse.json({ error: "Event not found." }, { status: 404 });
   return NextResponse.json({ event });
@@ -31,25 +32,28 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
   const session = await auth();
   const { id } = await context.params;
-  if (!session?.user?.id || !(await hasPermission(session.user.id, session.user.role, "events.manage"))) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await hasPermission(session.user.id, session.user.role, "events.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const parsed = schema.safeParse(await request.json());
-  if (!parsed.success) return NextResponse.json({ error: "Invalid event update." }, { status: 400 });
-
-  const current = await prisma.event.findUnique({ where: { id }, select: { startsAt: true, endsAt: true, capacity: true, title: true } });
+  if (!parsed.success) return NextResponse.json({ error: "Invalid event data." }, { status: 400 });
+  const current = await prisma.event.findUnique({ where: { id }, select: { startsAt: true, endsAt: true } });
   if (!current) return NextResponse.json({ error: "Event not found." }, { status: 404 });
-
   const startsAt = parsed.data.startsAt ?? current.startsAt;
   const endsAt = parsed.data.endsAt ?? current.endsAt;
-  if (endsAt <= startsAt) return NextResponse.json({ error: "Event must end after it starts." }, { status: 400 });
+  if (endsAt <= startsAt) return NextResponse.json({ error: "Event end must be after its start." }, { status: 400 });
+  const event = await prisma.event.update({ where: { id }, data: parsed.data });
+  await prisma.auditLog.create({ data: { actorId: session.user.id, action: "EVENT_UPDATED", entity: "Event", entityId: id, metadata: { title: event.title } } });
+  return NextResponse.json({ event });
+}
 
-  const updated = await prisma.event.update({ where: { id }, data: parsed.data });
-
-  await prisma.auditLog.create({
-    data: { actorId: session.user.id, action: "EVENT_UPDATED", entity: "Event", entityId: id, metadata: { title: updated.title } },
-  });
-
-  return NextResponse.json({ event: updated });
+export async function DELETE(_request: Request, context: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  const { id } = await context.params;
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await hasPermission(session.user.id, session.user.role, "events.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const event = await prisma.event.findUnique({ where: { id }, select: { id: true, title: true } });
+  if (!event) return NextResponse.json({ error: "Event not found." }, { status: 404 });
+  await prisma.event.delete({ where: { id } });
+  await prisma.auditLog.create({ data: { actorId: session.user.id, action: "EVENT_DELETED", entity: "Event", entityId: id, metadata: { title: event.title } } });
+  return NextResponse.json({ ok: true });
 }
