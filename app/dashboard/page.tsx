@@ -21,7 +21,7 @@ function formatDate(value: string | null, locale: string, withTime = false) {
 
 export default function DashboardOverview() {
   const [data, setData] = useState<DashboardData | null>(null);
-  const { language } = usePreferences();
+  const { language, can, permissionsReady } = usePreferences();
   const ar = language === "ar";
   const locale = ar ? "ar-EG" : "en-US";
 
@@ -43,7 +43,16 @@ export default function DashboardOverview() {
     ["Explore Learning", "Find courses and resources.", "/dashboard/learning/explore", "◇"],
     ["Join ATTL", "Apply to become an ATTL member.", "/dashboard/attl/applications", "✦"],
     ["Find Competitions", "Discover competitions and challenges.", "/dashboard/competitions/explore", "★"],
-  ], [ar]);
+  ].filter((item) => {
+    if (!permissionsReady) return false;
+    const permissionByPath: Record<string,string> = {
+      "/dashboard/projects/create":"projects.create",
+      "/dashboard/learning/explore":"learning.read",
+      "/dashboard/attl/applications":"attl.apply",
+      "/dashboard/competitions/explore":"competitions.read",
+    };
+    return can(permissionByPath[item[2]]);
+  }), [ar, can, permissionsReady]);
 
   return (
     <div className="space-y-5">
@@ -139,7 +148,7 @@ export default function DashboardOverview() {
                 <div className="mt-4 flex items-center justify-between text-[8px] text-black/25"><span>{project._count.members} {ar ? "أعضاء" : "members"}</span><span>{project._count.tasks} {ar ? "مهام" : "tasks"}</span></div>
               </Link>
             ))}
-            {data && data.recentProjects.length===0 && <div className="md:col-span-2 rounded-[22px] bg-black/[.025] p-8 text-center"><p className="text-sm font-semibold">{ar ? "لسه مفيش مشاريع منشورة" : "No public projects yet"}</p><p className="mt-2 text-[10px] text-black/35">{ar ? "ابدأ مشروعك الأول وخليه يظهر هنا." : "Create the first project and it will appear here."}</p><Link href="/dashboard/projects/create" className="mt-4 inline-flex rounded-[14px] bg-black px-4 py-2.5 text-[9px] font-semibold text-white">{ar ? "إنشاء مشروع" : "Create project"}</Link></div>}
+            {data && data.recentProjects.length===0 && <div className="md:col-span-2 rounded-[22px] bg-black/[.025] p-8 text-center"><p className="text-sm font-semibold">{ar ? "لسه مفيش مشاريع منشورة" : "No public projects yet"}</p><p className="mt-2 text-[10px] text-black/35">{ar ? "ابدأ مشروعك الأول وخليه يظهر هنا." : "Create the first project and it will appear here."}</p>{permissionsReady && can("projects.create") && <Link href="/dashboard/projects/create" className="mt-4 inline-flex rounded-[14px] bg-black px-4 py-2.5 text-[9px] font-semibold text-white">{ar ? "إنشاء مشروع" : "Create project"}</Link>}</div>}
           </div>
         </div>
 
