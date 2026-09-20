@@ -10,6 +10,9 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (!(await hasPermission(session.user.id, session.user.role, "projects.read"))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const projects = await prisma.project.findMany({
     where: {
