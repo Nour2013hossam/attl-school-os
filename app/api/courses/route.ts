@@ -15,8 +15,13 @@ const courseSchema = z.object({
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const manage = url.searchParams.get("manage") === "1";
-  const session = await auth();if (!(await hasPermission(session.user.id, session.user.role, "learning.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-if (manage) {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await hasPermission(session.user.id, session.user.role, "learning.read"))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (manage) {
     if (!session?.user?.id || !(await hasPermission(session.user.id, session.user.role, "learning.manage"))) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
