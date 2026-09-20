@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const createSchema = z.object({
   title: z.string().trim().min(2).max(160),
@@ -53,7 +54,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     project.ownerId === session.user.id ||
     project.members.some((m) => m.userId === session.user.id) ||
     [UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role);
-  if (!canManage) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!canManage || !(await hasPermission(session.user.id, session.user.role, "projects.tasks.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const parsed = createSchema.safeParse(await request.json());
   if (!parsed.success) return NextResponse.json({ error: "Invalid task data." }, { status: 400 });
