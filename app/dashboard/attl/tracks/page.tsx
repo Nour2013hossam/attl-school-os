@@ -1,7 +1,7 @@
 "use client";
-import{useEffect,useState}from"react";
+import{useEffect,useState}from"react";import{usePreferences}from"@/components/providers/preferences-provider";
 type T={id:string;name:string;description:string|null;active:boolean};
-export default function TracksPage(){const[items,setItems]=useState<T[]>([]);const[role,setRole]=useState("STUDENT");const[name,setName]=useState("");const[description,setDescription]=useState("");const[message,setMessage]=useState("");
+export default function TracksPage(){const{can,permissionsReady}=usePreferences();const[items,setItems]=useState<T[]>([]);const[role,setRole]=useState("STUDENT");const[name,setName]=useState("");const[description,setDescription]=useState("");const[message,setMessage]=useState("");
  async function load(){const [t,m]=await Promise.all([fetch("/api/attl/tracks",{cache:"no-store"}).then(r=>r.json()),fetch("/api/me",{cache:"no-store"}).then(r=>r.json())]);setItems(t.tracks??[]);setRole(m.user?.role??"STUDENT");}
  useEffect(()=>{load();},[]);
  const manager=["TRACK_LEAD","ADMIN","SUPER_ADMIN"].includes(role);
