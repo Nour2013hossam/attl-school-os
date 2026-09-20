@@ -21,6 +21,9 @@ export async function GET() {
       track: true,
       user: { select: { id: true, name: true, email: true, role: true, attlMembershipActive: true } },
       reviewer: { select: { id: true, name: true } },
+      interviewAt: true,
+      interviewResult: true,
+      interviewNotes: true,
     },
   });
 
