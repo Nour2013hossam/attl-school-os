@@ -14,16 +14,19 @@ const items = [
     href: "/dashboard/academics/overview",
     label: "Academic",
     icon: "◇",
+    permission: "academics.read",
   },
   {
     href: "/dashboard/projects/all",
     label: "Projects",
     icon: "✦",
+    permission: "projects.read",
   },
   {
     href: "/dashboard/attl/overview",
     label: "ATTL",
     icon: "A",
+    permission: "attl.read",
   },
   {
     href: "/dashboard/settings/account",
@@ -34,12 +37,12 @@ const items = [
 
 export function MobileDock() {
   const pathname = usePathname();
-  const { language } = usePreferences();
+  const { language, permissions, permissionsReady } = usePreferences();
 
   return (
     <nav className="fixed bottom-4 left-3 right-3 z-50 lg:hidden">
       <div className="mx-auto flex max-w-[520px] items-center justify-between rounded-[26px] border border-white/90 bg-white/75 p-2 shadow-[0_18px_50px_rgba(20,30,50,0.16),inset_0_1px_0_white] backdrop-blur-[30px]">
-        {items.map((item) => {
+        {items.filter((item) => !item.permission || (permissionsReady && permissions[item.permission] === true)).map((item) => {
           const active =
             pathname === item.href ||
             (item.href !== "/dashboard" &&
