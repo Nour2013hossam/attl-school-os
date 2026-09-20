@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const releaseSchema = z.object({
   term: z.string().trim().min(1).max(80),
@@ -30,6 +31,7 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  if (!(await hasPermission(user.id, user.role, "results.release"))) return NextResponse.json({ error: "You do not have permission to manage result releases." }, { status: 403 });
 
   const releases = await prisma.resultRelease.findMany({
     orderBy: { releaseAt: "desc" },
@@ -44,6 +46,7 @@ export async function POST(request: Request) {
   if (!user) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  if (!(await hasPermission(user.id, user.role, "results.release"))) return NextResponse.json({ error: "You do not have permission to manage result releases." }, { status: 403 });
 
   const parsed = releaseSchema.safeParse(await request.json());
 
