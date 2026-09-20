@@ -1,4 +1,4 @@
-import{NextResponse}from"next/server";import{auth}from"@/auth";import{prisma}from"@/lib/prisma";
+import{NextResponse}from"next/server";import{auth}from"@/auth";import{prisma}from"@/lib/prisma";import{hasPermission}from"@/lib/permissions";
 export async function GET(_req:Request,ctx:{params:Promise<{id:string}>}){const s=await auth();const{id}=await ctx.params;if(!s?.user?.id)return NextResponse.json({error:"Unauthorized"},{status:401});
  const p=await prisma.project.findUnique({where:{id},select:{id:true,title:true,ownerId:true,visibility:true,members:{select:{userId:true}},tasks:{select:{status:true,dueAt:true}},milestones:{select:{status:true,progress:true,dueAt:true}}}});
  if(!p)return NextResponse.json({error:"Project not found."},{status:404});
