@@ -2,6 +2,7 @@
 import Link from"next/link";import{useEffect,useState}from"react";import{usePreferences}from"@/components/providers/preferences-provider";
 type Stats={students:number;teachers:number;attlMembers:number;pendingReviews:number;activeProjects:number;upcomingEvents:number;upcomingCompetitions:number;activeUsers:number};
 const modules=[
+ {group:"Learning",title:"Course Studio",description:"Create courses, lessons, resources and files.",href:"/dashboard/learning/studio",icon:"▦",permission:"learning.manage"},
  {group:"Control",title:"Users",description:"Manage every account in the school.",href:"/dashboard/admin/users",icon:"◎",permission:"users.read"},
  {group:"Control",title:"Roles",description:"Create and manage custom roles.",href:"/dashboard/admin/roles",icon:"◈",permission:"roles.read"},
  {group:"Control",title:"Permissions",description:"Granular user access overrides.",href:"/dashboard/admin/permissions",icon:"⌘",permission:"permissions.read"},
@@ -23,7 +24,7 @@ const modules=[
 export default function AdminOverviewPage(){
  const{can,permissionsReady}=usePreferences();const[stats,setStats]=useState<Stats|null>(null);
  useEffect(()=>{fetch("/api/admin/overview",{cache:"no-store"}).then(async r=>r.ok?r.json():null).then(d=>setStats(d?.stats??null)).catch(()=>setStats(null));},[]);
- const groups=["Control","School","ATTL","Insights","Security"];
+ const groups=["Control","School","Learning","ATTL","Insights","Security"];
  return <div className="space-y-6">
   <section className="relative overflow-hidden rounded-[34px] bg-black p-7 text-white shadow-[0_35px_100px_rgba(0,0,0,.2)] md:p-9"><div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-blue-500/20 blur-[110px]"/><div className="relative flex flex-col justify-between gap-6 md:flex-row md:items-end"><div><p className="text-[9px] uppercase tracking-[.22em] text-blue-300">ATTL School OS · Administration</p><h1 className="mt-3 text-4xl font-semibold tracking-[-.06em] md:text-5xl">School Control Center.</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-white/40">One clear control surface for accounts, academics, projects, ATTL, events, security and system operations.</p></div><div className="rounded-[20px] border border-white/10 bg-white/5 px-5 py-4"><p className="text-[8px] uppercase tracking-[.18em] text-white/30">Access</p><p className="mt-1 text-sm font-medium text-blue-300">{permissionsReady?"Permission-aware":"Checking access…"}</p></div></div></section>
   <section className="grid grid-cols-2 gap-3 md:grid-cols-4">{[["Students",stats?.students],["Teachers",stats?.teachers],["ATTL Members",stats?.attlMembers],["Active Users",stats?.activeUsers]].map(([label,value])=><div key={String(label)} className="rounded-[24px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.16em] text-black/25">{label}</p><p className="mt-2 text-2xl font-semibold">{value??"—"}</p></div>)}</section>
