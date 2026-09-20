@@ -120,8 +120,11 @@ model User {
   auditLogs            AuditLog[]                  @relation("ActorAudit")
   preferences          UserPreference?
   permissions           UserPermission[]
+  customRoleId          String?
+  customRole            CustomRole?          @relation(fields: [customRoleId], references: [id], onDelete: SetNull)
   reviewedApplications AttlApplication[]            @relation("ApplicationReviewer")
   createdChallenges    Challenge[]                 @relation("ChallengeCreator")
+  createdCustomRoles   CustomRole[]                @relation("CustomRoleCreator")
 
   @@index([role])
   @@index([email])
@@ -676,6 +679,34 @@ model UserSkill {
   @@unique([userId, skillId])
 }
 
+model CustomRole {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  active      Boolean  @default(true)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy   User?                @relation("CustomRoleCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  users       User[]
+  permissions CustomRolePermission[]
+
+  @@index([active, name])
+}
+
+model CustomRolePermission {
+  id           String   @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+
+  role       CustomRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
 model Permission {
   id          String   @id @default(cuid())
   key         String   @unique
@@ -686,6 +717,7 @@ model Permission {
   updatedAt   DateTime @updatedAt
 
   assignments UserPermission[]
+  customRoles CustomRolePermission[]
 
   @@index([category])
 }
