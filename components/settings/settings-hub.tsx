@@ -92,7 +92,7 @@ export function SettingsHub({ kind }: { kind: Kind }) {
             ["Results", "View released results when available.", "/dashboard/academics/results"],
             ["Transcript", "Open your academic transcript.", "/dashboard/academics/transcript"],
           ] as Array<[string, string, string]>).filter(([, , href]) => can("academics.read") || href.includes("settings")).map(([title, text, href]) => (
-            <Link key={title} href={href} className="rounded-[23px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white">
+            <Link key={title} href={String(href)} className="rounded-[23px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white">
               <p className="text-[8px] uppercase tracking-[.18em] text-blue-500">Academic</p>
               <h2 className="mt-2 text-base font-semibold">{title}</h2>
               <p className="mt-2 text-[10px] leading-5 text-black/35">{text}</p>
@@ -120,7 +120,7 @@ export function SettingsHub({ kind }: { kind: Kind }) {
               ["Team", "/dashboard/attl/team"],
               ["Tracks", "/dashboard/attl/tracks"],
             ].filter(([, href]) => can(href.includes("tracks") ? "attl.tracks.manage" : "attl.read")).map(([title, href]) => (
-              <Link key={title} href={href} className="rounded-[23px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white">
+              <Link key={title} href={String(href)} className="rounded-[23px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white">
                 <h2 className="text-sm font-semibold">{title}</h2>
                 <p className="mt-2 text-[10px] text-black/35">Open the workspace.</p>
               </Link>
@@ -136,7 +136,7 @@ export function SettingsHub({ kind }: { kind: Kind }) {
             ["Level", me?.level ?? "—", "Current School OS level.", "/dashboard/student/level"],
             ["Achievements", "View", "Open your achievement collection.", "/dashboard/student/achievements"],
           ].map(([title, value, text, href]) => (
-            <Link key={title} href={href} className="rounded-[25px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white">
+            <Link key={title} href={String(href)} className="rounded-[25px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white">
               <p className="text-[8px] uppercase tracking-[.18em] text-black/25">{title}</p>
               <p className="mt-3 text-3xl font-semibold">{value}</p>
               <p className="mt-2 text-[10px] text-black/35">{text}</p>
@@ -153,7 +153,7 @@ export function SettingsHub({ kind }: { kind: Kind }) {
             ["Innovation assistant", "A future layer for idea shaping, research prompts and experiment planning.", "/dashboard/innovation/ideas", "innovation.submit"],
             ["School intelligence", "A future admin layer for operational insights and governed analytics.", "/dashboard/admin/analytics", "analytics.read"],
           ] as Array<[string, string, string, string]>).filter(([, , , permission]) => can(permission)).map(([title, text, href]) => (
-            <Link key={title} href={href} className="rounded-[25px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white">
+            <Link key={title} href={String(href)} className="rounded-[25px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white">
               <p className="text-[8px] uppercase tracking-[.18em] text-blue-500">AI layer</p>
               <h2 className="mt-2 text-base font-semibold">{title}</h2>
               <p className="mt-2 text-[10px] leading-5 text-black/35">{text}</p>
