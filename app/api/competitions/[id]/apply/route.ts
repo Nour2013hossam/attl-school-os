@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { hasPermission } from "@/lib/permissions";
 
 export async function POST(
   request: Request,
@@ -11,6 +12,9 @@ export async function POST(
 
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (!(await hasPermission(session.user.id, session.user.role, "competitions.apply"))) {
+    return NextResponse.json({ error: "You do not have permission to apply." }, { status: 403 });
   }
 
   const competition = await prisma.competition.findUnique({
