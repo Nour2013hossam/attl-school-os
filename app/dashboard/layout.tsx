@@ -5,6 +5,7 @@ import { MobileDock } from "@/components/layout/mobile-dock";
 import { CommandCenter } from "@/components/layout/command-center";
 import { DashboardSearch } from "@/components/layout/dashboard-search";
 import { SignOutButton } from "@/components/auth/signout-button";
+import { QuickPreferences } from "@/components/layout/quick-preferences";
 
 export default async function DashboardLayout({
   children,
@@ -94,6 +95,7 @@ export default async function DashboardLayout({
             </div>
 
             <div className="flex items-center gap-2">
+              <QuickPreferences />
               <Link
                 href="/dashboard/notifications"
                 aria-label="Notifications"
