@@ -17,13 +17,19 @@ export async function GET() {
   const applications = await prisma.attlApplication.findMany({
     where: canReview ? undefined : { userId: session.user.id },
     orderBy: { createdAt: "desc" },
-    include: {
-      track: true,
-      user: { select: { id: true, name: true, email: true, role: true, attlMembershipActive: true } },
-      reviewer: { select: { id: true, name: true } },
+    select: {
+      id: true,
+      status: true,
+      reviewerNotes: true,
       interviewAt: true,
       interviewResult: true,
       interviewNotes: true,
+      createdAt: true,
+      updatedAt: true,
+      answers: true,
+      track: true,
+      user: { select: { id: true, name: true, email: true, role: true, attlMembershipActive: true } },
+      reviewer: { select: { id: true, name: true } },
     },
   });
 
