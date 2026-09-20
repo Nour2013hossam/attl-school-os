@@ -1,13 +1,10 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="ATTL"
-      title="ATTL Tracks"
-      description="Active ATTL tracks available to members and applicants."
-      icon="◇"
-      api="/api/attl/tracks"
-    />
-  );
-}
+"use client";
+import{useEffect,useState}from"react";
+type T={id:string;name:string;description:string|null;active:boolean};
+export default function TracksPage(){const[items,setItems]=useState<T[]>([]);const[role,setRole]=useState("STUDENT");const[name,setName]=useState("");const[description,setDescription]=useState("");const[message,setMessage]=useState("");
+ async function load(){const [t,m]=await Promise.all([fetch("/api/attl/tracks",{cache:"no-store"}).then(r=>r.json()),fetch("/api/me",{cache:"no-store"}).then(r=>r.json())]);setItems(t.tracks??[]);setRole(m.user?.role??"STUDENT");}
+ useEffect(()=>{load();},[]);
+ const manager=["TRACK_LEAD","ADMIN","SUPER_ADMIN"].includes(role);
+ async function create(){const r=await fetch("/api/attl/tracks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,description})});const d=await r.json();setMessage(r.ok?"Track created.":d.error??"Could not create track.");if(r.ok){setName("");setDescription("");load();}}
+ async function toggle(t:T){const r=await fetch("/api/attl/tracks/"+t.id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({active:!t.active})});const d=await r.json();setMessage(r.ok?"Track updated.":d.error??"Could not update track.");if(r.ok)load();}
+ return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">ATTL</p><h1 className="mt-3 text-3xl font-semibold md:text-5xl">Tracks</h1><p className="mt-3 max-w-2xl text-sm text-white/40">Organize members and projects around focused technical tracks.</p></section>{manager&&<section className="rounded-[28px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><div className="grid gap-2 md:grid-cols-[.8fr_1.2fr_auto]"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Track name" className="h-11 rounded-[14px] bg-white px-3 text-[10px] outline-none"/><input value={description} onChange={e=>setDescription(e.target.value)} placeholder="Description" className="h-11 rounded-[14px] bg-white px-3 text-[10px] outline-none"/><button onClick={create} className="rounded-[14px] bg-black px-5 text-[9px] font-semibold text-white">Create track</button></div></section>}{message&&<div className="rounded-[15px] bg-blue-500/10 px-4 py-3 text-[9px] text-blue-700">{message}</div>}<section className="grid gap-3 md:grid-cols-2">{items.map(t=><article key={t.id} className="rounded-[26px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><div className="flex items-start justify-between gap-3"><div><p className="text-[8px] uppercase tracking-[.15em] text-blue-600">ATTL Track</p><h2 className="mt-2 text-base font-semibold">{t.name}</h2></div><span className={t.active?"rounded-full bg-green-500/10 px-3 py-1.5 text-[8px] text-green-600":"rounded-full bg-black/[.04] px-3 py-1.5 text-[8px] text-black/30"}>{t.active?"Active":"Inactive"}</span></div><p className="mt-3 text-[10px] leading-5 text-black/40">{t.description??"No description."}</p>{manager&&<button onClick={()=>toggle(t)} className="mt-5 rounded-[13px] bg-black/[.04] px-4 py-2.5 text-[9px] font-semibold text-black/50">{t.active?"Deactivate":"Activate"}</button>}</article>)}{items.length===0&&<div className="rounded-[24px] border border-dashed border-black/10 p-10 text-center text-[10px] text-black/30 md:col-span-2">No active ATTL tracks yet.</div>}</section></div>
