@@ -8,9 +8,9 @@ export const ROLE_DEFINITIONS = [
 ] as const;
 
 export const PERMISSION_MATRIX: Record<string, string[]> = {
-  STUDENT: ["profile:read", "profile:write", "academics:read", "learning:read", "projects:read", "projects:create", "projects:participate", "competitions:read", "competitions:apply", "events:read", "events:register", "community:read", "community:participate", "mentorship:request", "challenges:read", "challenges:participate", "attl:apply"],
-  ATTL_MEMBER: ["profile:*", "academics:read", "learning:read", "projects:*", "competitions:read", "competitions:apply", "events:*", "community:*", "mentorship:*", "challenges:*", "attl:read", "attl:operations"],
-  TRACK_LEAD: ["profile:*", "academics:read", "learning:*", "projects:*", "competitions:*", "events:*", "community:*", "mentorship:*", "challenges:*", "attl:read", "attl:review", "attl:tracks", "attl.tracks.manage", "attl.team.manage"],
+  STUDENT: ["profile:read", "profile:write", "academics:read", "learning:read", "learning:enroll", "projects:read", "projects:create", "projects:participate", "competitions:read", "competitions:apply", "events:read", "events:register", "community:read", "community:participate", "mentorship:request", "challenges:read", "challenges:participate", "attl:apply"],
+  ATTL_MEMBER: ["profile:*", "academics:read", "learning:read", "learning:enroll", "projects:*", "competitions:read", "competitions:apply", "events:*", "community:*", "mentorship:*", "challenges:*", "attl:read", "attl:operations"],
+  TRACK_LEAD: ["profile:*", "academics:read", "learning:*", "learning:enroll", "projects:*", "competitions:*", "events:*", "community:*", "mentorship:*", "challenges:*", "attl:read", "attl:review", "attl:tracks", "attl.tracks.manage", "attl.team.manage"],
   TEACHER: ["profile:*", "academics:read", "academics:teaching", "academics:gradebook", "academics:attendance", "academics:assignments", "academics:exams", "learning:read", "learning:teaching", "messages:*", "mentorship:manage"],
   ADMIN: ["users:*", "roles:*", "permissions:*", "results:*", "academics:*", "attl:*", "projects:*", "competitions:*", "events:*", "analytics:*", "audit:read", "security:manage", "system:manage"],
   SUPER_ADMIN: ["*"],
