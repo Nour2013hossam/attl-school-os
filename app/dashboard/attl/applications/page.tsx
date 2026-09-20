@@ -406,7 +406,7 @@ export default function AttlApplicationsPage() {
                     className="h-10 rounded-[13px] border border-black/5 bg-white px-3 text-[9px] outline-none"
                   >
                     {statuses
-                      .filter((item) => item !== "ACCEPTED" || (application.status === "INTERVIEW" && draft.interviewResult === "PASS"))
+                      .filter((item) => item !== "ACCEPTED" || draft.status === "ACCEPTED" || (application.status === "INTERVIEW" && draft.interviewResult === "PASS"))
                       .map((item) => <option key={item}>{item}</option>)}
                   </select>
                 </div>
