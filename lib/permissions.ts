@@ -29,10 +29,12 @@ export async function getEffectivePermissions(userId: string, role: UserRole) {
   });
 
   const map: Record<string, boolean> = {};
-  for (const [key] of Object.values(PERMISSION_MATRIX).flatMap((x) => x.map((p) => [p]))) {
-    if (key === "*" || key.endsWith(":*")) continue;
-    map[key] = roleAllows(role, key);
-  }
+  const keys = new Set(
+    Object.values(PERMISSION_MATRIX).flatMap((items) => items).filter(
+      (key) => key !== "*" && !key.endsWith(":*")
+    )
+  );
+  for (const key of keys) map[key] = roleAllows(role, key);
   for (const item of overrides) map[item.permission.key] = item.granted;
   return map;
 }
