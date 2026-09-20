@@ -10,9 +10,9 @@ export const ROLE_DEFINITIONS = [
 export const PERMISSION_MATRIX: Record<string, string[]> = {
   STUDENT: ["profile:read", "profile:write", "academics:read", "learning:read", "projects:create", "projects:participate", "competitions:apply", "events:register", "community:participate", "mentorship:request", "challenges:participate", "attl:apply"],
   ATTL_MEMBER: ["profile:*", "academics:read", "learning:read", "projects:*", "competitions:apply", "events:*", "community:*", "mentorship:*", "challenges:*", "attl:operations"],
-  TRACK_LEAD: ["profile:*", "academics:read", "learning:*", "projects:*", "competitions:*", "events:*", "community:*", "mentorship:*", "challenges:*", "attl:review", "attl:tracks"],
+  TRACK_LEAD: ["profile:*", "academics:read", "learning:*", "projects:*", "competitions:*", "events:*", "community:*", "mentorship:*", "challenges:*", "attl:review", "attl:tracks", "attl.tracks.manage", "attl.team.manage"],
   TEACHER: ["profile:*", "academics:teaching", "academics:gradebook", "academics:attendance", "academics:assignments", "academics:exams", "learning:teaching", "messages:*"],
-  ADMIN: ["users:*", "roles:manage", "permissions:manage", "academics:*", "attl:*", "projects:*", "competitions:*", "events:*", "analytics:*", "audit:read", "security:manage", "system:manage"],
+  ADMIN: ["users:*", "roles:*", "permissions:*", "results:*", "academics:*", "attl:*", "projects:*", "competitions:*", "events:*", "analytics:*", "audit:read", "security:manage", "system:manage"],
   SUPER_ADMIN: ["*"],
 };
 
