@@ -7,7 +7,7 @@ import { hasPermission } from "@/lib/permissions";
 
 export async function GET(){
  const session=await auth();
- if(!session?.user?.id || ![UserRole.ADMIN,UserRole.SUPER_ADMIN].includes(session.user.role) || !(await hasPermission(session.user.id,session.user.role,"roles.read"))) return NextResponse.json({error:"Forbidden"},{status:403});
+ if(!session?.user?.id || !(await hasPermission(session.user.id,session.user.role,"roles.read"))) return NextResponse.json({error:"Forbidden"},{status:403});
  const [users,customRoles]=await Promise.all([
    prisma.user.count(),
    prisma.customRole.findMany({orderBy:{name:"asc"},include:{permissions:{include:{permission:true}},_count:{select:{users:true}}}})
