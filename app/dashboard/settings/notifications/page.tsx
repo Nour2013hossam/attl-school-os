@@ -1,13 +1,2 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Settings"
-      title="Notifications"
-      description="Manage your notification preferences."
-      icon="●"
-      api="/api/settings"
-    />
-  );
-}
+import { SettingsHub } from "@/components/settings/settings-hub";
+export default function Page() { return <SettingsHub kind="notifications" />; }
