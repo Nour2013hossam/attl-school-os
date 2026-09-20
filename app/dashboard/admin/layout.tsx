@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { UserRole } from "@prisma/client";
+import { hasAnyPermission } from "@/lib/permissions";
 
 export default async function AdminLayout({
   children,
@@ -13,9 +13,19 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  if (!([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role)) {
-    redirect("/dashboard");
-  }
+  const canEnterAdmin = await hasAnyPermission(session.user.id, session.user.role, [
+    "users.read",
+    "roles.read",
+    "permissions.read",
+    "academics.grades.write",
+    "results.release",
+    "analytics.read",
+    "audit.read",
+    "security.manage",
+    "system.manage",
+  ]);
+
+  if (!canEnterAdmin) redirect("/dashboard");
 
   return children;
 }
