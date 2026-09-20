@@ -8,6 +8,7 @@ export default function Page() {
       description="Shared resources for ATTL members."
       icon="▥"
       api="/api/courses"
+      actions={[{ label: "Browse courses", href: "/dashboard/learning/courses" }, { label: "Bookmarks", href: "/dashboard/learning/bookmarks" }]}
     />
   );
 }
