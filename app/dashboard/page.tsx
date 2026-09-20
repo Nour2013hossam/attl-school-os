@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePreferences } from "@/components/providers/preferences-provider";
 
 type DashboardData = {
-  user: { name: string; role: string; xp: number; level: number; gradeLevel: string | null; className: string | null; avatarUrl: string | null } | null;
+  user: { name: string; role: string; xp: number; level: number; gradeLevel: string | null; className: string | null; avatarUrl: string | null; attlMembershipActive: boolean; attlActivatedAt: string | null } | null;
   stats: { projects: number; activeGoals: number; achievements: number; upcomingAssignments: number; upcomingEvents: number; upcomingCompetitions: number };
   goals: Array<{ id: string; title: string; progress: number; targetDate: string | null }>;
   recentProjects: Array<{ id: string; title: string; description: string | null; status: string; progress: number; owner: { name: string; avatarUrl: string | null }; _count: { members: number; tasks: number } }>;
