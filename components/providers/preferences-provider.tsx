@@ -14,6 +14,7 @@ const PreferenceContext = createContext<{
   theme: Theme;
   setLanguage: (language: Language) => void;
   setTheme: (theme: Theme) => void;
+  updatePreferences: (patch: Partial<Preferences>) => Promise<void>;
   permissions: Record<string, boolean>;
   permissionsReady: boolean;
   can: (permission: string) => boolean;
@@ -23,6 +24,7 @@ const PreferenceContext = createContext<{
   theme: "system",
   setLanguage: () => {},
   setTheme: () => {},
+  updatePreferences: async () => {},
   permissions: {},
   permissionsReady: false,
   can: () => false,
@@ -137,7 +139,7 @@ export function PreferencesProvider({children}:{children:React.ReactNode}){
  }
 
  const can=(permission:string)=>permissions[permission]===true;
- const value=useMemo(()=>({preferences,language:preferences.language,theme:preferences.theme,setLanguage:(v:Language)=>void update({language:v}),setTheme:(v:Theme)=>void update({theme:v}),permissions,permissionsReady,can}),[preferences,permissions,permissionsReady]);
+ const value=useMemo(()=>({preferences,language:preferences.language,theme:preferences.theme,setLanguage:(v:Language)=>void update({language:v}),setTheme:(v:Theme)=>void update({theme:v}),updatePreferences:update,permissions,permissionsReady,can}),[preferences,permissions,permissionsReady]);
  return <PreferenceContext.Provider value={value}>{children}</PreferenceContext.Provider>;
 }
 
