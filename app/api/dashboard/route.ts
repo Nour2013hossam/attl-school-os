@@ -9,7 +9,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [user, projects, goals, achievements, upcomingAssignments, upcomingEvents, upcomingCompetitions, recentProjects, nextEvents, nextCompetitions, attlMembers] = await Promise.all([
+  const [user, projects, goals, achievements, upcomingAssignments, upcomingEvents, upcomingCompetitions, recentProjects, nextEvents, nextCompetitions, attlMembers, featuredCourses, activeChallenges, attlTracks] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: { id: true, name: true, email: true, role: true, xp: true, level: true, gradeLevel: true, className: true, avatarUrl: true },
@@ -64,10 +64,41 @@ export async function GET() {
       select: { id: true, title: true, description: true, organizer: true, startsAt: true, deadlineAt: true, location: true },
     }),
     prisma.user.findMany({
-      where: { isActive: true, role: { in: ["ATTL_MEMBER", "TRACK_LEAD"] } },
+      where: { isActive: true, attlMembershipActive: true, role: { in: ["ATTL_MEMBER", "TRACK_LEAD"] } },
       orderBy: { name: "asc" },
       take: 8,
       select: { id: true, name: true, role: true, avatarUrl: true, gradeLevel: true },
+    }),
+    prisma.course.findMany({
+      where: { published: true },
+      orderBy: { updatedAt: "desc" },
+      take: 4,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        level: true,
+        _count: { select: { lessons: true, resources: true, enrollments: true } },
+      },
+    }),
+    prisma.challenge.findMany({
+      where: { status: "ACTIVE" },
+      orderBy: { createdAt: "desc" },
+      take: 4,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        xpReward: true,
+        endsAt: true,
+        _count: { select: { entries: true } },
+      },
+    }),
+    prisma.attlTrack.findMany({
+      where: { active: true },
+      orderBy: { name: "asc" },
+      take: 6,
+      select: { id: true, name: true, description: true },
     }),
   ]);
 
@@ -86,5 +117,8 @@ export async function GET() {
     nextEvents,
     nextCompetitions,
     attlMembers,
+    featuredCourses,
+    activeChallenges,
+    attlTracks,
   });
 }
