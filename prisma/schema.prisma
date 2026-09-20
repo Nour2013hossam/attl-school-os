@@ -992,3 +992,4 @@ model AppSetting {
   value     Json
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
+}
