@@ -3,26 +3,31 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const challenges = await prisma.challenge.findMany({
     where: { status: { in: ["ACTIVE", "COMPLETED"] } },
     orderBy: { createdAt: "desc" },
     include: {
       _count: { select: { entries: true } },
+      entries: { where: { userId: session.user.id }, select: { id: true, progress: true, completedAt: true } },
     },
   });
 
-  return NextResponse.json({ challenges });
+  return NextResponse.json({
+    challenges: challenges.map(({ entries, ...challenge }) => ({
+      ...challenge,
+      participation: entries[0] ?? null,
+    })),
+  });
 }
 
 export async function POST(request: Request) {
   const session = await auth();
-
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-
   if (typeof body.title !== "string" || body.title.trim().length < 2) {
     return NextResponse.json({ error: "A challenge title is required." }, { status: 400 });
   }
