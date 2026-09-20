@@ -135,9 +135,7 @@ export default function ApplicationFormPage() {
               <div className="grid h-11 w-11 place-items-center rounded-[13px] bg-black text-[9px] font-semibold text-white">{index + 1}</div>
               <div className="space-y-2">
                 <input defaultValue={question.prompt} onBlur={(e) => { if (e.target.value.trim() && e.target.value !== question.prompt) updateQuestion(question, { prompt: e.target.value.trim() }); }} className="h-10 w-full rounded-[13px] bg-white px-3 text-[10px] font-semibold outline-none" />
-                {(question.type === "select" || question.type === "multiselect") && <textarea defaultValue={(question.options ?? []).join("
-")} onBlur={(e) => updateQuestion(question, { options: e.target.value.split("
-").map((v) => v.trim()).filter(Boolean) })} rows={3} className="w-full rounded-[13px] bg-white px-3 py-2 text-[9px] outline-none" />}
+                {(question.type === "select" || question.type === "multiselect") && <textarea defaultValue={(question.options ?? []).join("\n")} onBlur={(e) => updateQuestion(question, { options: e.target.value.split("\n").map((v) => v.trim()).filter(Boolean) })} rows={3} className="w-full rounded-[13px] bg-white px-3 py-2 text-[9px] outline-none" />}
               </div>
               <div className="space-y-2">
                 <select value={question.type} onChange={(e) => updateQuestion(question, { type: e.target.value as Question["type"] })} className="h-10 w-full rounded-[13px] bg-white px-3 text-[9px] outline-none">{types.map((item) => <option key={item}>{item}</option>)}</select>
