@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { usePreferences, translateLabel } from "@/components/providers/preferences-provider";
 
 const sections = [
   {
@@ -229,6 +230,7 @@ const sections = [
 
 export function DashboardNav({ role = "STUDENT" }: { role?: string }) {
   const pathname = usePathname();
+  const { language } = usePreferences();
 
   const visibleSections = sections.filter((section) => {
     if (section.label === "ATTL") {
