@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import type { UserRole } from "@prisma/client";
 import { credentialsSchema } from "@/lib/validation";
 import { authConfig } from "@/auth.config";
 
@@ -65,7 +66,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub ?? "";
-        session.user.role = token.role ?? "STUDENT";
+        session.user.role = (token.role as UserRole | undefined) ?? "STUDENT";
         session.user.image = token.picture ?? null;
 
         if (token.sub) {
