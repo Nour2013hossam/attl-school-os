@@ -468,3 +468,52 @@ nav a > span:first-child {
     transparent 100%
   );
 }
+
+
+/* =========================================
+   ATTL DARK MODE
+   ========================================= */
+html.dark {
+  --background: #090b0f;
+  --foreground: #f5f7fb;
+  color-scheme: dark;
+}
+
+html.dark body {
+  background: #090b0f;
+  color: #f5f7fb;
+}
+
+html.dark [class*="bg-[#eef2f7]"] { background-color: #090b0f !important; }
+html.dark [class*="bg-white"] { background-color: rgba(23, 27, 35, 0.74) !important; }
+html.dark [class*="bg-black/["] { background-color: rgba(255,255,255,.05) !important; }
+html.dark [class*="text-black/"] { color: rgba(245,247,251,.62) !important; }
+html.dark [class*="text-black"] { color: #f5f7fb !important; }
+html.dark [class*="border-white"] { border-color: rgba(255,255,255,.12) !important; }
+html.dark [class*="border-black/"] { border-color: rgba(255,255,255,.08) !important; }
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background: rgba(18,22,29,.88) !important;
+  color: #f5f7fb !important;
+  border-color: rgba(255,255,255,.10) !important;
+}
+html.dark input::placeholder,
+html.dark textarea::placeholder { color: rgba(245,247,251,.32) !important; }
+html.dark option { background: #12161d; color: #f5f7fb; }
+html.dark .glass {
+  background: rgba(20,24,32,.62);
+  border-color: rgba(255,255,255,.10);
+  box-shadow: 0 20px 60px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
+}
+html.dark .dashboard-sidebar-scroll {
+  scrollbar-color: rgba(255,255,255,.18) transparent;
+}
+html.dark .dashboard-sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); }
+html.dark .dashboard-sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.28); }
+
+/* =========================================
+   RTL HELPERS
+   ========================================= */
+html[dir="rtl"] .text-right { text-align: left; }
+html[dir="rtl"] .text-left { text-align: right; }
