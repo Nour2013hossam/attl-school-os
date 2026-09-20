@@ -8,6 +8,7 @@ export default function Page() {
       description="Teacher communication workspace."
       icon="✉"
       api="/api/messages"
+      actions={[{ label: "Open messages", href: "/dashboard/messages" }, { label: "Mentorship", href: "/dashboard/mentorship/requests" }]}
     />
   );
 }
