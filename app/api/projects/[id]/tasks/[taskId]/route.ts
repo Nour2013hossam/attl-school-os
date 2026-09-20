@@ -27,7 +27,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   const canManage =
     task.project.ownerId === session.user.id ||
     task.project.members.some((m) => m.userId === session.user.id) ||
-    [UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role);
+    ([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role);
   if (!canManage && task.assigneeId !== session.user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   if (canManage && !(await hasPermission(session.user.id, session.user.role, "projects.tasks.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
