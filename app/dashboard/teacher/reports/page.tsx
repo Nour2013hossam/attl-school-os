@@ -1,13 +1,3 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Teacher OS"
-      title="Reports"
-      description="Teaching and academic reporting workspace."
-      icon="▥"
-      api="/api/teacher/overview"
-    />
-  );
-}
+"use client";import{useEffect,useState}from"react";
+type Report={students:number;subjects:number;gradesRecorded:number;averageScore:number;assignments:number;submissions:number;attendance:Record<string,number>};
+export default function ReportsPage(){const[r,setR]=useState<Report|null>(null);const[s,setS]=useState<Array<{id:string;code:string;name:string}>>([]);useEffect(()=>{fetch("/api/teacher/reports",{cache:"no-store"}).then(x=>x.json()).then(d=>{setR(d.report??null);setS(d.subjects??[]);});},[]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Teacher OS</p><h1 className="mt-3 text-3xl font-semibold md:text-5xl">Reports</h1><p className="mt-3 max-w-2xl text-sm text-white/40">Live teaching and academic signals for your assigned subjects.</p></section>{r&&<><section className="grid grid-cols-2 gap-3 md:grid-cols-4">{[["Students",r.students],["Subjects",r.subjects],["Grades",r.gradesRecorded],["Average score",r.averageScore+"%"]].map(([k,v])=><div key={String(k)} className="rounded-[24px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.16em] text-black/25">{k}</p><p className="mt-2 text-2xl font-semibold">{v}</p></div>)}</section><section className="grid gap-4 md:grid-cols-2"><div className="rounded-[28px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Attendance</p><div className="mt-4 space-y-2">{Object.entries(r.attendance).map(([k,v])=><div key={k} className="flex items-center justify-between rounded-[14px] bg-black/[.025] px-3 py-3 text-[9px]"><span>{k}</span><span className="font-semibold">{v}</span></div>)}</div></div><div className="rounded-[28px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Assignments</p><p className="mt-2 text-xl font-semibold">{r.assignments} created</p><p className="mt-1 text-[9px] text-black/35">{r.submissions} submissions recorded.</p><p className="mt-6 text-[8px] uppercase tracking-[.15em] text-black/25">Subjects</p><div className="mt-2 flex flex-wrap gap-2">{s.map(x=><span key={x.id} className="rounded-full bg-black/[.04] px-3 py-1.5 text-[8px]">{x.code} · {x.name}</span>)}</div></div></section></>}</div>}
