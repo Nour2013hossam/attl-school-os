@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hasPermission } from "@/lib/permissions";
-import { hasPermission } from "@/lib/permissions";
 
 export async function POST(_request:Request,context:{params:Promise<{id:string}>}){
  const s=await auth();const{id}=await context.params;if(!s?.user?.id)return NextResponse.json({error:"Unauthorized"},{status:401});
