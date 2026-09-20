@@ -35,7 +35,7 @@ async function main() {
 
   const adminPassword = await bcrypt.hash(seedPassword, 12);
 
-  const admin = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: "admin@attl.school" },
     update: { passwordHash: adminPassword, isActive: true, role: UserRole.SUPER_ADMIN },
     create: {
@@ -62,7 +62,7 @@ async function main() {
     },
   });
 
-  const memberTwo = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: "lead@attl.school" },
     update: { passwordHash: studentPassword, isActive: true },
     create: {
