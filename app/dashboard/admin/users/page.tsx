@@ -16,9 +16,10 @@ export default function AdminUsersPage(){
  const [query,setQuery]=useState("");
  const [busy,setBusy]=useState("");
  const [message,setMessage]=useState("");
+ const [myRole,setMyRole]=useState("STUDENT");
 
  async function load(){const res=await fetch("/api/admin/users",{cache:"no-store"});const data=await res.json();if(res.ok)setUsers(data.users??[]);else setMessage(data.error??"Unable to load users.");}
- useEffect(()=>{load(); fetch("/api/admin/roles",{cache:"no-store"}).then(r=>r.json()).then(d=>setCustomRoles((d.customRoles??[]).filter((r:{active?:boolean})=>r.active!==false)));},[]);
+ useEffect(()=>{load(); fetch("/api/me/permissions",{cache:"no-store"}).then(r=>r.json()).then(d=>setMyRole(d.role??"STUDENT")); fetch("/api/admin/roles",{cache:"no-store"}).then(r=>r.json()).then(d=>setCustomRoles((d.customRoles??[]).filter((r:{active?:boolean})=>r.active!==false)));},[]);
 
  const filtered=useMemo(()=>users.filter(u=>[u.name,u.email,u.role,u.schoolId??""].join(" ").toLowerCase().includes(query.toLowerCase())),[users,query]);
 
