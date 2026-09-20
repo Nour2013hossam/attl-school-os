@@ -112,6 +112,7 @@ const sections = [
       { label: "Members", href: "/dashboard/attl/members", icon: "●" },
       { label: "Tracks", href: "/dashboard/attl/tracks", icon: "◇" },
       { label: "Applications", href: "/dashboard/attl/applications", icon: "□" },
+      { label: "Application Form", href: "/dashboard/attl/application-form", icon: "✎" },
       { label: "Recruitment", href: "/dashboard/attl/recruitment", icon: "↗" },
       { label: "Projects", href: "/dashboard/attl/projects", icon: "▣" },
       { label: "Events", href: "/dashboard/attl/events", icon: "◷" },
