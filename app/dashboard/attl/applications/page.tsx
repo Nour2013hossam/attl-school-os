@@ -254,7 +254,7 @@ export default function AttlApplicationsPage() {
         </section>
       )}
 
-      {!reviewer && applicant && !myApplication && (
+      {!reviewer && applicant && (!myApplication || myApplication.status === "REJECTED") && (
         <section className="rounded-[30px] border border-white/80 bg-white/60 p-5 backdrop-blur-2xl md:p-8">
           <div className="mb-7 grid gap-3 md:grid-cols-3">
             <div className="rounded-[20px] bg-black/[.025] p-4">
@@ -405,7 +405,9 @@ export default function AttlApplicationsPage() {
                     onChange={(event) => updateDraft(application.id, { status: event.target.value })}
                     className="h-10 rounded-[13px] border border-black/5 bg-white px-3 text-[9px] outline-none"
                   >
-                    {statuses.map((item) => <option key={item}>{item}</option>)}
+                    {statuses
+                      .filter((item) => item !== "ACCEPTED" || (application.status === "INTERVIEW" && draft.interviewResult === "PASS"))
+                      .map((item) => <option key={item}>{item}</option>)}
                   </select>
                 </div>
 
