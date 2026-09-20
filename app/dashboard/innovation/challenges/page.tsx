@@ -8,6 +8,7 @@ export default function Page() {
       description="Innovation challenges and problem spaces."
       icon="◆"
       api="/api/challenges"
+      actions={[{ label: "Explore challenges", href: "/dashboard/challenges/explore" }, { label: "Leaderboard", href: "/dashboard/challenges/leaderboard" }]}
     />
   );
 }
