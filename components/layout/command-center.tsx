@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { usePreferences, translateLabel } from "@/components/providers/preferences-provider";
 
 const commands = [
   { label: "Overview", description: "Your school dashboard", href: "/dashboard", icon: "⌂" },
@@ -15,6 +16,7 @@ const commands = [
 ];
 
 export function CommandCenter() {
+  const { language } = usePreferences();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(0);
@@ -122,7 +124,7 @@ export function CommandCenter() {
               setQuery(event.target.value);
               setSelected(0);
             }}
-            placeholder="Search ATTL School OS..."
+            placeholder={language === "ar" ? "ابحث في نظام مدرسة ATTL..." : "Search ATTL School OS..."}
             className="h-9 flex-1 bg-transparent text-sm outline-none placeholder:text-black/30"
           />
 
@@ -156,14 +158,14 @@ export function CommandCenter() {
 
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-medium">
-                    {command.label}
+                    {translateLabel(command.label, language)}
                   </span>
                   <span
                     className={`block truncate text-[10px] ${
                       selected === index ? "text-white/45" : "text-black/35"
                     }`}
                   >
-                    {command.description}
+                    {translateLabel(command.description, language)}
                   </span>
                 </span>
 
@@ -179,16 +181,16 @@ export function CommandCenter() {
           ) : (
             <div className="px-5 py-12 text-center">
               <div className="text-3xl">⌕</div>
-              <p className="mt-3 text-sm font-medium">No results</p>
+              <p className="mt-3 text-sm font-medium">{language === "ar" ? "لا توجد نتائج" : "No results"}</p>
               <p className="mt-1 text-xs text-black/35">
-                Try another search.
+                {language === "ar" ? "جرّب بحثًا آخر." : "Try another search."}
               </p>
             </div>
           )}
         </div>
 
         <div className="flex items-center justify-between border-t border-black/5 px-5 py-3 text-[10px] text-black/30">
-          <span>Navigate anywhere in ATTL</span>
+          <span>{language === "ar" ? "انتقل إلى أي مكان في ATTL" : "Navigate anywhere in ATTL"}</span>
           <div className="flex items-center gap-2">
             <span>↑ ↓</span>
             <span>Enter</span>
