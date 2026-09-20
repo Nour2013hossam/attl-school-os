@@ -12,6 +12,44 @@ const managePermissions: Record<string, string> = {
   competition: "competitions.manage",
 };
 
+async function canReadFile(userId: string, role: Parameters<typeof hasPermission>[1], entityType: string, entityId: string) {
+  const permissionByEntity: Record<string, string> = {
+    course: "learning.read",
+    lesson: "learning.read",
+    resource: "learning.read",
+    project: "projects.read",
+    event: "events.read",
+    competition: "competitions.read",
+  };
+  const permission = permissionByEntity[entityType];
+  if (!permission || !(await hasPermission(userId, role, permission))) return false;
+
+  if (entityType === "project") {
+    const project = await prisma.project.findUnique({
+      where: { id: entityId },
+      select: { ownerId: true, members: { select: { userId: true } } },
+    });
+    return Boolean(project && (project.ownerId === userId || project.members.some((m) => m.userId === userId) || role === "SUPER_ADMIN"));
+  }
+
+  if (entityType === "course") {
+    const course = await prisma.course.findUnique({ where: { id: entityId }, select: { published: true } });
+    return Boolean(course && (course.published || await hasPermission(userId, role, "learning.manage")));
+  }
+
+  if (entityType === "lesson") {
+    const lesson = await prisma.lesson.findUnique({ where: { id: entityId }, select: { course: { select: { published: true } } } });
+    return Boolean(lesson && (lesson.course.published || await hasPermission(userId, role, "learning.manage")));
+  }
+
+  if (entityType === "resource") {
+    const resource = await prisma.resource.findUnique({ where: { id: entityId }, select: { course: { select: { published: true } } } });
+    return Boolean(resource && (!resource.course || resource.course.published || await hasPermission(userId, role, "learning.manage")));
+  }
+
+  return true;
+}
+
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const session = await auth();
   const { id } = await context.params;
@@ -22,15 +60,17 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     select: { id: true, fileName: true, mimeType: true, data: true, entityType: true, entityId: true },
   });
   if (!file) return NextResponse.json({ error: "File not found." }, { status: 404 });
-  const permissionByEntity: Record<string, string> = { course: "learning.read", lesson: "learning.read", resource: "learning.read", project: "projects.read", event: "events.read", competition: "competitions.read" };
-  const permission = permissionByEntity[file.entityType];
-  if (!permission || !(await hasPermission(session.user.id, session.user.role, permission))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  if (!(await canReadFile(session.user.id, session.user.role, file.entityType, file.entityId))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   return new Response(file.data, {
     headers: {
       "Content-Type": file.mimeType || "application/octet-stream",
-      "Content-Disposition": `inline; filename="${file.fileName.replace(/"/g, "")}"`,
+      "Content-Disposition": `attachment; filename="${file.fileName.replace(/"/g, "")}"`,
       "Cache-Control": "private, max-age=3600",
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }
