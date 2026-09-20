@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CustomCursor } from "@/components/effects/custom-cursor";
 import "./globals.css";
+import { PreferencesProvider } from "@/components/providers/preferences-provider";
 
 export const metadata: Metadata = {
   title: "ATTL School OS",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr">
       <body>
-        {children}
+        <PreferencesProvider>
+          {children}
+        </PreferencesProvider>
         <CustomCursor />
       </body>
     </html>
