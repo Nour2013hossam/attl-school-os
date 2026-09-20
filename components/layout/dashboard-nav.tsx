@@ -231,15 +231,6 @@ const sections = [
 export function DashboardNav({}: { role?: string }) {
   const pathname = usePathname();
   const { language, permissions, permissionsReady } = usePreferences();
-  const [permissions, setPermissions] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    fetch("/api/me/permissions", { cache: "no-store" })
-      .then((response) => response.ok ? response.json() : null)
-      .then((data) => setPermissions(data?.permissions ?? {}))
-      .catch(() => {});
-  }, []);
-
   const requiredPermission = (href: string) => {
     const rules: Record<string,string> = {
       "/dashboard/academics/overview":"academics.read",
@@ -478,10 +469,7 @@ export function DashboardNav({}: { role?: string }) {
               >
                 <div className="min-h-0 overflow-hidden pt-1">
                   <div className="space-y-1 pl-2">
-                    {section.items.filter((item) => {
-                      const permission = requiredPermission(item.href);
-                      return !permission || permissions[permission] !== false;
-                    }).map((item) => {
+                    {section.items.map((item) => {
                       const active =
                         pathname === item.href ||
                         (item.href !== "/dashboard" &&
