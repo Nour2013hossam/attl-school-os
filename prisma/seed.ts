@@ -1,10 +1,19 @@
 import { PrismaClient, UserRole } from "@prisma/client";
+import { PERMISSION_CATALOG } from "../lib/roles";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
   const seedPassword = process.env.SEED_PASSWORD ?? "ChangeMe123!";
+
+  for (const [key, name, category] of PERMISSION_CATALOG) {
+    await prisma.permission.upsert({
+      where: { key },
+      update: { name, category },
+      create: { key, name, category },
+    });
+  }
 
   const studentPassword = await bcrypt.hash(seedPassword, 12);
 
