@@ -21,7 +21,7 @@ export async function GET(request: Request) {
         { name: { contains: query, mode: "insensitive" } },
         { email: { contains: query, mode: "insensitive" } },
       ],
-      preferences: { profileVisible: true },
+      OR: [{ preferences: { is: { profileVisible: true } } }, { preferences: { is: null } }],
     },
     orderBy: { name: "asc" },
     take: 20,
