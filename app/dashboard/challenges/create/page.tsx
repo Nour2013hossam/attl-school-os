@@ -14,7 +14,7 @@ export default function CreateChallengePage(){
    <h1 className="mt-5 text-3xl font-semibold tracking-[-.06em] md:text-5xl">Create a challenge.</h1>
    <p className="mt-3 max-w-xl text-sm text-white/40">Create a challenge record and configure its reward before publishing.</p>
   </section>
-  <section className="rounded-[30px] border border-white/80 bg-white/60 p-6 backdrop-blur-2xl md:p-8">
+  {permissionsReady && can("challenges.manage") && <section className="rounded-[30px] border border-white/80 bg-white/60 p-6 backdrop-blur-2xl md:p-8">
    <form onSubmit={submit} className="space-y-5">
     <input value={title} onChange={e=>setTitle(e.target.value)} required maxLength={140} placeholder="Challenge title" className="h-12 w-full rounded-[16px] border border-black/5 bg-white/80 px-4 text-xs outline-none" />
     <textarea value={description} onChange={e=>setDescription(e.target.value)} maxLength={5000} rows={6} placeholder="Challenge description" className="w-full rounded-[16px] border border-black/5 bg-white/80 px-4 py-3 text-xs outline-none" />
@@ -25,6 +25,6 @@ export default function CreateChallengePage(){
      <Link href="/dashboard/challenges/explore" className="rounded-[15px] bg-black/[.04] px-5 py-3 text-[9px] font-semibold text-black/50">Back</Link>
     </div>
    </form>
-  </section>
+  </section>}
  </div>
 }
