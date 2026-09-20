@@ -66,10 +66,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Your account is already an active ATTL member." }, { status: 400 });
   }
 
-  const [questions, existing] = await Promise.all([
+  const [questions, existing, track] = await Promise.all([
     prisma.applicationQuestion.findMany({ where: { active: true }, orderBy: { position: "asc" } }),
     prisma.attlApplication.findUnique({ where: { userId: session.user.id }, select: { id: true, status: true } }),
+    prisma.attlTrack.findFirst({ where: { id: trackId, active: true }, select: { id: true } }),
   ]);
+
+  if (!track) {
+    return NextResponse.json({ error: "This ATTL track is not available." }, { status: 400 });
+  }
 
   for (const question of questions) {
     if (!question.required) continue;
