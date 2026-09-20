@@ -33,7 +33,7 @@ export const PERMISSION_CATALOG = [
   ["community.read","View community","Community"],["community.participate","Use community","Community"],["community.moderate","Moderate community","Community"],["messages.read","View messages","Community"],["messages.send","Send messages","Community"],
   ["mentorship.request","Request mentorship","Mentorship"],["notifications.read","View notifications","Profile"],["notifications.manage","Manage notifications","Profile"],["goals.manage","Manage personal goals","Profile"],["mentorship.manage","Manage mentorship","Mentorship"],
   ["academics.assignments.submit","Submit assignments","Academics"],["challenges.read","View challenges","Challenges"],["challenges.participate","Participate in challenges","Challenges"],["challenges.manage","Manage challenges","Challenges"],
-  ["users.read","View users","Administration"],["users.manage","Manage users","Administration"],
+  ["users.read","View users","Administration"],["users.manage","Manage users","Administration"],["xp.manage","Adjust user XP","Administration"],
   ["roles.read","View roles","Administration"],["roles.assign","Assign roles","Administration"],["roles.manage","Create and manage custom roles","Administration"],
   ["permissions.read","View permissions","Administration"],["permissions.manage","Manage user overrides","Administration"],
   ["audit.read","View audit logs","Administration"],["security.manage","Manage security","Administration"],["school.manage","Manage school settings","Administration"],
