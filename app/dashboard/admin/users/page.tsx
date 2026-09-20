@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePreferences } from "@/components/providers/preferences-provider";
 
 type User = {
-  id:string; name:string; email:string; role:string; isActive:boolean; gradeLevel:string|null; className:string|null; xp:number; level:number;
+  id:string; name:string; email:string; role:string; isActive:boolean; gradeLevel:string|null; className:string|null; schoolId:string|null; xp:number; level:number; customRole?:{id:string;name:string}|null;
 };
 
 const roles=["STUDENT","ATTL_MEMBER","TRACK_LEAD","TEACHER","ADMIN","SUPER_ADMIN"];
