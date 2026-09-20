@@ -1,13 +1,4 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Workspace"
-      title="Notifications"
-      description="Your system, academic, project and ATTL notifications."
-      icon="⌂"
-      api="/api/notifications"
-    />
-  );
-}
+"use client";
+import {useEffect,useState} from "react";
+type N={id:string;title:string;body:string;type:string;readAt:string|null;createdAt:string};
+export default function NotificationsPage(){const [items,setItems]=useState<N[]>([]);const [busy,setBusy]=useState("");async function load(){const d=await fetch("/api/notifications",{cache:"no-store"}).then(r=>r.json());setItems(d.notifications??[]);}useEffect(()=>{load();},[]);async function mark(id:string){setBusy(id);await fetch("/api/notifications/"+id,{method:"PATCH"});setBusy("");load();}async function markAll(){setBusy("all");await fetch("/api/notifications",{method:"PATCH"});setBusy("");load();}const unread=items.filter(n=>!n.readAt).length;return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><div className="flex items-end justify-between gap-4"><div><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Workspace</p><h1 className="mt-3 text-3xl font-semibold tracking-[-.05em] md:text-5xl">Notifications</h1><p className="mt-3 text-sm text-white/40">{unread} unread notifications.</p></div><button onClick={markAll} disabled={busy==="all"||unread===0} className="rounded-[15px] bg-white px-4 py-2.5 text-[9px] font-semibold text-black disabled:opacity-40">Mark all read</button></div></section><section className="space-y-3">{items.map(n=><article key={n.id} className={"rounded-[24px] border p-5 backdrop-blur-xl "+(n.readAt?"border-white/80 bg-white/55":"border-blue-500/20 bg-blue-500/[.04]")}><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex items-center gap-2"><span className="rounded-full bg-black/[.05] px-3 py-1 text-[8px] uppercase tracking-[.12em] text-black/35">{n.type}</span>{!n.readAt&&<span className="h-1.5 w-1.5 rounded-full bg-blue-500"/>}</div><h2 className="mt-3 text-sm font-semibold">{n.title}</h2><p className="mt-2 text-[10px] leading-5 text-black/40">{n.body}</p><p className="mt-3 text-[8px] text-black/25">{new Date(n.createdAt).toLocaleString()}</p></div>{!n.readAt&&<button disabled={busy===n.id} onClick={()=>mark(n.id)} className="rounded-[13px] bg-black px-3 py-2 text-[9px] font-semibold text-white disabled:opacity-40">{busy===n.id?"...":"Mark read"}</button>}</div></article>)}{items.length===0&&<div className="rounded-[26px] border border-dashed border-black/10 p-10 text-center text-[10px] text-black/30">No notifications yet.</div>}</section></div>}
