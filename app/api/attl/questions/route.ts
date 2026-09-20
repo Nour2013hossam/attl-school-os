@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const questionSchema = z.object({
   prompt: z.string().trim().min(3).max(500),
@@ -32,7 +33,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const session = await auth();
 
-  if (!session?.user?.id || !reviewerRoles.includes(session.user.role)) {
+  if (!session?.user?.id || !reviewerRoles.includes(session.user.role) || !(await hasPermission(session.user.id, session.user.role, "attl.review"))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
