@@ -129,6 +129,13 @@ model User {
   lessonProgress       LessonProgress[]
   bookmarks            Bookmark[]
   certificates         Certificate[]
+  communityDiscussions CommunityDiscussion[]
+  discussionPosts      CommunityDiscussionPost[]
+  groupMemberships     GroupMember[]
+  ownedGroups          CommunityGroup[]          @relation("GroupOwner")
+  pollVotes            PollVote[]
+  createdPolls         Poll[]                    @relation("PollCreator")
+  announcements        Announcement[]
 
   @@index([role])
   @@index([email])
@@ -649,6 +656,114 @@ model ChallengeParticipation {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([challengeId, userId])
+}
+
+model CommunityDiscussion {
+  id        String   @id @default(cuid())
+  authorId  String
+  title     String
+  body      String
+  status    String   @default("OPEN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author User                     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  posts  CommunityDiscussionPost[]
+
+  @@index([status, createdAt])
+}
+
+model CommunityDiscussionPost {
+  id           String   @id @default(cuid())
+  discussionId String
+  authorId     String
+  body         String
+  createdAt    DateTime @default(now())
+
+  discussion CommunityDiscussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  author     User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([discussionId, createdAt])
+}
+
+model CommunityGroup {
+  id          String   @id @default(cuid())
+  ownerId     String
+  name        String   @unique
+  description String?
+  visibility  String   @default("SCHOOL")
+  createdAt   DateTime @default(now())
+
+  owner   User        @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members GroupMember[]
+
+  @@index([visibility, name])
+}
+
+model GroupMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  role      String   @default("MEMBER")
+  joinedAt  DateTime @default(now())
+
+  group CommunityGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+}
+
+model Poll {
+  id          String   @id @default(cuid())
+  creatorId   String
+  question    String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  creator User       @relation("PollCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  options PollOption[]
+
+  @@index([active, createdAt])
+}
+
+model PollOption {
+  id     String @id @default(cuid())
+  pollId String
+  label  String
+
+  poll  Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes PollVote[]
+
+  @@unique([pollId, label])
+}
+
+model PollVote {
+  id       String   @id @default(cuid())
+  pollId   String
+  optionId String
+  userId   String
+  createdAt DateTime @default(now())
+
+  poll   Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId])
+  @@index([optionId])
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  authorId  String
+  title     String
+  body      String
+  audience  String   @default("SCHOOL")
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([published, createdAt])
 }
 
 model Notification {
