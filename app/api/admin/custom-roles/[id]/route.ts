@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { UserRole } from "@prisma/client";
 import { PERMISSION_CATALOG } from "@/lib/roles";
 import { hasPermission } from "@/lib/permissions";
 import { z } from "zod";
@@ -10,7 +9,7 @@ const schema=z.object({name:z.string().trim().min(2).max(80).optional(),descript
 
 async function admin(){
  const s=await auth();
- if(!s?.user?.id||![UserRole.ADMIN,UserRole.SUPER_ADMIN].includes(s.user.role))return null;
+ if(!s?.user?.id)return null;
  if(!(await hasPermission(s.user.id,s.user.role,"roles.manage")))return null;
  return s.user;
 }
