@@ -261,6 +261,45 @@ async function main() {
     create: { id: "seed-resource-mdn", courseId: course.id, title: "MDN Web Docs", description: "Reference material for web development.", type: "Reference", url: "https://developer.mozilla.org/" },
   });
 
+  const challengeSeeds = [
+    {
+      id: "seed-challenge-build-landing",
+      title: "Build a Better Landing Page",
+      description: "Redesign a school landing page with a clear structure, responsive layout and accessible interactions.",
+      xpReward: 150,
+      endsAt: new Date("2026-10-15T21:00:00.000Z"),
+    },
+    {
+      id: "seed-challenge-data-story",
+      title: "Turn Data Into a Story",
+      description: "Create a small data story that explains a school problem using clear charts and evidence.",
+      xpReward: 200,
+      endsAt: new Date("2026-10-30T21:00:00.000Z"),
+    },
+  ];
+
+  for (const challenge of challengeSeeds) {
+    await prisma.challenge.upsert({
+      where: { id: challenge.id },
+      update: {
+        title: challenge.title,
+        description: challenge.description,
+        status: "ACTIVE",
+        xpReward: challenge.xpReward,
+        endsAt: challenge.endsAt,
+      },
+      create: {
+        id: challenge.id,
+        creatorId: memberOne.id,
+        title: challenge.title,
+        description: challenge.description,
+        status: "ACTIVE",
+        xpReward: challenge.xpReward,
+        endsAt: challenge.endsAt,
+      },
+    });
+  }
+
   const projectSeed = await prisma.project.upsert({
     where: { slug: "attl-smart-campus-demo" },
     update: { ownerId: memberOne.id, visibility: "school", progress: 62 },
