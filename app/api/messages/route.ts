@@ -26,9 +26,13 @@ export async function POST(request: Request) {
   if (!(await hasPermission(session.user.id, session.user.role, "messages.send"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await request.json();
+  if (body.userId === session.user.id) return NextResponse.json({ error: "You cannot message yourself." }, { status: 400 });
   if (typeof body.userId !== "string" || typeof body.message !== "string" || !body.message.trim()) {
     return NextResponse.json({ error: "Recipient and message are required." }, { status: 400 });
   }
+
+  const recipient = await prisma.user.findUnique({ where: { id: body.userId }, select: { id: true, isActive: true } });
+  if (!recipient?.isActive) return NextResponse.json({ error: "Recipient not found or inactive." }, { status: 404 });
 
   const thread = await prisma.messageThread.create({
     data: {
@@ -46,5 +50,6 @@ export async function POST(request: Request) {
     },
   });
 
+  await prisma.auditLog.create({ data: { actorId: session.user.id, action: "MESSAGE_THREAD_CREATED", entity: "MessageThread", entityId: thread.id } });
   return NextResponse.json({ thread }, { status: 201 });
 }
