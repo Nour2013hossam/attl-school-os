@@ -1,13 +1,4 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Learning"
-      title="Certificates"
-      description="Track certificates earned from completed learning experiences."
-      icon="✦"
-      api="/api/courses"
-    />
-  );
-}
+"use client";
+import{useEffect,useState}from"react";
+type Certificate={id:string;code:string;issuedAt:string;course:{id:string;title:string;description:string|null}};
+export default function CertificatesPage(){const[items,setItems]=useState<Certificate[]>([]);useEffect(()=>{fetch("/api/learning/certificates",{cache:"no-store"}).then(r=>r.json()).then(d=>setItems(d.certificates??[]));},[]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Learning</p><h1 className="mt-3 text-3xl font-semibold md:text-5xl">Certificates</h1><p className="mt-3 text-sm text-white/40">Certificates issued when a course is completed.</p></section><section className="grid gap-4 md:grid-cols-2">{items.map(c=><article key={c.id} className="relative overflow-hidden rounded-[28px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl"><div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-blue-400/15 blur-[60px]"/><div className="relative"><p className="text-[8px] uppercase tracking-[.18em] text-blue-600">ATTL Certificate</p><h2 className="mt-3 text-xl font-semibold">{c.course.title}</h2><p className="mt-2 text-[10px] leading-5 text-black/35">{c.course.description??"Completed learning experience."}</p><div className="mt-5 flex items-center justify-between rounded-[16px] bg-black/[.03] p-3"><div><p className="text-[7px] uppercase tracking-[.14em] text-black/25">Certificate code</p><p className="mt-1 text-[9px] font-semibold">{c.code}</p></div><p className="text-[9px] text-black/30">{new Date(c.issuedAt).toLocaleDateString()}</p></div></div></article>)}{items.length===0&&<div className="rounded-[24px] border border-dashed border-black/10 p-10 text-center text-[10px] text-black/30 md:col-span-2">Complete a course to earn your first certificate.</div>}</section></div>}
