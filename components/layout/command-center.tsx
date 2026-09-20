@@ -6,17 +6,17 @@ import { usePreferences, translateLabel } from "@/components/providers/preferenc
 
 const commands = [
   { label: "Overview", description: "Your school dashboard", href: "/dashboard", icon: "⌂" },
-  { label: "My Profile", description: "Your student identity", href: "/dashboard/student", icon: "○" },
-  { label: "Academics", description: "Grades and academic progress", href: "/dashboard/academics", icon: "◇" },
-  { label: "Projects", description: "Build and manage projects", href: "/dashboard/projects", icon: "✦" },
-  { label: "Competitions", description: "Competitions and challenges", href: "/dashboard/competitions", icon: "◈" },
-  { label: "Skills", description: "Track your skill growth", href: "/dashboard/skills", icon: "◎" },
-  { label: "ATTL", description: "Al Thagr Technical Lab", href: "/dashboard/attl", icon: "A" },
+  { label: "My Profile", description: "Your student identity", href: "/dashboard/student", icon: "○", permission: "profile.read" },
+  { label: "Academics", description: "Grades and academic progress", href: "/dashboard/academics", icon: "◇", permission: "academics.read" },
+  { label: "Projects", description: "Build and manage projects", href: "/dashboard/projects", icon: "✦", permission: "projects.read" },
+  { label: "Competitions", description: "Competitions and challenges", href: "/dashboard/competitions", icon: "◈", permission: "competitions.read" },
+  { label: "Skills", description: "Track your skill growth", href: "/dashboard/skills", icon: "◎", permission: "skills.read" },
+  { label: "ATTL", description: "Al Thagr Technical Lab", href: "/dashboard/attl", icon: "A", permission: "attl.read" },
   { label: "Settings", description: "Customize your experience", href: "/dashboard/settings", icon: "⚙" },
 ];
 
 export function CommandCenter() {
-  const { language } = usePreferences();
+  const { language, permissions, permissionsReady } = usePreferences();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(0);
@@ -24,9 +24,13 @@ export function CommandCenter() {
   const filtered = useMemo(() => {
     const value = query.toLowerCase().trim();
 
-    if (!value) return commands;
+    const accessible = permissionsReady
+      ? commands.filter((command) => !command.permission || permissions[command.permission] === true)
+      : commands.filter((command) => !command.permission);
 
-    return commands.filter(
+    if (!value) return accessible;
+
+    return accessible.filter(
       (command) =>
         command.label.toLowerCase().includes(value) ||
         command.description.toLowerCase().includes(value)
