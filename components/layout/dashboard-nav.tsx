@@ -58,6 +58,7 @@ const sections = [
       { label: "Bookmarks", href: "/dashboard/learning/bookmarks", icon: "◇" },
       { label: "Certificates", href: "/dashboard/learning/certificates", icon: "✦" },
       { label: "Library", href: "/dashboard/learning/library", icon: "▥" },
+      { label: "Course Studio", href: "/dashboard/learning/studio", icon: "✦" },
     ],
   },
   {
@@ -258,6 +259,7 @@ export function DashboardNav({}: { role?: string }) {
       "/dashboard/learning/bookmarks":"learning.read",
       "/dashboard/learning/certificates":"learning.read",
       "/dashboard/learning/library":"learning.read",
+      "/dashboard/learning/studio":"learning.manage",
 
       "/dashboard/skills/skill-map":"skills.read",
       "/dashboard/skills/my-skills":"skills.read",
