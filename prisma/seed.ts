@@ -266,7 +266,7 @@ async function main() {
       slug: "attl-smart-campus-demo",
       description: "A school technology concept for connected campus services.",
       visibility: "school",
-      status: "IN_PROGRESS",
+      status: "ACTIVE",
       progress: 62,
     },
   });
@@ -324,7 +324,7 @@ async function main() {
   await prisma.notification.createMany({
     data:[
       {userId:student.id,title:"Welcome to ATTL School OS",body:"Your School OS workspace is ready.",type:"SYSTEM"},
-      {userId:student.id,title:"New ATTL workshop",body:"A new innovation workshop is available.",type:"EVENT"},
+      {userId:student.id,title:"New ATTL workshop",body:"A new innovation workshop is available.",type:"ATTL"},
     ],
     skipDuplicates:true,
   });
