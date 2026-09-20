@@ -8,6 +8,7 @@ export default function Page() {
       description="Track how your skills develop over time."
       icon="↗"
       api="/api/skills"
+      actions={[{ label: "Skill Map", href: "/dashboard/skills/skill-map" }, { label: "History", href: "/dashboard/skills/skill-history" }]}
     />
   );
 }
