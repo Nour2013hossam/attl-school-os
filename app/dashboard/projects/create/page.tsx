@@ -10,6 +10,7 @@ export default function CreateProjectPage() {
   const [visibility,setVisibility]=useState("private");
   const [saving,setSaving]=useState(false);
   const [message,setMessage]=useState("");
+  const { can, permissionsReady } = usePreferences();
 
   async function submit(event: FormEvent) {
     event.preventDefault();
