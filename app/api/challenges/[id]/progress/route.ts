@@ -31,6 +31,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
        const xp = progression.xp;
        const level = progression.level;
        await tx.user.update({where:{id:session.user.id},data:{xp,level}});
+       await tx.xpTransaction.create({data:{userId:session.user.id,delta:challenge.xpReward,balanceAfter:xp,reason:"Completed challenge: "+challenge.title,source:"CHALLENGE"}});
+       await tx.xpTransaction.create({data:{userId:session.user.id,delta:challenge.xpReward,balanceAfter:xp,reason:"Completed challenge: "+challenge.title,source:"CHALLENGE"}});
        await tx.auditLog.create({data:{actorId:session.user.id,action:"CHALLENGE_XP_AWARDED",entity:"Challenge",entityId:id,metadata:{xpReward:challenge.xpReward,challenge:challenge.title}}});
        rewardGranted=true;
      }
