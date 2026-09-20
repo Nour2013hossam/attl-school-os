@@ -228,7 +228,7 @@ const sections = [
   },
 ];
 
-export function DashboardNav({ role = "STUDENT" }: { role?: string }) {
+export function DashboardNav({}: { role?: string }) {
   const pathname = usePathname();
   const { language, permissions, permissionsReady } = usePreferences();
   const [permissions, setPermissions] = useState<Record<string, boolean>>({});
@@ -267,6 +267,15 @@ export function DashboardNav({ role = "STUDENT" }: { role?: string }) {
       "/dashboard/learning/bookmarks":"learning.read",
       "/dashboard/learning/certificates":"learning.read",
       "/dashboard/learning/library":"learning.read",
+
+      "/dashboard/skills/skill-map":"skills.read",
+      "/dashboard/skills/my-skills":"skills.read",
+      "/dashboard/skills/assessments":"skills.read",
+      "/dashboard/skills/growth":"skills.read",
+      "/dashboard/skills/recommendations":"skills.read",
+      "/dashboard/skills/technical":"skills.read",
+      "/dashboard/skills/soft-skills":"skills.read",
+      "/dashboard/skills/skill-history":"skills.read",
 
       "/dashboard/projects/all":"projects.read",
       "/dashboard/projects/my-projects":"projects.read",
