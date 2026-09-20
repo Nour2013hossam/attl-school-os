@@ -1,13 +1,3 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="ATTL"
-      title="ATTL Members"
-      description="Current ATTL membership records."
-      icon="●"
-      api="/api/attl/applications"
-    />
-  );
-}
+"use client";import{useEffect,useState}from"react";
+type Row={id:string;status:string;track:{name:string};user:{id:string;name:string;email:string;role:string}};
+export default function MembersPage(){const[accepted,setAccepted]=useState<Row[]>([]);useEffect(()=>{fetch("/api/attl/applications",{cache:"no-store"}).then(r=>r.json()).then(d=>setAccepted((d.applications??[]).filter((a:Row)=>a.status==="ACCEPTED")));},[]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">ATTL</p><h1 className="mt-3 text-3xl font-semibold md:text-5xl">Members</h1><p className="mt-3 text-sm text-white/40">Accepted ATTL applications and current member account roles.</p></section><section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{accepted.map(a=><article key={a.id} className="rounded-[26px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">{a.user.name.slice(0,1)}</div><div><p className="text-[10px] font-semibold">{a.user.name}</p><p className="mt-1 text-[8px] text-black/30">{a.user.email}</p></div></div><div className="mt-4 flex items-center justify-between"><span className="rounded-full bg-blue-500/10 px-3 py-1.5 text-[8px] text-blue-600">{a.track.name}</span><span className="text-[8px] text-black/35">{a.user.role.replaceAll("_"," ")}</span></div></article>)}{accepted.length===0&&<div className="rounded-[26px] border border-dashed border-black/10 p-10 text-center text-[10px] text-black/30 md:col-span-2 xl:col-span-3">No accepted applications yet.</div>}</section></div>}
