@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { hasPermission } from "@/lib/permissions";
+import { hasPermission } from "@/lib/permissions";
 
 const profileSchema = z.object({
   name: z.string().trim().min(2).max(120).optional(),
@@ -32,6 +33,10 @@ export async function GET() {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
+  await prisma.auditLog.create({
+    data: { actorId: session.user.id, action: "PROFILE_UPDATED", entity: "User", entityId: session.user.id, metadata: { fields: Object.keys(parsed.data) } },
+  });
+
   return NextResponse.json({ user });
 }
 
@@ -51,6 +56,8 @@ export async function PATCH(request: Request) {
   }
 
   const { interests, portfolioUrl, ...userData } = parsed.data;
+  delete userData.gradeLevel;
+  delete userData.className;
 
   const user = await prisma.user.update({
     where: { id: session.user.id },
