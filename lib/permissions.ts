@@ -30,6 +30,8 @@ async function getCustomRolePermissions(userId: string) {
 }
 
 export async function hasPermission(userId: string, role: UserRole, key: string) {
+  if (role === "SUPER_ADMIN") return true;
+
   const override = await prisma.userPermission.findFirst({
     where: { userId, permission: { key } },
     select: { granted: true },
