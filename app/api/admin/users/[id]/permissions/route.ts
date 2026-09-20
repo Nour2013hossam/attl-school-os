@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { PERMISSION_CATALOG } from "@/lib/roles";
-import { getEffectivePermissions } from "@/lib/permissions";
+import { getEffectivePermissions, hasPermission } from "@/lib/permissions";
 
 const adminRoles=[UserRole.ADMIN,UserRole.SUPER_ADMIN];
 
@@ -15,7 +15,7 @@ async function requireAdmin() {
 
 export async function GET(_request:Request,context:{params:Promise<{id:string}>}) {
   const admin=await requireAdmin(); const {id}=await context.params;
-  if(!admin) return NextResponse.json({error:"Forbidden"},{status:403});
+  if(!admin || !(await hasPermission(admin.id, admin.role, "permissions.read"))) return NextResponse.json({error:"Forbidden"},{status:403});
 
   const user=await prisma.user.findUnique({
     where:{id},
@@ -33,7 +33,7 @@ export async function GET(_request:Request,context:{params:Promise<{id:string}>}
 
 export async function PATCH(request:Request,context:{params:Promise<{id:string}>}) {
   const admin=await requireAdmin(); const {id}=await context.params;
-  if(!admin) return NextResponse.json({error:"Forbidden"},{status:403});
+  if(!admin || !(await hasPermission(admin.id, admin.role, "permissions.manage"))) return NextResponse.json({error:"Forbidden"},{status:403});
   if(admin.id===id) return NextResponse.json({error:"Manage another account's permissions from an admin account."},{status:400});
 
   const target=await prisma.user.findUnique({where:{id},select:{id:true,role:true,name:true}});
