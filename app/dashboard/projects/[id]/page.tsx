@@ -22,10 +22,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id:str
     if(!id)return;
     const [p,u]=await Promise.all([
       fetch("/api/projects/"+id,{cache:"no-store"}).then(r=>r.json()),
-      fetch("/api/projects/"+id+"/members",{cache:"no-store"}).then(r=>r.json()).catch(()=>({users:[]})),
+      fetch("/api/projects/"+id+"/members",{cache:"no-store"}).then(r=>r.json()).catch(()=>({members:[]})),
     ]);
     setProject(p.project??null);
-    setUsers(u.users??[]);
+    setUsers((u.members??[]).map((m:{user:User})=>m.user));
   }
   useEffect(()=>{if(id)load();},[id]);
 
