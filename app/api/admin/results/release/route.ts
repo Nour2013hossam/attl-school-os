@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { UserRole } from "@prisma/client";
 import { z } from "zod";
 import { hasPermission } from "@/lib/permissions";
 
@@ -18,9 +17,7 @@ async function requireAdmin() {
     return null;
   }
 
-  if (!([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role)) {
-    return null;
-  }
+  if (!(await hasPermission(session.user.id, session.user.role, "results.release"))) return null;
 
   return session.user;
 }
@@ -31,7 +28,6 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  if (!(await hasPermission(user.id, user.role, "results.release"))) return NextResponse.json({ error: "You do not have permission to manage result releases." }, { status: 403 });
 
   const releases = await prisma.resultRelease.findMany({
     orderBy: { releaseAt: "desc" },
