@@ -5,7 +5,7 @@ import { UserRole } from "@prisma/client";
 import { z } from "zod";
 import { hasPermission } from "@/lib/permissions";
 
-const roles=[UserRole.TRACK_LEAD,UserRole.ADMIN,UserRole.SUPER_ADMIN];
+const roles:UserRole[]=[UserRole.TRACK_LEAD,UserRole.ADMIN,UserRole.SUPER_ADMIN];
 const schema=z.object({name:z.string().trim().min(2).max(100).optional(),description:z.string().trim().max(1000).nullable().optional(),active:z.boolean().optional()});
 
 export async function PATCH(request:Request,context:{params:Promise<{id:string}>}){
