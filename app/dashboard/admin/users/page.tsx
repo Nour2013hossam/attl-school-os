@@ -16,6 +16,7 @@ export default function AdminUsersPage(){
  const [query,setQuery]=useState("");
  const [busy,setBusy]=useState("");
  const [message,setMessage]=useState("");
+ const [currentRole,setCurrentRole]=useState("");
  const [myRole,setMyRole]=useState("STUDENT");
 
  async function load(){const res=await fetch("/api/admin/users",{cache:"no-store"});const data=await res.json();if(res.ok)setUsers(data.users??[]);else setMessage(data.error??"Unable to load users.");}
