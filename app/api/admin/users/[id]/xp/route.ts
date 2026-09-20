@@ -33,6 +33,17 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     select: { id: true, name: true, email: true, xp: true, level: true },
   });
 
+  await prisma.xpTransaction.create({
+    data: {
+      userId: id,
+      actorId: session.user.id,
+      delta: updated.xp - target.xp,
+      balanceAfter: updated.xp,
+      reason: parsed.data.reason ?? null,
+      source: "ADMIN",
+    },
+  });
+
   await prisma.auditLog.create({
     data: {
       actorId: session.user.id,
