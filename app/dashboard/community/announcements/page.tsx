@@ -1,13 +1,1 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Community"
-      title="Announcements"
-      description="Read important community announcements."
-      icon="!"
-      api="/api/community/feed"
-    />
-  );
-}
+"use client";import{useEffect,useState}from"react";type A={id:string;title:string;body:string;createdAt:string;author:{name:string}};export default function AnnouncementsPage(){const[items,setItems]=useState<A[]>([]);useEffect(()=>{fetch("/api/community/announcements",{cache:"no-store"}).then(r=>r.json()).then(d=>setItems(d.announcements??[]));},[]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Community</p><h1 className="mt-3 text-3xl font-semibold md:text-5xl">Announcements</h1><p className="mt-3 text-sm text-white/40">Important school and ATTL updates in one place.</p></section><section className="space-y-3">{items.map(a=><article key={a.id} className="rounded-[25px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.15em] text-blue-600">{a.author.name} · {new Date(a.createdAt).toLocaleString()}</p><h2 className="mt-2 text-lg font-semibold">{a.title}</h2><p className="mt-3 whitespace-pre-line text-[10px] leading-5 text-black/45">{a.body}</p></article>)}{items.length===0&&<div className="rounded-[24px] border border-dashed border-black/10 p-10 text-center text-[10px] text-black/30">No announcements yet.</div>}</section></div> }
