@@ -15,6 +15,7 @@ type DashboardData = {
   featuredCourses: Array<{ id: string; title: string; description: string | null; level: string | null; _count: { lessons: number; resources: number; enrollments: number } }>;
   activeChallenges: Array<{ id: string; title: string; description: string | null; xpReward: number; endsAt: string | null; _count: { entries: number } }>;
   attlTracks: Array<{ id: string; name: string; description: string | null }>;
+  attlApplication: { id: string; status: string; interviewAt: string | null; interviewResult: string | null; reviewerNotes: string | null; track: { name: string } } | null;
 };
 
 function formatDate(value: string | null, locale: string, withTime = false) {
@@ -106,6 +107,40 @@ export default function DashboardOverview() {
           </Link>
         </div>
       </section>
+
+      {permissionsReady && (data?.attlApplication || user?.attlMembershipActive) && (
+        <section className="rounded-[30px] border border-white/80 bg-white/60 p-5 backdrop-blur-2xl">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-[8px] font-semibold uppercase tracking-[.2em] text-black/30">ATTL</p>
+              <h2 className="mt-1 text-xl font-semibold tracking-[-.04em]">
+                {user?.attlMembershipActive ? (ar ? "عضوية ATTL مفعّلة" : "ATTL membership is active") : (ar ? "حالة طلبك" : "Your application status")}
+              </h2>
+              <p className="mt-2 text-[9px] text-black/35">
+                {user?.attlMembershipActive
+                  ? (ar ? "حساب عضوية ATTL متاح لك الآن." : "Your ATTL member account is active.")
+                  : (ar ? "عضوية ATTL تفضل مقفولة لحد نتيجة المقابلة." : "Your ATTL member account stays locked until the interview decision.")}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={user?.attlMembershipActive ? "rounded-full bg-green-500/10 px-3 py-2 text-[8px] font-semibold text-green-700" : "rounded-full bg-black/[.04] px-3 py-2 text-[8px] font-semibold text-black/45"}>
+                {user?.attlMembershipActive ? (ar ? "مفعّل" : "ACTIVE") : (data?.attlApplication?.status ?? "PENDING")}
+              </span>
+              {can("attl.apply") && <Link href="/dashboard/attl/applications" className="rounded-[13px] bg-black px-4 py-2.5 text-[8px] font-semibold text-white">{ar ? "فتح الطلب" : "Open application"} →</Link>}
+            </div>
+          </div>
+          {data?.attlApplication?.interviewAt && (
+            <div className="mt-5 rounded-[18px] bg-blue-500/[.05] p-4">
+              <p className="text-[8px] uppercase tracking-[.16em] text-blue-600">{ar ? "المقابلة" : "Interview"}</p>
+              <div className="mt-2 flex flex-wrap gap-3 text-[9px] text-black/40">
+                <span>{new Date(data.attlApplication.interviewAt).toLocaleString(locale)}</span>
+                <span>•</span>
+                <span>{ar ? "النتيجة" : "Result"}: {data.attlApplication.interviewResult ?? "PENDING"}</span>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
