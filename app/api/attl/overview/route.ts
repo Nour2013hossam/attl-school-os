@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 
-const allowedRoles = [
+const allowedRoles: UserRole[] = [
   UserRole.ATTL_MEMBER,
   UserRole.TRACK_LEAD,
   UserRole.ADMIN,
