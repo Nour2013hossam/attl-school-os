@@ -75,8 +75,9 @@ export default async function DashboardLayout({
 
       <main className="relative lg:mr-[274px]">
         <header className="sticky top-0 z-40 px-3 pt-3 md:px-5 lg:px-8 lg:pt-4">
-          <div className="relative mx-auto flex h-[68px] max-w-[1500px] items-center rounded-[24px] border border-white/80 bg-white/60 px-3 shadow-[0_12px_40px_rgba(20,30,50,0.06)] backdrop-blur-2xl md:px-4">
-            <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-white" />
+          <div className="apple-glass-header relative mx-auto flex h-[70px] max-w-[1500px] items-center rounded-[25px] border border-white/75 bg-white/55 px-3 shadow-[0_14px_45px_rgba(20,30,50,0.07)] backdrop-blur-[35px] md:px-4">
+            <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-white/90" />
+            <div className="apple-glass-shine pointer-events-none absolute inset-0 rounded-[25px]" />
 
             <div className="hidden items-center gap-2 rounded-[17px] bg-black/[0.025] px-2 py-1.5 sm:flex">
               <Link
