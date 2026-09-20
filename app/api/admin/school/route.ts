@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
+import { Prisma, prisma } from "@/lib/prisma";
 import { hasPermission } from "@/lib/permissions";
 import { z } from "zod";
 
@@ -50,8 +50,8 @@ export async function PATCH(request: Request) {
     Object.entries(parsed.data).map(([key, value]) =>
       prisma.appSetting.upsert({
         where: { key: "school." + key },
-        update: { value },
-        create: { key: "school." + key, value },
+        update: { value: value === null ? Prisma.JsonNull : value },
+        create: { key: "school." + key, value: value === null ? Prisma.JsonNull : value },
       }),
     ),
   );
