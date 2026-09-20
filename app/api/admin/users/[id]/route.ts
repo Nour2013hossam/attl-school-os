@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const updateSchema = z.object({
   role: z.nativeEnum(UserRole).optional(),
@@ -25,12 +26,15 @@ export async function PATCH(
   if (![UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  if (!(await hasPermission(session.user.id, session.user.role, "users.manage"))) return NextResponse.json({ error: "You do not have permission to manage users." }, { status: 403 });
 
-  if (id === session.user.id && (await request.clone().json()).role === UserRole.STUDENT) {
+  const rawBody = await request.json();
+
+  if (id === session.user.id && rawBody.role === UserRole.STUDENT) {
     return NextResponse.json({ error: "You cannot remove your own admin role." }, { status: 400 });
   }
 
-  const parsed = updateSchema.safeParse(await request.json());
+  const parsed = updateSchema.safeParse(rawBody);
 
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid user update." }, { status: 400 });
