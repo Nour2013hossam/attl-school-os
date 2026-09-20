@@ -77,3 +77,36 @@ Both use the password supplied through `SEED_PASSWORD`. Change it before sharing
 Authentication, registration, current-user profile, schedule, grades/results, assignments, projects, notifications, events, competitions, ATTL applications, innovation ideas, goals and database health are now backed by server-side APIs.
 
 The frontend contains a larger route inventory by design. Remaining pages can be connected progressively to these domain models without changing their public URLs.
+
+
+## Production deployment
+
+ATTL School OS is a dynamic Next.js application. Deploy it to a Node-compatible host such as Vercel, not GitHub Pages.
+
+Set these production environment variables:
+
+- `DATABASE_URL` — PostgreSQL connection string with SSL enabled.
+- `AUTH_SECRET` — long random production secret.
+- `NEXT_PUBLIC_APP_URL` — the public HTTPS URL of the deployed app.
+- `SEED_PASSWORD` — only for controlled development/staging seed runs; do not use a shared default in production.
+
+Before the first production launch:
+
+1. Run `npm install`.
+2. Run `npm run db:generate`.
+3. Apply the Prisma schema with your production migration process.
+4. Set the environment variables on the hosting platform.
+5. Deploy with `npm run build` and run with `npm start`.
+
+The repository CI runs Prisma generation and a full Next.js production build on every push to `main`.
+
+## Security baseline
+
+- Credentials use bcrypt password hashing.
+- Authenticated dashboard routes are protected by Auth.js.
+- API mutations use server-side authorization and permission checks.
+- The Super Admin role has full effective permissions.
+- Sensitive management pages hide controls when the current permission is missing.
+- Login, registration and password-change attempts have basic rate limiting.
+- Security headers are configured in `next.config.ts`.
+- Audit records cover key administrative, permission and project actions.
