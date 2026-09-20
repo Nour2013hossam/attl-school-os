@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { UserRole } from "@prisma/client";
+import { hasPermission } from "@/lib/permissions";
 import { z } from "zod";
 import { hasPermission } from "@/lib/permissions";
 
@@ -13,13 +13,6 @@ const questionSchema = z.object({
   position: z.number().int().min(0).max(500).optional(),
   active: z.boolean().default(true),
 });
-
-const reviewerRoles: UserRole[] = [
-  UserRole.ATTL_MEMBER,
-  UserRole.TRACK_LEAD,
-  UserRole.ADMIN,
-  UserRole.SUPER_ADMIN,
-];
 
 export async function GET() {
   const questions = await prisma.applicationQuestion.findMany({
@@ -33,7 +26,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const session = await auth();
 
-  if (!session?.user?.id || !reviewerRoles.includes(session.user.role) || !(await hasPermission(session.user.id, session.user.role, "attl.review"))) {
+  if (!session?.user?.id || !(await hasPermission(session.user.id, session.user.role, "attl.review"))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
