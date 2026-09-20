@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const schema=z.object({progress:z.number().int().min(0).max(100)});
 
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
  const session=await auth(); const {id}=await context.params;
  if(!session?.user?.id) return NextResponse.json({error:"Unauthorized"},{status:401});
+ if(!(await hasPermission(session.user.id,session.user.role,"challenges.participate")))return NextResponse.json({error:"Forbidden"},{status:403});
  const parsed=schema.safeParse(await request.json());
  if(!parsed.success) return NextResponse.json({error:"Progress must be 0–100."},{status:400});
  const participation=await prisma.challengeParticipation.findUnique({
