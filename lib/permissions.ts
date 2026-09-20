@@ -68,7 +68,7 @@ export async function hasPermission(userId: string, role: UserRole, key: string)
   if (roleAllows(role, key)) return true;
 
   const customPermissions = await getCustomRolePermissions(userId);
-  return customPermissions.has(key);
+  return [...customPermissions].some((permission) => permissionMatches(permission, key));
 }
 
 export async function getEffectivePermissions(userId: string, role: UserRole) {
@@ -80,7 +80,7 @@ export async function getEffectivePermissions(userId: string, role: UserRole) {
 
   const map: Record<string, boolean> = {};
   for (const [key] of PERMISSION_CATALOG) {
-    map[key] = roleAllows(role, key) || customPermissions.has(key);
+    map[key] = roleAllows(role, key) || [...customPermissions].some((permission) => permissionMatches(permission, key));
   }
 
   for (const item of overrides) {
