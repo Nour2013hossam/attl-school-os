@@ -3,7 +3,6 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { hasPermission } from "@/lib/permissions";
-import { hasPermission } from "@/lib/permissions";
 
 const schema=z.object({progress:z.number().int().min(0).max(100)});
 
