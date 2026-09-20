@@ -14,7 +14,7 @@ const questionSchema = z.object({
   active: z.boolean().default(true),
 });
 
-const reviewerRoles = [
+const reviewerRoles: UserRole[] = [
   UserRole.ATTL_MEMBER,
   UserRole.TRACK_LEAD,
   UserRole.ADMIN,
