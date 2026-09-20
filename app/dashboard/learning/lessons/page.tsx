@@ -8,6 +8,7 @@ export default function Page() {
       description="Continue through structured lessons from your courses."
       icon="▦"
       api="/api/courses"
+      actions={[{ label: "My Courses", href: "/dashboard/learning/my-courses" }, { label: "Progress", href: "/dashboard/learning/progress" }]}
     />
   );
 }
