@@ -536,6 +536,9 @@ model AttlApplication {
   answers       Json?
   reviewerId    String?
   reviewerNotes String?
+  interviewAt   DateTime?
+  interviewResult String?
+  interviewNotes String?
   interviewAt DateTime?
   interviewResult String?
   interviewNotes String?
