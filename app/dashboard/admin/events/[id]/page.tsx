@@ -22,6 +22,7 @@ export default function AdminEventEditPage() {
   const [form, setForm] = useState({ title: "", description: "", startsAt: "", endsAt: "", location: "", capacity: "" });
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!params.id) return;
@@ -63,6 +64,19 @@ export default function AdminEventEditPage() {
     setSaving(false);
   }
 
+  async function removeEvent() {
+    if (!window.confirm("Delete this event?")) return;
+    setDeleting(true);
+    const response = await fetch("/api/events/" + params.id, { method: "DELETE" });
+    const data = await response.json();
+    if (response.ok) {
+      window.location.href = "/dashboard/admin/events";
+      return;
+    }
+    setMessage(data.error ?? "Could not delete event.");
+    setDeleting(false);
+  }
+
   if (!permissionsReady) return <div className="rounded-[26px] bg-white/60 p-8 text-sm text-black/40">Loading access…</div>;
   if (!can("events.manage")) return <div className="rounded-[26px] bg-white/60 p-8 text-sm text-black/40">You do not have permission to manage events.</div>;
 
@@ -86,7 +100,7 @@ export default function AdminEventEditPage() {
         {message && <div className="mt-4 rounded-[14px] bg-blue-500/10 px-4 py-3 text-[9px] text-blue-700">{message}</div>}
         <div className="mt-5 flex flex-wrap gap-2">
           <button onClick={save} disabled={saving} className="rounded-[14px] bg-black px-5 py-3 text-[9px] font-semibold text-white disabled:opacity-40">{saving ? "Saving..." : "Save changes"}</button>
-          <Link href="/dashboard/admin/events" className="rounded-[14px] bg-black/[.04] px-5 py-3 text-[9px] font-semibold text-black/50">Back to events</Link>
+          <button onClick={removeEvent} disabled={deleting} className="rounded-[14px] bg-red-500/10 px-5 py-3 text-[9px] font-semibold text-red-600 disabled:opacity-40">{deleting ? "Deleting..." : "Delete event"}</button><Link href="/dashboard/admin/events" className="rounded-[14px] bg-black/[.04] px-5 py-3 text-[9px] font-semibold text-black/50">Back to events</Link>
         </div>
       </section>
     </div>
