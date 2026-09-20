@@ -5,7 +5,7 @@ import { UserRole } from "@prisma/client";
 import { z } from "zod";
 import { hasPermission } from "@/lib/permissions";
 
-const managerRoles=[UserRole.TRACK_LEAD,UserRole.ADMIN,UserRole.SUPER_ADMIN];
+const managerRoles:UserRole[]=[UserRole.TRACK_LEAD,UserRole.ADMIN,UserRole.SUPER_ADMIN];
 const schema=z.object({name:z.string().trim().min(2).max(100),description:z.string().trim().max(1000).nullable().optional(),active:z.boolean().optional()});
 
 export async function GET(){
