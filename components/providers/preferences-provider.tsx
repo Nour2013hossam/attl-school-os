@@ -89,9 +89,23 @@ export function PreferencesProvider({children}:{children:React.ReactNode}){
  useEffect(()=>{
    const stored=localStorage.getItem("attl-preferences");
    if(stored){try{const p={...defaults,...JSON.parse(stored)};setPreferences(p);applyTheme(p.theme);applyLanguage(p.language);}catch{}}
-   Promise.resolve(fetch("/api/settings",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{
-     if(d?.preferences){setPreferences(d.preferences);localStorage.setItem("attl-preferences",JSON.stringify(d.preferences));applyTheme(d.preferences.theme);applyLanguage(d.preferences.language);}
-   }).finally(()=>setReady(true))).catch(()=>setReady(true));
+   Promise.all([
+     fetch("/api/settings",{cache:"no-store"}).then(r=>r.ok?r.json():null),
+     fetch("/api/me/permissions",{cache:"no-store"}).then(r=>r.ok?r.json():null),
+   ]).then(([settingsData, permissionData])=>{
+     if(settingsData?.preferences){
+       setPreferences(settingsData.preferences);
+       localStorage.setItem("attl-preferences",JSON.stringify(settingsData.preferences));
+       applyTheme(settingsData.preferences.theme);
+       applyLanguage(settingsData.preferences.language);
+     }
+     if(permissionData?.permissions){
+       setPermissions(permissionData.permissions);
+     }
+   }).catch(()=>{}).finally(()=>{
+     setReady(true);
+     setPermissionsReady(true);
+   });
  },[]);
 
  useEffect(() => {
