@@ -450,7 +450,7 @@ export function DashboardNav({}: { role?: string }) {
                 </span>
 
                 <span className="flex-1 text-[9px] font-semibold uppercase tracking-[0.16em]">
-                  {section.label}
+                  {translateLabel(section.label, language)}
                 </span>
 
                 <span
@@ -504,7 +504,7 @@ export function DashboardNav({}: { role?: string }) {
                           </span>
 
                           <span className="relative z-10 flex-1 text-[9px] font-medium">
-                            {item.label}
+                            {translateLabel(item.label, language)}
                           </span>
 
                           {active && (
