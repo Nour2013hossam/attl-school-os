@@ -17,7 +17,7 @@ const copy: Record<Kind, { eyebrow: string; title: string; description: string }
 };
 
 export function SettingsHub({ kind }: { kind: Kind }) {
-  const { preferences, language, can } = usePreferences();
+  const { preferences, language, can, updatePreferences } = usePreferences();
   const [me, setMe] = useState<Me | null>(null);
   const [message, setMessage] = useState("");
   const [emailNotifications, setEmailNotifications] = useState(preferences.emailNotifications);
@@ -35,10 +35,12 @@ export function SettingsHub({ kind }: { kind: Kind }) {
   }, []);
 
   async function update(patch: Partial<typeof preferences>) {
-    const next = { ...preferences, ...patch };
-    const response = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(next) });
-    const data = await response.json();
-    setMessage(response.ok ? (language === "ar" ? "تم حفظ الإعدادات." : "Settings saved.") : (data.error ?? "Could not save settings."));
+    try {
+      await updatePreferences(patch);
+      setMessage(language === "ar" ? "تم حفظ الإعدادات." : "Settings saved.");
+    } catch {
+      setMessage(language === "ar" ? "تعذر حفظ الإعدادات." : "Could not save settings.");
+    }
   }
 
   const meta = copy[kind];
