@@ -14,6 +14,7 @@ export default async function DashboardLayout({
   const session = await auth();
   const displayName = session?.user?.name ?? "ATTL Student";
   const initial = displayName.trim().charAt(0).toUpperCase() || "A";
+  const avatarUrl = session?.user?.image ?? null;
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#eef2f7] text-[#08090b]">
@@ -34,9 +35,13 @@ export default async function DashboardLayout({
 
           <Link
             href="/dashboard/student/profile"
-            className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-black text-sm font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-105"
+            className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-[15px] bg-black text-sm font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-105"
           >
-            {initial}
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              initial
+            )}
           </Link>
         </div>
 
@@ -108,9 +113,13 @@ export default async function DashboardLayout({
 
                 <Link
                   href="/dashboard/student/profile"
-                  className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-black text-xs font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-105"
+                  className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[14px] bg-black text-xs font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-105"
                 >
-                  {initial}
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    initial
+                  )}
                 </Link>
               </div>
             </div>
