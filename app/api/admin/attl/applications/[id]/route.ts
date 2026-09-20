@@ -11,7 +11,7 @@ const updateSchema = z.object({
   reviewerNotes: z.string().max(5000).nullable().optional(),
 });
 
-const reviewerRoles = [
+const reviewerRoles: UserRole[] = [
   UserRole.ATTL_MEMBER,
   UserRole.TRACK_LEAD,
   UserRole.ADMIN,
@@ -84,7 +84,6 @@ export async function PATCH(
     } else if (
       parsed.data.status &&
       parsed.data.status !== existing.status &&
-      parsed.data.status !== ApplicationStatus.ACCEPTED
     ) {
       await tx.notification.create({
         data: {
