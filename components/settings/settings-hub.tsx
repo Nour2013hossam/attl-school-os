@@ -20,6 +20,15 @@ export function SettingsHub({ kind }: { kind: Kind }) {
   const { preferences, language, can } = usePreferences();
   const [me, setMe] = useState<Me | null>(null);
   const [message, setMessage] = useState("");
+  const [emailNotifications, setEmailNotifications] = useState(preferences.emailNotifications);
+  const [pushNotifications, setPushNotifications] = useState(preferences.pushNotifications);
+  const [profileVisible, setProfileVisible] = useState(preferences.profileVisible);
+
+  useEffect(() => {
+    setEmailNotifications(preferences.emailNotifications);
+    setPushNotifications(preferences.pushNotifications);
+    setProfileVisible(preferences.profileVisible);
+  }, [preferences.emailNotifications, preferences.pushNotifications, preferences.profileVisible]);
 
   useEffect(() => {
     fetch("/api/me", { cache: "no-store" }).then((r) => r.ok ? r.json() : null).then((d) => setMe(d?.user ?? null));
@@ -48,12 +57,12 @@ export function SettingsHub({ kind }: { kind: Kind }) {
       {kind === "notifications" && (
         <section className="rounded-[28px] border border-white/80 bg-white/60 p-6 backdrop-blur-2xl md:p-8">
           {[
-            ["Email notifications", preferences.emailNotifications, { emailNotifications: !preferences.emailNotifications }],
-            ["Push notifications", preferences.pushNotifications, { pushNotifications: !preferences.pushNotifications }],
+            ["Email notifications", emailNotifications, { emailNotifications: !emailNotifications }],
+            ["Push notifications", pushNotifications, { pushNotifications: !pushNotifications }],
           ].map(([label, value, patch]) => (
             <div key={String(label)} className="flex items-center justify-between gap-4 border-b border-black/5 py-5 last:border-0">
               <div><p className="text-sm font-semibold">{String(label)}</p><p className="mt-1 text-[9px] text-black/35">Saved to your School OS account.</p></div>
-              <button type="button" onClick={() => update(patch as Partial<typeof preferences>)} className={"h-7 w-12 rounded-full p-1 transition " + (value ? "bg-black" : "bg-black/10")}><span className={"block h-5 w-5 rounded-full bg-white transition " + (value ? "translate-x-5" : "")} /></button>
+              <button type="button" onClick={() => { const next = Boolean(!(value as boolean)); if (String(label).startsWith("Email")) setEmailNotifications(next); else setPushNotifications(next); update(patch as Partial<typeof preferences>); }} className={"h-7 w-12 rounded-full p-1 transition " + (value ? "bg-black" : "bg-black/10")}><span className={"block h-5 w-5 rounded-full bg-white transition " + (value ? "translate-x-5" : "")} /></button>
             </div>
           ))}
           {message && <p className="mt-4 rounded-[15px] bg-black/[.03] px-4 py-3 text-[10px] text-black/50">{message}</p>}
@@ -64,7 +73,7 @@ export function SettingsHub({ kind }: { kind: Kind }) {
         <section className="rounded-[28px] border border-white/80 bg-white/60 p-6 backdrop-blur-2xl md:p-8">
           <div className="flex items-center justify-between gap-5">
             <div><p className="text-sm font-semibold">Profile visibility</p><p className="mt-1 max-w-xl text-[10px] leading-5 text-black/35">When enabled, your profile can be discovered by other School OS members where the relevant feature supports it.</p></div>
-            <button type="button" onClick={() => update({ profileVisible: !preferences.profileVisible })} className={"h-7 w-12 shrink-0 rounded-full p-1 transition " + (preferences.profileVisible ? "bg-black" : "bg-black/10")}><span className={"block h-5 w-5 rounded-full bg-white transition " + (preferences.profileVisible ? "translate-x-5" : "")} /></button>
+            <button type="button" onClick={() => { const next = !profileVisible; setProfileVisible(next); update({ profileVisible: next }); }} className={"h-7 w-12 shrink-0 rounded-full p-1 transition " + (profileVisible ? "bg-black" : "bg-black/10")}><span className={"block h-5 w-5 rounded-full bg-white transition " + (profileVisible ? "translate-x-5" : "")} /></button>
           </div>
           {message && <p className="mt-5 rounded-[15px] bg-black/[.03] px-4 py-3 text-[10px] text-black/50">{message}</p>}
         </section>
