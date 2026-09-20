@@ -432,6 +432,21 @@ model Project {
   @@index([ownerId, status])
 }
 
+model ProjectMilestone {
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String
+  description String?
+  dueAt       DateTime?
+  progress    Int      @default(0)
+  status      String   @default("Planned")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, dueAt])
+}
 model ProjectMember {
   id        String   @id @default(cuid())
   projectId String
