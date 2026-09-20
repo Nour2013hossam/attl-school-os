@@ -14,11 +14,11 @@ export async function GET() {
 
   const [tracks, members, applications, projects, events] = await Promise.all([
     prisma.attlTrack.count({ where: { active: true } }),
-    prisma.attlApplication.count({ where: { status: "ACCEPTED" } }),
+    prisma.user.count({ where: { isActive: true, attlMembershipActive: true, role: { in: [UserRole.ATTL_MEMBER, UserRole.TRACK_LEAD] } } }),
     prisma.attlApplication.count({
       where: { status: { in: ["NEW", "UNDER_REVIEW", "SHORTLISTED", "INTERVIEW"] } },
     }),
-    prisma.project.count({ where: { owner: { role: UserRole.ATTL_MEMBER } } }),
+    prisma.project.count({ where: { owner: { role: { in: [UserRole.ATTL_MEMBER, UserRole.TRACK_LEAD] }, attlMembershipActive: true } } }),
     prisma.event.count({
       where: { startsAt: { gte: new Date() } },
     }),
