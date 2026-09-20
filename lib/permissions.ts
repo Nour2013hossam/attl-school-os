@@ -93,7 +93,15 @@ export async function getEffectivePermissions(userId: string, role: UserRole) {
 
   const map: Record<string, boolean> = {};
   for (const [key] of PERMISSION_CATALOG) {
-    map[key] = roleAllows(role, key) || [...customPermissions].some((permission) => permissionMatches(permission, key));
+    const blockedForStudent =
+      role === "STUDENT" &&
+      key !== "attl.apply" &&
+      (key.startsWith("attl.") || key.startsWith("attl:"));
+
+    map[key] = !blockedForStudent && (
+      roleAllows(role, key) ||
+      [...customPermissions].some((permission) => permissionMatches(permission, key))
+    );
   }
 
   for (const item of overrides) {
