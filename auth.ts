@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import type { UserRole } from "@prisma/client";
 import { credentialsSchema } from "@/lib/validation";
 import { authConfig } from "@/auth.config";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -25,6 +26,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!parsed.success) {
           return null;
         }
+
+        const rate = rateLimit("login:"+parsed.data.email.toLowerCase(), 10, 15 * 60 * 1000);
+        if (!rate.allowed) return null;
 
         const user = await prisma.user.findUnique({
           where: { email: parsed.data.email.toLowerCase() },
