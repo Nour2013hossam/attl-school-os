@@ -41,7 +41,7 @@ export async function PATCH(request:Request,context:{params:Promise<{id:string}>
   const body=await request.json();
   if(!Array.isArray(body.updates)) return NextResponse.json({error:"updates must be an array."},{status:400});
 
-  const catalogKeys=new Set(PERMISSION_CATALOG.map(([key])=>key));
+  const catalogKeys=new Set<string>(PERMISSION_CATALOG.map(([key])=>key));
   const updates=body.updates.filter((item:{key?:unknown;granted?:unknown})=>typeof item.key==="string" && catalogKeys.has(item.key) && typeof item.granted==="boolean") as {key:string;granted:boolean}[];
 
   await prisma.$transaction(async(tx)=>{
