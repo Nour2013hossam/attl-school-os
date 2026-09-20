@@ -517,3 +517,15 @@ html.dark .dashboard-sidebar-scroll::-webkit-scrollbar-thumb:hover { background:
    ========================================= */
 html[dir="rtl"] .text-right { text-align: left; }
 html[dir="rtl"] .text-left { text-align: right; }
+
+
+html.compact-ui .dashboard-sidebar-scroll a { height: 32px; }
+html.compact-ui .dashboard-sidebar-scroll > div { gap: 0.125rem; }
+html.reduced-motion *,
+html.reduced-motion *::before,
+html.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
