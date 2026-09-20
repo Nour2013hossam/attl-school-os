@@ -144,11 +144,11 @@ export default function DashboardOverview() {
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
-          [ar ? "المشاريع" : "Projects", String(data?.stats.projects ?? "—"), "/dashboard/projects/all"],
-          [ar ? "الفعاليات القادمة" : "Upcoming Events", String(data?.stats.upcomingEvents ?? "—"), "/dashboard/events/upcoming"],
-          [ar ? "المسابقات" : "Competitions", String(data?.stats.upcomingCompetitions ?? "—"), "/dashboard/competitions/upcoming"],
-          [ar ? "الإنجازات" : "Achievements", String(data?.stats.achievements ?? "—"), "/dashboard/student/achievements"],
-        ].map(([label, value, href]) => (
+          [ar ? "المشاريع" : "Projects", String(data?.stats.projects ?? "—"), "/dashboard/projects/all", "projects.read"],
+          [ar ? "الفعاليات القادمة" : "Upcoming Events", String(data?.stats.upcomingEvents ?? "—"), "/dashboard/events/upcoming", "events.read"],
+          [ar ? "المسابقات" : "Competitions", String(data?.stats.upcomingCompetitions ?? "—"), "/dashboard/competitions/upcoming", "competitions.read"],
+          [ar ? "الإنجازات" : "Achievements", String(data?.stats.achievements ?? "—"), "/dashboard/student/achievements", "profile.read"],
+        ].filter(([, , , permission]) => !permission || (permissionsReady && can(permission))).map(([label, value, href]) => (
           <Link key={label} href={href} className="glass interactive-glass rounded-[24px] p-5 transition hover:-translate-y-1">
             <p className="text-[8px] font-semibold uppercase tracking-[.16em] text-black/30">{label}</p>
             <p className="mt-3 text-3xl font-semibold tracking-[-.06em]">{value}</p>
@@ -327,11 +327,11 @@ export default function DashboardOverview() {
           <div className="flex items-end justify-between"><div><p className="text-[8px] font-semibold uppercase tracking-[.2em] text-black/30">{ar ? "خطواتك التالية" : "Next actions"}</p><h2 className="mt-1 text-xl font-semibold">{ar ? "حافظ على تقدّمك" : "Keep your momentum"}</h2></div></div>
           <div className="mt-5 grid gap-2 sm:grid-cols-2">
             {[
-              [ar ? "الواجبات" : "Assignments", String(data?.stats.upcomingAssignments ?? "—"), "/dashboard/academics/assignments"],
-              [ar ? "الفعاليات" : "Events", String(data?.stats.upcomingEvents ?? "—"), "/dashboard/events/upcoming"],
-              [ar ? "المسابقات" : "Competitions", String(data?.stats.upcomingCompetitions ?? "—"), "/dashboard/competitions/upcoming"],
-              [ar ? "الأهداف النشطة" : "Active goals", String(data?.stats.activeGoals ?? "—"), "/dashboard/student/goals"],
-            ].map(([label,value,href])=><Link key={label} href={href} className="rounded-[18px] bg-black/[.025] p-4 transition hover:bg-white"><p className="text-[8px] uppercase tracking-[.15em] text-black/25">{label}</p><p className="mt-2 text-lg font-semibold">{value}</p></Link>)}
+              [ar ? "الواجبات" : "Assignments", String(data?.stats.upcomingAssignments ?? "—"), "/dashboard/academics/assignments", "academics.read"],
+              [ar ? "الفعاليات" : "Events", String(data?.stats.upcomingEvents ?? "—"), "/dashboard/events/upcoming", "events.read"],
+              [ar ? "المسابقات" : "Competitions", String(data?.stats.upcomingCompetitions ?? "—"), "/dashboard/competitions/upcoming", "competitions.read"],
+              [ar ? "الأهداف النشطة" : "Active goals", String(data?.stats.activeGoals ?? "—"), "/dashboard/student/goals", "profile.read"],
+            ].filter(([, , , permission]) => !permission || (permissionsReady && can(permission))).map(([label,value,href])=><Link key={label} href={href} className="rounded-[18px] bg-black/[.025] p-4 transition hover:bg-white"><p className="text-[8px] uppercase tracking-[.15em] text-black/25">{label}</p><p className="mt-2 text-lg font-semibold">{value}</p></Link>)}
           </div>
         </div>
         <div className="rounded-[30px] bg-black p-6 text-white">
