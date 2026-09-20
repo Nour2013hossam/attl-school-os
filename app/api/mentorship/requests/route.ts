@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole, NotificationType } from "@prisma/client";
+import { hasAnyPermission, hasPermission } from "@/lib/permissions";
 
 export async function GET() {
   const session = await auth();
@@ -9,6 +10,8 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  if (!(await hasAnyPermission(session.user.id, session.user.role, ["mentorship.request", "mentorship.manage"]))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const requests = await prisma.mentorshipRequest.findMany({
     where: {
@@ -30,6 +33,8 @@ export async function POST(request: Request) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  if (!(await hasPermission(session.user.id, session.user.role, "mentorship.request"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await request.json();
 
