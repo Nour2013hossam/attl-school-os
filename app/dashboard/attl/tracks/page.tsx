@@ -1,8 +1,8 @@
 "use client";
 import{useEffect,useState}from"react";import{usePreferences}from"@/components/providers/preferences-provider";
 type T={id:string;name:string;description:string|null;active:boolean};
-export default function TracksPage(){const{can,permissionsReady}=usePreferences();const[items,setItems]=useState<T[]>([]);const[role,setRole]=useState("STUDENT");const[name,setName]=useState("");const[description,setDescription]=useState("");const[message,setMessage]=useState("");
- async function load(){const [t,m]=await Promise.all([fetch("/api/attl/tracks",{cache:"no-store"}).then(r=>r.json()),fetch("/api/me",{cache:"no-store"}).then(r=>r.json())]);setItems(t.tracks??[]);setRole(m.user?.role??"STUDENT");}
+export default function TracksPage(){const{can,permissionsReady}=usePreferences();const[items,setItems]=useState<T[]>([]);const[name,setName]=useState("");const[description,setDescription]=useState("");const[message,setMessage]=useState("");
+ async function load(){const t=await fetch("/api/attl/tracks",{cache:"no-store"}).then(r=>r.json());setItems(t.tracks??[]);}
  useEffect(()=>{load();},[]);
  const manager=permissionsReady && can("attl.tracks.manage");
  async function create(){const r=await fetch("/api/attl/tracks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,description})});const d=await r.json();setMessage(r.ok?"Track created.":d.error??"Could not create track.");if(r.ok){setName("");setDescription("");load();}}
