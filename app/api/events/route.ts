@@ -14,6 +14,9 @@ const schema=z.object({
 });
 
 export async function GET() {
+ const s=await auth();
+ if(!s?.user?.id)return NextResponse.json({error:"Unauthorized"},{status:401});
+ if(!(await hasPermission(s.user.id,s.user.role,"events.read")))return NextResponse.json({error:"Forbidden"},{status:403});
  const events=await prisma.event.findMany({
   where:{endsAt:{gte:new Date()}},orderBy:{startsAt:"asc"},take:100,
   include:{_count:{select:{registrations:true}}},
