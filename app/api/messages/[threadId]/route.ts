@@ -19,7 +19,6 @@ export async function GET(
 
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!(await hasPermission(session.user.id, session.user.role, "messages.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  if (!(await hasPermission(session.user.id, session.user.role, "messages.send"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   if (!(await membership(session.user.id, threadId))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const thread = await prisma.messageThread.findUnique({
@@ -43,6 +42,7 @@ export async function POST(
   const { threadId } = await context.params;
 
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await hasPermission(session.user.id, session.user.role, "messages.send"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   if (!(await membership(session.user.id, threadId))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await request.json();
@@ -52,6 +52,26 @@ export async function POST(
 
   const message = await prisma.message.create({
     data: { threadId, senderId: session.user.id, body: body.body.trim().slice(0, 5000) },
+  });
+
+  const recipients = await prisma.threadParticipant.findMany({
+    where: { threadId, userId: { not: session.user.id } },
+    select: { userId: true },
+  });
+
+  if (recipients.length) {
+    await prisma.notification.createMany({
+      data: recipients.map((item) => ({
+        userId: item.userId,
+        title: "New message",
+        body: body.body.trim().slice(0, 120),
+        type: "SYSTEM" as const,
+      })),
+    });
+  }
+
+  await prisma.auditLog.create({
+    data: { actorId: session.user.id, action: "MESSAGE_SENT", entity: "Message", entityId: message.id, metadata: { threadId } },
   });
 
   await prisma.messageThread.update({
