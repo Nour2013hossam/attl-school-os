@@ -15,6 +15,9 @@ const schema=z.object({
 });
 
 export async function GET(){
+ const s=await auth();
+ if(!s?.user?.id)return NextResponse.json({error:"Unauthorized"},{status:401});
+ if(!(await hasPermission(s.user.id,s.user.role,"competitions.read")))return NextResponse.json({error:"Forbidden"},{status:403});
  const competitions=await prisma.competition.findMany({where:{OR:[{deadlineAt:{gte:new Date()}},{deadlineAt:null}]},orderBy:[{deadlineAt:"asc"},{startsAt:"asc"}],take:100});
  return NextResponse.json({competitions});
 }
