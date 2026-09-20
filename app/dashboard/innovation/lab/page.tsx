@@ -8,6 +8,7 @@ export default function Page() {
       description="Your innovation workspace."
       icon="◇"
       api="/api/ideas"
+      actions={[{ label: "Submit idea", href: "/dashboard/innovation/submit" }, { label: "View showcase", href: "/dashboard/innovation/showcase" }]}
     />
   );
 }
