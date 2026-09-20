@@ -38,6 +38,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
       owner: { select: { id: true, name: true, avatarUrl: true } },
       members: { include: { user: { select: { id: true, name: true, avatarUrl: true, email: true } } } },
       tasks: { orderBy: [{ status: "asc" }, { createdAt: "desc" }] },
+      milestones: { orderBy: { dueAt: "asc" } },
     },
   });
 
