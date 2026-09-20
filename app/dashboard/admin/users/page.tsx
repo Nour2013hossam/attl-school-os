@@ -15,7 +15,7 @@ export default function AdminUsersPage(){
  const [message,setMessage]=useState("");
 
  async function load(){const res=await fetch("/api/admin/users",{cache:"no-store"});const data=await res.json();if(res.ok)setUsers(data.users??[]);else setMessage(data.error??"Unable to load users.");}
- useEffect(()=>{load();},[]);
+ useEffect(()=>{load(); fetch("/api/admin/roles",{cache:"no-store"}).then(r=>r.json()).then(d=>setCustomRoles((d.customRoles??[]).filter((r:{active?:boolean})=>r.active!==false)));},[]);
 
  const filtered=useMemo(()=>users.filter(u=>[u.name,u.email,u.role,u.schoolId??""].join(" ").toLowerCase().includes(query.toLowerCase())),[users,query]);
 
@@ -36,7 +36,10 @@ export default function AdminUsersPage(){
     {filtered.map(user=><article key={user.id} className="rounded-[20px] border border-black/[.04] bg-white/60 p-4">
       <div className="grid gap-4 lg:grid-cols-[1.4fr_.7fr_.5fr_.7fr] lg:items-center">
        <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-xs font-semibold text-white">{user.name.trim().charAt(0).toUpperCase()}</div><div><p className="text-xs font-semibold">{user.name}</p><p className="mt-1 text-[9px] text-black/30">{user.email}</p></div></div>
-       <select value={user.role} disabled={busy===user.id} onChange={e=>update(user.id,{role:e.target.value})} className="h-10 rounded-[13px] border border-black/5 bg-white px-3 text-[9px] outline-none">{roles.map(role=><option key={role}>{role}</option>)}</select>
+       <div className="space-y-2">
+        <select value={user.role} disabled={busy===user.id} onChange={e=>update(user.id,{role:e.target.value})} className="h-10 w-full rounded-[13px] border border-black/5 bg-white px-3 text-[9px] outline-none">{roles.map(role=><option key={role}>{role}</option>)}</select>
+        <select value={user.customRole?.id??""} disabled={busy===user.id} onChange={async e=>{setBusy(user.id);setMessage("");const res=await fetch("/api/admin/users/"+user.id+"/custom-role",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({customRoleId:e.target.value||null})});const d=await res.json();setMessage(res.ok?"Custom role updated.":(d.error??"Could not update custom role."));if(res.ok)await load();setBusy("");}} className="h-10 w-full rounded-[13px] border border-blue-500/10 bg-blue-500/[.04] px-3 text-[9px] outline-none"><option value="">No custom role</option>{customRoles.map(r=><option key={r.id} value={r.id}>{r.name}</option>)}</select>
+       </div>
        <span className={user.isActive?"rounded-full bg-green-500/10 px-3 py-2 text-center text-[8px] font-semibold text-green-600":"rounded-full bg-black/[.04] px-3 py-2 text-center text-[8px] text-black/35"}>{user.isActive?"Active":"Disabled"}</span>
        <div className="flex gap-2">
         <a href={"/dashboard/admin/users/"+user.id+"/permissions"} className="rounded-[13px] bg-blue-500/10 px-3 py-2.5 text-[9px] font-semibold text-blue-600">Access</a>
