@@ -12,6 +12,23 @@ function roleAllows(role: UserRole, key: string) {
   });
 }
 
+async function getCustomRolePermissions(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      customRole: {
+        select: {
+          active: true,
+          permissions: { select: { permission: { select: { key: true } } } },
+        },
+      },
+    },
+  });
+
+  if (!user?.customRole?.active) return new Set<string>();
+  return new Set(user.customRole.permissions.map((item) => item.permission.key));
+}
+
 export async function hasPermission(userId: string, role: UserRole, key: string) {
   const override = await prisma.userPermission.findFirst({
     where: { userId, permission: { key } },
@@ -19,17 +36,28 @@ export async function hasPermission(userId: string, role: UserRole, key: string)
   });
 
   if (override) return override.granted;
-  return roleAllows(role, key);
+
+  if (roleAllows(role, key)) return true;
+
+  const customPermissions = await getCustomRolePermissions(userId);
+  return customPermissions.has(key);
 }
 
 export async function getEffectivePermissions(userId: string, role: UserRole) {
+  const customPermissions = await getCustomRolePermissions(userId);
   const overrides = await prisma.userPermission.findMany({
     where: { userId },
     select: { permission: { select: { key: true } }, granted: true },
   });
 
   const map: Record<string, boolean> = {};
-  for (const [key] of PERMISSION_CATALOG) map[key] = roleAllows(role, key);
-  for (const item of overrides) map[item.permission.key] = item.granted;
+  for (const [key] of PERMISSION_CATALOG) {
+    map[key] = roleAllows(role, key) || customPermissions.has(key);
+  }
+
+  for (const item of overrides) {
+    map[item.permission.key] = item.granted;
+  }
+
   return map;
 }
