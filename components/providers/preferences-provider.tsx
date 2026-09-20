@@ -148,7 +148,7 @@ export const AR_LABELS: Record<string,string> = {
   Community:"المجتمع",Feed:"الخلاصة",Discussions:"النقاشات",Groups:"المجموعات",People:"الأشخاص",Announcements:"الإعلانات",Polls:"الاستطلاعات",
   Mentorship:"الإرشاد",Mentors:"المرشدون",Requests:"الطلبات",Sessions:"الجلسات",
   History:"السجل",
-  Challenges:"التحديات",Active:"النشطة","My Challenges":"تحدياتي",Completed:"المكتملة",Leaderboard:"المتصدرون","Create Challenge":"إنشاء تحدي",
+  Active:"النشطة","My Challenges":"تحدياتي",Completed:"المكتملة",Leaderboard:"المتصدرون","Create Challenge":"إنشاء تحدي",
   Teacher:"المعلم",Classes:"الفصول",Gradebook:"دفتر الدرجات",
   Admin:"الإدارة",Users:"المستخدمون",Students:"الطلاب",Roles:"الأدوار",Permissions:"الصلاحيات","Result Release":"نشر النتائج","Audit Logs":"سجلات التدقيق",Security:"الأمان",System:"النظام",
   Settings:"الإعدادات",Account:"الحساب",Appearance:"المظهر",Language:"اللغة",Privacy:"الخصوصية",Academic:"الأكاديمي",Gamification:"التلعيب",AI:"الذكاء الاصطناعي",Files:"الملفات",Integrations:"التكاملات"
