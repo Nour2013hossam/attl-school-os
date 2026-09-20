@@ -1,13 +1,6 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Admin OS"
-      title="Events"
-      description="Manage School OS events and registrations."
-      icon="◷"
-      api="/api/events"
-    />
-  );
-}
+"use client";import{useEffect,useState}from"react";
+type Event={id:string;title:string;description:string|null;startsAt:string;endsAt:string;location:string|null;capacity:number|null;_count:{registrations:number}};
+export default function AdminEventsPage(){const[items,setItems]=useState<Event[]>([]);const[title,setTitle]=useState("");const[description,setDescription]=useState("");const[startsAt,setStartsAt]=useState("");const[endsAt,setEndsAt]=useState("");const[location,setLocation]=useState("");const[capacity,setCapacity]=useState("80");const[msg,setMsg]=useState("");
+ async function load(){const r=await fetch("/api/events",{cache:"no-store"});if(r.ok){const d=await r.json();setItems(d.events??[]);}}useEffect(()=>{load();},[]);
+ async function create(){const r=await fetch("/api/events",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title,description,startsAt,endsAt,location:location||null,capacity:Number(capacity)||null})});const d=await r.json();setMsg(r.ok?"Event created.":d.error??"Could not create event.");if(r.ok){setTitle("");setDescription("");setStartsAt("");setEndsAt("");load();}}
+ return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Admin OS</p><h1 className="mt-3 text-3xl font-semibold md:text-5xl">Events</h1><p className="mt-3 text-sm text-white/40">Create and monitor school events and registration capacity.</p></section><section className="grid gap-2 md:grid-cols-2"><input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Event title" className="h-11 rounded-[14px] bg-white/70 px-3 text-[10px] outline-none"/><input value={location} onChange={e=>setLocation(e.target.value)} placeholder="Location" className="h-11 rounded-[14px] bg-white/70 px-3 text-[10px] outline-none"/><textarea value={description} onChange={e=>setDescription(e.target.value)} rows={3} placeholder="Description" className="rounded-[14px] bg-white/70 px-3 py-3 text-[10px] outline-none md:col-span-2"/><input value={startsAt} onChange={e=>setStartsAt(e.target.value)} type="datetime-local" className="h-11 rounded-[14px] bg-white/70 px-3 text-[10px] outline-none"/><input value={endsAt} onChange={e=>setEndsAt(e.target.value)} type="datetime-local" className="h-11 rounded-[14px] bg-white/70 px-3 text-[10px] outline-none"/><input value={capacity} onChange={e=>setCapacity(e.target.value)} type="number" min="1" placeholder="Capacity" className="h-11 rounded-[14px] bg-white/70 px-3 text-[10px] outline-none"/><button onClick={create} className="rounded-[14px] bg-black py-3 text-[9px] font-semibold text-white">Create event</button></section>{msg&&<div className="rounded-[15px] bg-blue-500/10 px-4 py-3 text-[9px] text-blue-700">{msg}</div>}<section className="grid gap-3 md:grid-cols-2">{items.map(e=><article key={e.id} className="rounded-[25px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold">{e.title}</p><p className="mt-1 text-[8px] text-black/30">{new Date(e.startsAt).toLocaleString()} · {e.location??"Online"}</p></div><span className="text-[9px] text-black/35">{e._count.registrations}{e.capacity?"/"+e.capacity:""} registered</span></div><p className="mt-3 text-[9px] leading-5 text-black/40">{e.description??"No description."}</p></article>)}</section></div>}
