@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { UserRole } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 import { z } from "zod";
 
 const schema = z.object({
@@ -13,7 +13,7 @@ const schema = z.object({
   active: z.boolean().optional(),
 });
 
-const roles = [
+const roles: UserRole[] = [
   UserRole.ATTL_MEMBER,
   UserRole.TRACK_LEAD,
   UserRole.ADMIN,
@@ -43,9 +43,17 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid question update." }, { status: 400 });
   }
 
+  const data = {
+    ...parsed.data,
+    options:
+      parsed.data.options === null
+        ? Prisma.JsonNull
+        : parsed.data.options,
+  };
+
   const question = await prisma.applicationQuestion.update({
     where: { id },
-    data: parsed.data,
+    data,
   });
 
   await prisma.auditLog.create({
