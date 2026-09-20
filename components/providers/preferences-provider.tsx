@@ -119,6 +119,15 @@ export function PreferencesProvider({children}:{children:React.ReactNode}){
 }
 
 export const AR_LABELS: Record<string,string> = {
+  "Your school dashboard":"لوحة مدرستك",
+"Your student identity":"هويتك كطالب",
+"Grades and academic progress":"الدرجات والتقدم الأكاديمي",
+"Build and manage projects":"إنشاء وإدارة المشاريع",
+"Competitions and challenges":"المسابقات والتحديات",
+"Track your skill growth":"تابع تطور مهاراتك",
+"Al Thagr Technical Lab":"معمل الثغر التقني",
+"Customize your experience":"خصص تجربتك",
+
   Workspace:"مساحة العمل",Overview:"نظرة عامة","My Profile":"ملفي الشخصي",Identity:"الهوية",Timeline:"الخط الزمني",Activity:"النشاط",Achievements:"الإنجازات",XP:"الخبرة",Level:"المستوى",Goals:"الأهداف",Interests:"الاهتمامات",Portfolio:"معرض الأعمال",Notifications:"الإشعارات",Messages:"الرسائل",Search:"البحث",Calendar:"التقويم",
   Academic:"الأكاديميات","Academic Overview":"نظرة عامة أكاديمية",Grades:"الدرجات",Subjects:"المواد",Schedule:"الجدول",Exams:"الاختبارات",Attendance:"الحضور",Results:"النتائج",Transcript:"السجل الأكاديمي",GPA:"المعدل",Assignments:"الواجبات",Deadlines:"المواعيد النهائية",Teachers:"المعلمون","Academic Calendar":"التقويم الأكاديمي",Reports:"التقارير",
   Learning:"التعلم",Courses:"الدورات","My Courses":"دوراتي",Explore:"استكشاف",Lessons:"الدروس",Resources:"المصادر",Roadmaps:"المسارات",Progress:"التقدم",Bookmarks:"المفضلة",Certificates:"الشهادات",Library:"المكتبة",
