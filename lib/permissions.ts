@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { UserRole } from "@prisma/client";
-import { PERMISSION_MATRIX } from "@/lib/roles";
+import { PERMISSION_MATRIX, PERMISSION_CATALOG } from "@/lib/roles";
 
 function roleAllows(role: UserRole, key: string) {
   const permissions = PERMISSION_MATRIX[role] ?? [];
@@ -29,12 +29,7 @@ export async function getEffectivePermissions(userId: string, role: UserRole) {
   });
 
   const map: Record<string, boolean> = {};
-  const keys = new Set(
-    Object.values(PERMISSION_MATRIX).flatMap((items) => items).filter(
-      (key) => key !== "*" && !key.endsWith(":*")
-    )
-  );
-  for (const key of keys) map[key] = roleAllows(role, key);
+  for (const [key] of PERMISSION_CATALOG) map[key] = roleAllows(role, key);
   for (const item of overrides) map[item.permission.key] = item.granted;
   return map;
 }
