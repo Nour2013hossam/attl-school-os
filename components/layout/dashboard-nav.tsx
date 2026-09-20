@@ -281,7 +281,7 @@ export function DashboardNav({ role = "STUDENT" }: { role?: string }) {
     return true;
   });
 
-  const [openSections, setOpenSections] = useState<string[]>(["Workspace"]);
+  const [openSections, setOpenSections] = useState<string[]>([]);
 
   useEffect(() => {
     const activeSection = sections.find((section) =>
