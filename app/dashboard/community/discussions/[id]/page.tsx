@@ -1,0 +1,16 @@
+"use client";
+import Link from "next/link";
+import{useEffect,useState}from"react";
+
+type Post={id:string;body:string;createdAt:string;author:{name:string;avatarUrl:string|null}};
+type Discussion={id:string;title:string;body:string;createdAt:string;author:{name:string;avatarUrl:string|null};posts:Post[]};
+
+export default function DiscussionDetail({params}:{params:Promise<{id:string}>}){
+ const[id,setId]=useState("");const[d,setD]=useState<Discussion|null>(null);const[body,setBody]=useState("");const[msg,setMsg]=useState("");
+ useEffect(()=>{params.then(p=>setId(p.id));},[params]);
+ async function load(){if(!id)return;const r=await fetch("/api/community/discussions/"+id,{cache:"no-store"});if(r.ok){const x=await r.json();setD(x.discussion);}}
+ useEffect(()=>{load();},[id]);
+ async function reply(){const r=await fetch("/api/community/discussions/"+id,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body})});const x=await r.json();setMsg(r.ok?"Reply added.":x.error??"Could not reply.");if(r.ok){setBody("");load();}}
+ if(!d)return <div className="rounded-[28px] border border-white/80 bg-white/60 p-10 text-center text-sm text-black/40">Loading discussion...</div>;
+ return <div className="mx-auto max-w-[950px] space-y-5"><Link href="/dashboard/community/discussions" className="text-[9px] uppercase tracking-[.18em] text-black/35">← Discussions</Link><article className="rounded-[30px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl md:p-8"><div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black text-xs text-white">{d.author.avatarUrl?<img src={d.author.avatarUrl} alt="" className="h-full w-full object-cover"/>:d.author.name.slice(0,1)}</div><div><p className="text-xs font-semibold">{d.author.name}</p><p className="text-[8px] text-black/25">{new Date(d.createdAt).toLocaleString()}</p></div></div><h1 className="mt-5 text-2xl font-semibold tracking-[-.04em]">{d.title}</h1><p className="mt-4 whitespace-pre-line text-sm leading-7 text-black/50">{d.body}</p></article><section className="space-y-3">{d.posts.map(p=><article key={p.id} className="rounded-[23px] border border-white/80 bg-white/55 p-5 backdrop-blur-xl"><p className="text-[9px] font-semibold">{p.author.name}</p><p className="mt-1 text-[8px] text-black/25">{new Date(p.createdAt).toLocaleString()}</p><p className="mt-3 whitespace-pre-line text-[11px] leading-6 text-black/45">{p.body}</p></article>)}</section><section className="rounded-[25px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><textarea value={body} onChange={e=>setBody(e.target.value)} rows={4} placeholder="Write a reply..." className="w-full rounded-[15px] bg-white/70 p-3 text-[10px] outline-none"/><div className="mt-3 flex items-center gap-3"><button onClick={reply} className="rounded-[14px] bg-black px-5 py-2.5 text-[9px] font-semibold text-white">Reply</button>{msg&&<span className="text-[9px] text-black/35">{msg}</span>}</div></section></div>;
+}
