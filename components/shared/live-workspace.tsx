@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { usePreferences } from "@/components/providers/preferences-provider";
+import { translateUiText } from "@/lib/i18n";
 
 type LiveWorkspaceProps = {
   eyebrow: string;
@@ -39,6 +41,7 @@ export function LiveWorkspace({
   api,
   actions = [],
 }: LiveWorkspaceProps) {
+  const { language } = usePreferences();
   const [payload, setPayload] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(Boolean(api));
@@ -96,13 +99,13 @@ export function LiveWorkspace({
               {icon}
             </div>
             <div>
-              <p className="text-[8px] uppercase tracking-[.22em] text-white/40">{eyebrow}</p>
-              <p className="mt-1 text-[9px] text-white/25">Connected School OS workspace</p>
+              <p className="text-[8px] uppercase tracking-[.22em] text-white/40">{translateUiText(eyebrow, language)}</p>
+              <p className="mt-1 text-[9px] text-white/25">{translateUiText("Connected School OS workspace", language)}</p>
             </div>
           </div>
 
-          <h1 className="mt-6 text-3xl font-semibold tracking-[-.06em] md:text-5xl">{title}</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-white/40">{description}</p>
+          <h1 className="mt-6 text-3xl font-semibold tracking-[-.06em] md:text-5xl">{translateUiText(title, language)}</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-white/40">{translateUiText(description, language)}</p>
 
           {actions.length > 0 && (
             <div className="mt-7 flex flex-wrap gap-2">
@@ -118,7 +121,7 @@ export function LiveWorkspace({
 
       {loading && (
         <section className="rounded-[28px] border border-white/80 bg-white/60 p-6 text-[10px] text-black/35 backdrop-blur-2xl">
-          Loading live data...
+          {translateUiText("Loading live data...", language)}
         </section>
       )}
 
@@ -132,7 +135,7 @@ export function LiveWorkspace({
         <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {stats.map(([key, value]) => (
             <div key={key} className="rounded-[23px] border border-white/80 bg-white/60 p-5 backdrop-blur-2xl">
-              <p className="text-[8px] uppercase tracking-[.18em] text-black/30">{titleize(key)}</p>
+              <p className="text-[8px] uppercase tracking-[.18em] text-black/30">{translateUiText(titleize(key), language)}</p>
               <p className="mt-3 text-2xl font-semibold tracking-[-.05em]">{String(value)}</p>
             </div>
           ))}
@@ -144,7 +147,7 @@ export function LiveWorkspace({
           <div className="flex items-end justify-between gap-3">
             <div>
               <p className="text-[8px] uppercase tracking-[.18em] text-black/25">{titleize(key)}</p>
-              <h2 className="mt-1 text-xl font-semibold tracking-[-.04em]">{collection.length} records</h2>
+              <h2 className="mt-1 text-xl font-semibold tracking-[-.04em]">{collection.length} {language === "ar" ? "سجلات" : "records"}</h2>
             </div>
             <span className="rounded-full bg-black/[.04] px-3 py-1.5 text-[8px] text-black/35">
               Live
@@ -172,7 +175,7 @@ export function LiveWorkspace({
           </div>
 
           {collection.length > 24 && (
-            <p className="mt-4 text-center text-[9px] text-black/25">Showing the first 24 records.</p>
+            <p className="mt-4 text-center text-[9px] text-black/25">{language === "ar" ? "يتم عرض أول 24 سجلًا." : "Showing the first 24 records."}</p>
           )}
         </section>
       ))}
@@ -180,9 +183,9 @@ export function LiveWorkspace({
       {!loading && !error && collections.length === 0 && stats.length === 0 && (
         <section className="rounded-[30px] border border-dashed border-black/10 bg-black/[.02] p-10 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-black text-white">{icon}</div>
-          <h2 className="mt-4 text-lg font-semibold">Workspace ready</h2>
+          <h2 className="mt-4 text-lg font-semibold">{language === "ar" ? "مساحة العمل جاهزة" : "Workspace ready"}</h2>
           <p className="mx-auto mt-2 max-w-xl text-[10px] leading-5 text-black/30">
-            This screen is wired to the School OS architecture and ready for its domain data.
+            {language === "ar" ? "هذه الشاشة متصلة ببنية نظام المدرسة وجاهزة لبياناتها." : "This screen is wired to the School OS architecture and ready for its domain data."}
           </p>
         </section>
       )}
