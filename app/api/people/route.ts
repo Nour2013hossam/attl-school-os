@@ -17,11 +17,20 @@ export async function GET(request: Request) {
     where: {
       isActive: true,
       id: { not: session.user.id },
-      OR: [
-        { name: { contains: query, mode: "insensitive" } },
-        { email: { contains: query, mode: "insensitive" } },
+      AND: [
+        {
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { email: { contains: query, mode: "insensitive" } },
+          ],
+        },
+        {
+          OR: [
+            { preferences: { is: { profileVisible: true } } },
+            { preferences: { is: null } },
+          ],
+        },
       ],
-      OR: [{ preferences: { is: { profileVisible: true } } }, { preferences: { is: null } }],
     },
     orderBy: { name: "asc" },
     take: 20,
