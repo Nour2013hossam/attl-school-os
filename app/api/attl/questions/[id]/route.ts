@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Prisma, UserRole } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { hasPermission } from "@/lib/permissions";
 import { z } from "zod";
 
 const schema = z.object({
@@ -13,16 +14,10 @@ const schema = z.object({
   active: z.boolean().optional(),
 });
 
-const roles: UserRole[] = [
-  UserRole.ATTL_MEMBER,
-  UserRole.TRACK_LEAD,
-  UserRole.ADMIN,
-  UserRole.SUPER_ADMIN,
-];
-
 async function allowed() {
   const session = await auth();
-  if (!session?.user?.id || !roles.includes(session.user.role)) return null;
+  if (!session?.user?.id) return null;
+  if (!(await hasPermission(session.user.id, session.user.role, "attl.review"))) return null;
   return session.user;
 }
 
