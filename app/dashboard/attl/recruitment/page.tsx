@@ -1,13 +1,5 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="ATTL"
-      title="Recruitment"
-      description="Track the ATTL recruitment pipeline."
-      icon="↗"
-      api="/api/attl/applications"
-    />
-  );
-}
+"use client";
+import { useEffect,useMemo,useState } from "react";
+type App={id:string;status:string;createdAt:string;user:{name:string;email:string};track:{name:string};reviewer:{name:string}|null};
+const statuses=["NEW","UNDER_REVIEW","SHORTLISTED","INTERVIEW","ACCEPTED","REJECTED"];
+export default function RecruitmentPage(){const [apps,setApps]=useState<App[]>([]);const [message,setMessage]=useState("");async function load(){const d=await fetch("/api/attl/applications",{cache:"no-store"}).then(r=>r.json());setApps(d.applications??[]);}useEffect(()=>{load();},[]);async function update(id:string,status:string){const res=await fetch("/api/admin/attl/applications/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})});const d=await res.json();setMessage(res.ok?"Application updated.":d.error??"Could not update.");if(res.ok)load();}const groups=useMemo(()=>statuses.map(s=>({status:s,items:apps.filter(a=>a.status===s)})),[apps]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">ATTL Recruitment</p><h1 className="mt-3 text-3xl font-semibold tracking-[-.05em] md:text-5xl">Recruitment pipeline</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-white/40">Move applications through a clear pipeline and approve members directly from the review workspace.</p></section>{message&&<div className="rounded-[16px] bg-blue-500/10 px-4 py-3 text-[10px] text-blue-700">{message}</div>}<section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{groups.map(group=><div key={group.status} className="rounded-[24px] border border-white/80 bg-white/60 p-4 backdrop-blur-2xl"><div className="flex items-center justify-between"><p className="text-[9px] font-semibold uppercase tracking-[.15em]">{group.status.replaceAll("_"," ")}</p><span className="rounded-full bg-black/[.04] px-2.5 py-1 text-[8px]">{group.items.length}</span></div><div className="mt-4 space-y-2">{group.items.map(app=><article key={app.id} className="rounded-[18px] bg-white/80 p-4"><p className="text-[10px] font-semibold">{app.user.name}</p><p className="mt-1 text-[8px] text-black/30">{app.track.name} · {app.user.email}</p><select value={app.status} onChange={e=>update(app.id,e.target.value)} className="mt-3 h-9 w-full rounded-[12px] border border-black/5 bg-white px-2 text-[8px] outline-none">{statuses.map(s=><option key={s}>{s}</option>)}</select></article>)}</div></div>)}</section></div>}
