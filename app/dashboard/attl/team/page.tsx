@@ -1,13 +1,4 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="ATTL"
-      title="ATTL Team"
-      description="Team members and ATTL role structure."
-      icon="♧"
-      api="/api/attl/overview"
-    />
-  );
-}
+"use client";
+import{useEffect,useState}from"react";
+type Member={id:string;name:string;email:string;role:string;avatarUrl:string|null;bio:string|null;gradeLevel:string|null;className:string|null};
+export default function TeamPage(){const[members,setMembers]=useState<Member[]>([]);const[tracks,setTracks]=useState<any[]>([]);const[projects,setProjects]=useState<any[]>([]);useEffect(()=>{fetch("/api/attl/team",{cache:"no-store"}).then(r=>r.json()).then(d=>{setMembers(d.members??[]);setTracks(d.tracks??[]);setProjects(d.projects??[]);});},[]);return <div className="space-y-6"><section className="rounded-[34px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">ATTL</p><h1 className="mt-3 text-3xl font-semibold tracking-[-.05em] md:text-5xl">Team</h1><p className="mt-3 max-w-2xl text-sm text-white/40">Current ATTL members, active tracks and team-owned projects.</p></section><section className="grid grid-cols-2 gap-3 md:grid-cols-4">{[["Members",members.length],["Tracks",tracks.length],["Projects",projects.length],["Open applications",tracks.reduce((n,t)=>n+(t._count?.applications??0),0)]].map(([l,v])=><div key={String(l)} className="rounded-[23px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.15em] text-black/25">{l}</p><p className="mt-2 text-2xl font-semibold">{v}</p></div>)}</section><section className="grid gap-4 lg:grid-cols-[1.1fr_.9fr]"><div className="rounded-[28px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Members</p><div className="mt-5 space-y-2">{members.map(m=><div key={m.id} className="flex items-center gap-3 rounded-[18px] bg-black/[.025] p-3"><div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black text-white">{m.avatarUrl?<img src={m.avatarUrl} alt="" className="h-full w-full object-cover"/>:m.name.slice(0,1)}</div><div className="min-w-0"><p className="truncate text-[10px] font-semibold">{m.name}</p><p className="mt-1 text-[8px] text-black/30">{m.role.replaceAll("_"," ")} · {m.email}</p></div></div>)}{members.length===0&&<p className="text-[10px] text-black/30">No members yet.</p>}</div></div><div className="space-y-4"><div className="rounded-[28px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Tracks</p><div className="mt-4 space-y-2">{tracks.map(t=><div key={t.id} className="rounded-[16px] bg-black/[.025] p-3"><p className="text-[10px] font-semibold">{t.name}</p><p className="mt-1 text-[8px] text-black/30">{t._count?.applications??0} applications</p></div>)}</div></div></div></section></div>}
