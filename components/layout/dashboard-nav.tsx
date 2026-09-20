@@ -326,12 +326,12 @@ export function DashboardNav({}: { role?: string }) {
       "/dashboard/innovation/challenges":"challenges.read",
 
       "/dashboard/community/feed":"community.read",
-      "/dashboard/community/discussions":"community.participate",
-      "/dashboard/community/groups":"community.participate",
+      "/dashboard/community/discussions":"community.read",
+      "/dashboard/community/groups":"community.read",
       "/dashboard/community/people":"community.read",
       "/dashboard/community/messages":"messages.read",
       "/dashboard/community/announcements":"community.read",
-      "/dashboard/community/polls":"community.participate",
+      "/dashboard/community/polls":"community.read",
 
       "/dashboard/mentorship/mentors":"mentorship.request",
       "/dashboard/mentorship/requests":"mentorship.request",
@@ -364,10 +364,10 @@ export function DashboardNav({}: { role?: string }) {
       "/dashboard/teacher/messages":"messages.read",
 
       "/dashboard/admin/overview":"analytics.read",
-      "/dashboard/admin/users":"users.manage",
+      "/dashboard/admin/users":"users.read",
       "/dashboard/admin/students":"users.read",
       "/dashboard/admin/teachers":"users.read",
-      "/dashboard/admin/roles":"roles.assign",
+      "/dashboard/admin/roles":"roles.read",
       "/dashboard/admin/permissions":"permissions.manage",
       "/dashboard/admin/applications":"attl.review",
       "/dashboard/admin/grades":"academics.grades.write",
