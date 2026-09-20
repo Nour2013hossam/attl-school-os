@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const gradeSchema = z.object({
   userId: z.string().min(1),
@@ -30,6 +31,7 @@ async function canTeachSubject(teacherId: string, subjectId: string) {
 export async function GET() {
   const session = await requireTeacher();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await hasPermission(session.user.id, session.user.role, "academics.grades.write"))) return NextResponse.json({ error: "You do not have permission to access the gradebook." }, { status: 403 });
 
   const [grades, subjects] = await Promise.all([
     prisma.grade.findMany({
