@@ -8,6 +8,7 @@ export default function Page() {
       description="Events organized through ATTL."
       icon="◷"
       api="/api/events"
+      actions={[{ label: "Discover events", href: "/dashboard/events/discover" }, { label: "ATTL command center", href: "/dashboard/attl/command-center" }]}
     />
   );
 }
