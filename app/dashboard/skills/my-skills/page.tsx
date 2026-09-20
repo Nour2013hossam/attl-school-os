@@ -1,13 +1,3 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Development"
-      title="My Skills"
-      description="Your current skill profile and development record."
-      icon="◇"
-      api="/api/skills"
-    />
-  );
-}
+"use client"; import {useEffect,useState} from "react";
+type Item={id:string;level:number;progress:number;skill:{name:string;category:string;description:string|null}};
+export default function MySkillsPage(){const [items,setItems]=useState<Item[]>([]);useEffect(()=>{fetch("/api/skills",{cache:"no-store"}).then(r=>r.json()).then(d=>setItems(d.skills??[]));},[]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Development</p><h1 className="mt-3 text-3xl font-semibold tracking-[-.05em] md:text-5xl">My skills</h1><p className="mt-3 max-w-2xl text-sm text-white/40">Track your technical and soft-skill growth from live user skill records.</p></section><section className="grid gap-3 md:grid-cols-2">{items.map(item=><article key={item.id} className="rounded-[26px] border border-white/80 bg-white/65 p-5 backdrop-blur-xl"><div className="flex items-center justify-between"><div><p className="text-[8px] uppercase tracking-[.15em] text-blue-600">{item.skill.category}</p><h2 className="mt-1 text-base font-semibold">{item.skill.name}</h2></div><span className="rounded-full bg-black px-3 py-1.5 text-[8px] text-white">Level {item.level}</span></div><p className="mt-3 text-[10px] text-black/40">{item.skill.description??"Keep practicing and update your progress regularly."}</p><div className="mt-5 h-2 overflow-hidden rounded-full bg-black/[.05]"><div className="h-full rounded-full bg-black" style={{width:`${Math.max(0,Math.min(100,item.progress))}%`}}/></div><p className="mt-2 text-right text-[8px] text-black/30">{item.progress}% progress</p></article>)}{items.length===0&&<div className="rounded-[24px] border border-dashed border-black/10 p-10 text-center text-[10px] text-black/30 md:col-span-2">No skills have been assigned yet.</div>}</section></div>
