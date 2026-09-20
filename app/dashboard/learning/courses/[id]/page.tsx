@@ -7,11 +7,12 @@ import { usePreferences } from "@/components/providers/preferences-provider";
 type Lesson={id:string;title:string;content:string|null;duration:number|null;position:number};
 type Course={id:string;title:string;description:string|null;level:string|null;subject:{code:string;name:string;description:string|null}|null;lessons:Lesson[];resources:Array<{id:string;title:string;description:string|null;type:string;url:string|null}>};
 type Enrollment={progress:number;status:string};
+type Asset={id:string;fileName:string;mimeType:string;sizeBytes:number;createdAt:string;owner:{id:string;name:string}};
 
 export default function CourseDetailPage({params}:{params:Promise<{id:string}>}){
  const {can,permissionsReady}=usePreferences();
  const[id,setId]=useState("");const[c,setC]=useState<Course|null>(null);const[e,setE]=useState<Enrollment|null>(null);
- const[completed,setCompleted]=useState<Record<string,boolean>>({});const[bookmarked,setBookmarked]=useState<Record<string,boolean>>({});
+ const[completed,setCompleted]=useState<Record<string,boolean>>({});const[bookmarked,setBookmarked]=useState<Record<string,boolean>>({});const[files,setFiles]=useState<Asset[]>([]);
  const[busy,setBusy]=useState("");const[msg,setMsg]=useState("");
 
  useEffect(()=>{params.then(p=>setId(p.id));},[params]);
@@ -22,6 +23,7 @@ export default function CourseDetailPage({params}:{params:Promise<{id:string}>})
   const my=await fetch("/api/courses/"+id+"/enroll",{cache:"no-store"});if(my.ok){const ed=await my.json();setE(ed.enrollment??null);}
   const marks=await fetch("/api/learning/bookmarks",{cache:"no-store"});if(marks.ok){const md=await marks.json();const bm:Record<string,boolean>={};for(const b of md.bookmarks??[]){if(b.lesson?.id)bm[b.lesson.id]=true;}setBookmarked(bm);}
   const pr=await fetch("/api/learning/lessons/progress?courseId="+id,{cache:"no-store"});if(pr.ok){const pd=await pr.json();const map:Record<string,boolean>={};for(const x of pd.progress??[]){map[x.lessonId]=x.completed;}setCompleted(map);setE(pd.enrollment??null);}
+  const fr=await fetch("/api/uploads?entityType=course&entityId="+encodeURIComponent(id),{cache:"no-store"});if(fr.ok){const fd=await fr.json();setFiles(fd.files??[]);}
  }
  useEffect(()=>{load();},[id]);
 
@@ -85,6 +87,13 @@ export default function CourseDetailPage({params}:{params:Promise<{id:string}>})
     <div className="rounded-[28px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Subject</p><h2 className="mt-2 text-lg font-semibold">{c.subject?.code??"—"}</h2><p className="mt-1 text-[10px] text-black/35">{c.subject?.name??"Independent course"}</p></div>
     <div className="rounded-[28px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl"><div className="flex items-end justify-between"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Resources</p><span className="text-[8px] text-black/25">{c.resources.length}</span></div><div className="mt-4 space-y-2">{c.resources.map(r=><a key={r.id} href={r.url??"#"} target="_blank" rel="noreferrer" className="block rounded-[15px] bg-black/[.025] p-3 transition hover:bg-white"><p className="text-[9px] font-semibold">{r.title}</p><p className="mt-1 text-[8px] text-black/30">{r.type}</p></a>)}{c.resources.length===0&&<p className="text-[10px] text-black/30">No resources attached yet.</p>}</div></div>
    </div>
+    <div className="rounded-[28px] border border-white/80 bg-white/60 p-6 backdrop-blur-xl">
+      <div className="flex items-end justify-between"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Files</p><span className="text-[8px] text-black/25">{files.length}</span></div>
+      <div className="mt-4 space-y-2">
+        {files.map(file=><a key={file.id} href={"/api/uploads/"+file.id} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-[15px] bg-black/[.025] p-3 transition hover:bg-white"><div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-black text-[7px] font-semibold text-white">FILE</div><div className="min-w-0 flex-1"><p className="truncate text-[9px] font-semibold">{file.fileName}</p><p className="mt-1 text-[8px] text-black/30">{(file.sizeBytes/1024/1024).toFixed(1)} MB</p></div><span className="text-[8px] text-blue-600">Open</span></a>)}
+        {files.length===0&&<p className="text-[10px] text-black/30">No downloadable files attached.</p>}
+      </div>
+    </div>
   </section>
  </div>;
 }
