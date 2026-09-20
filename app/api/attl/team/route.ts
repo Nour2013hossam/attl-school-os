@@ -10,7 +10,7 @@ export async function GET(){
  const [members,tracks,projects]=await Promise.all([
   prisma.user.findMany({where:{isActive:true,attlMembershipActive:true,role:{in:[UserRole.ATTL_MEMBER,UserRole.TRACK_LEAD]}},orderBy:[{role:"asc"},{name:"asc"}],select:{id:true,name:true,email:true,role:true,avatarUrl:true,bio:true,gradeLevel:true,className:true}}),
   prisma.attlTrack.findMany({where:{active:true},orderBy:{name:"asc"},include:{_count:{select:{applications:true}}}}),
-  prisma.project.findMany({where:{owner:{role:{in:[UserRole.ATTL_MEMBER,UserRole.TRACK_LEAD],attlMembershipActive:true}}},orderBy:{updatedAt:"desc"},take:20,select:{id:true,title:true,status:true,progress:true,owner:{select:{name:true}}}})
+  prisma.project.findMany({where:{owner:{role:{in:[UserRole.ATTL_MEMBER,UserRole.TRACK_LEAD]},attlMembershipActive:true}},orderBy:{updatedAt:"desc"},take:20,select:{id:true,title:true,status:true,progress:true,owner:{select:{name:true}}}})
  ]);
  return NextResponse.json({members,tracks,projects});
 }
