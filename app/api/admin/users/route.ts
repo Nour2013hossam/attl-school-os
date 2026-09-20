@@ -27,6 +27,7 @@ export async function GET() {
       xp: true,
       level: true,
       isActive: true,
+      attlMembershipActive: true,
       customRole: { select: { id: true, name: true } },
       createdAt: true,
     },
