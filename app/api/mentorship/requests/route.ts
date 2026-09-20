@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { UserRole, NotificationType } from "@prisma/client";
 
 export async function GET() {
   const session = await auth();
@@ -36,11 +37,42 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "A valid mentor is required." }, { status: 400 });
   }
 
+  const mentor = await prisma.user.findFirst({
+    where: {
+      id: body.mentorId,
+      isActive: true,
+      role: { in: [UserRole.TEACHER, UserRole.ATTL_MEMBER, UserRole.TRACK_LEAD] },
+    },
+    select: { id: true, name: true },
+  });
+
+  if (!mentor) {
+    return NextResponse.json({ error: "Mentor not found." }, { status: 404 });
+  }
+
+  const existing = await prisma.mentorshipRequest.findFirst({
+    where: { menteeId: session.user.id, mentorId: mentor.id, status: "Pending" },
+    select: { id: true },
+  });
+
+  if (existing) {
+    return NextResponse.json({ error: "You already have a pending request with this mentor." }, { status: 409 });
+  }
+
   const requestRow = await prisma.mentorshipRequest.create({
     data: {
       menteeId: session.user.id,
       mentorId: body.mentorId,
       message: typeof body.message === "string" ? body.message.trim() : null,
+    },
+  });
+
+  await prisma.notification.create({
+    data: {
+      userId: mentor.id,
+      title: "New mentorship request",
+      body: "A student has requested mentorship from you.",
+      type: NotificationType.MENTORSHIP,
     },
   });
 
