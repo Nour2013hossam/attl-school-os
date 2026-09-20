@@ -1,13 +1,3 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Challenges"
-      title="Leaderboard"
-      description="Explore challenge participation and progress."
-      icon="★"
-      api="/api/challenges"
-    />
-  );
-}
+"use client";import{useEffect,useState}from"react";
+type Row={id:string;rank:number;name:string;avatarUrl:string|null;role:string;completed:number;progress:number;xp:number};
+export default function LeaderboardPage(){const[rows,setRows]=useState<Row[]>([]);const[current,setCurrent]=useState<Row|null>(null);useEffect(()=>{fetch("/api/challenges/leaderboard",{cache:"no-store"}).then(r=>r.json()).then(d=>{setRows(d.leaderboard??[]);setCurrent(d.currentUser??null);});},[]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Challenges</p><h1 className="mt-3 text-3xl font-semibold md:text-5xl">Leaderboard</h1><p className="mt-3 text-sm text-white/40">Live challenge progress, completions and XP.</p></section>{current&&<section className="rounded-[25px] border border-blue-500/15 bg-blue-500/[.05] p-5"><p className="text-[8px] uppercase tracking-[.16em] text-blue-600">Your position</p><div className="mt-2 flex items-center justify-between"><p className="text-lg font-semibold">#{current.rank} · {current.name}</p><p className="text-sm font-semibold">{current.xp} XP</p></div></section>}<section className="rounded-[28px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><div className="space-y-2">{rows.map(r=><div key={r.id} className="flex items-center gap-3 rounded-[18px] border border-black/5 bg-white/50 p-4"><span className="w-7 text-center text-xs font-semibold">{r.rank}</span><div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black text-xs text-white">{r.avatarUrl?<img src={r.avatarUrl} alt="" className="h-full w-full object-cover"/>:r.name.slice(0,1).toUpperCase()}</div><div className="min-w-0 flex-1"><p className="truncate text-[10px] font-semibold">{r.name}</p><p className="mt-1 text-[8px] text-black/30">{r.completed} completed · {r.progress}% total progress</p></div><div className="text-right"><p className="text-sm font-semibold">{r.xp}</p><p className="text-[7px] uppercase text-black/25">XP</p></div></div>)}{rows.length===0&&<p className="p-10 text-center text-[10px] text-black/30">No challenge activity yet.</p>}</div></section></div>}
