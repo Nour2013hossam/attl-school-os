@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
+import { hasPermission } from "@/lib/permissions";
 
 const schema = z.object({ userId: z.string().min(1), role: z.string().trim().max(60).optional() });
 
@@ -32,7 +33,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
   const canManage = project.ownerId === session.user.id || [UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role);
-  if (!canManage) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!canManage || !(await hasPermission(session.user.id, session.user.role, "projects.members.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const parsed = schema.safeParse(await request.json());
   if (!parsed.success) return NextResponse.json({ error: "Invalid member data." }, { status: 400 });
