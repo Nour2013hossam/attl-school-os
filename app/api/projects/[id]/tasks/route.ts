@@ -53,7 +53,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const canManage =
     project.ownerId === session.user.id ||
     project.members.some((m) => m.userId === session.user.id) ||
-    [UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(session.user.role);
+    ([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role);
   if (!canManage || !(await hasPermission(session.user.id, session.user.role, "projects.tasks.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const parsed = createSchema.safeParse(await request.json());
