@@ -1,8 +1,9 @@
 "use client";
 
 import {createContext,useContext,useEffect,useMemo,useState} from "react";
+import { translateUiText, type UiLanguage } from "@/lib/i18n";
 
-type Language="en"|"ar";
+type Language=UiLanguage;
 type Theme="system"|"light"|"dark";
 type Preferences={language:Language;theme:Theme;emailNotifications:boolean;pushNotifications:boolean;profileVisible:boolean};
 
@@ -26,9 +27,51 @@ function applyTheme(theme:Theme){
   document.documentElement.classList.toggle("dark",dark);
   document.documentElement.style.colorScheme=dark?"dark":"light";
 }
-function applyLanguage(language:Language){
-  document.documentElement.lang=language;
-  document.documentElement.dir=language==="ar"?"rtl":"ltr";
+function applyLanguage(language: Language) {
+  document.documentElement.lang = language;
+  document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+  document.body?.setAttribute("data-ui-language", language);
+}
+
+function shouldSkipI18n(element: Element) {
+  return (
+    element.hasAttribute("data-no-i18n") ||
+    element.closest("[data-no-i18n]") ||
+    ["SCRIPT", "STYLE", "NOSCRIPT", "CODE", "PRE", "INPUT", "TEXTAREA", "OPTION"].includes(element.tagName)
+  );
+}
+
+function translatePage(language: Language) {
+  if (!document.body) return;
+
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const nodes: Text[] = [];
+  let node: Node | null = walker.nextNode();
+
+  while (node) {
+    const parent = node.parentElement;
+    if (parent && !shouldSkipI18n(parent)) nodes.push(node as Text);
+    node = walker.nextNode();
+  }
+
+  for (const textNode of nodes) {
+    const next = translateUiText(textNode.nodeValue ?? "", language);
+    if (next !== textNode.nodeValue) textNode.nodeValue = next;
+  }
+
+  const elements = document.body.querySelectorAll<HTMLElement>(
+    "input[placeholder], textarea[placeholder], [aria-label], [title]"
+  );
+
+  elements.forEach((element) => {
+    if (shouldSkipI18n(element)) return;
+    for (const attr of ["placeholder", "aria-label", "title"]) {
+      const value = element.getAttribute(attr);
+      if (!value) continue;
+      const next = translateUiText(value, language);
+      if (next !== value) element.setAttribute(attr, next);
+    }
+  });
 }
 
 export function PreferencesProvider({children}:{children:React.ReactNode}){
@@ -43,7 +86,21 @@ export function PreferencesProvider({children}:{children:React.ReactNode}){
    }).finally(()=>setReady(true))).catch(()=>setReady(true));
  },[]);
 
- useEffect(()=>{if(!ready)return;applyTheme(preferences.theme);applyLanguage(preferences.language);localStorage.setItem("attl-preferences",JSON.stringify(preferences));},[preferences,ready]);
+ useEffect(() => {
+   if (!ready) return;
+   applyTheme(preferences.theme);
+   applyLanguage(preferences.language);
+   localStorage.setItem("attl-preferences", JSON.stringify(preferences));
+
+   const runTranslation = () => translatePage(preferences.language);
+   runTranslation();
+
+   const observer = new MutationObserver(() => {
+     window.requestAnimationFrame(runTranslation);
+   });
+   observer.observe(document.body, { childList: true, subtree: true });
+   return () => observer.disconnect();
+ }, [preferences.language, preferences.theme, ready]);
 
  useEffect(()=>{
    const media=window.matchMedia("(prefers-color-scheme: dark)");
