@@ -6,6 +6,7 @@ import { CommandCenter } from "@/components/layout/command-center";
 import { DashboardSearch } from "@/components/layout/dashboard-search";
 import { SignOutButton } from "@/components/auth/signout-button";
 import { QuickPreferences } from "@/components/layout/quick-preferences";
+import { PermissionRouter } from "@/components/auth/permission-router";
 
 export default async function DashboardLayout({
   children,
@@ -130,7 +131,7 @@ export default async function DashboardLayout({
         </header>
 
         <div className="mx-auto max-w-[1500px] px-3 pb-32 pt-4 md:px-5 lg:px-8 lg:pb-12">
-          {children}
+          <PermissionRouter>{children}</PermissionRouter>
         </div>
       </main>
 
