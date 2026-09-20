@@ -3,7 +3,6 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hasPermission } from "@/lib/permissions";
 import { z } from "zod";
-import { hasPermission } from "@/lib/permissions";
 
 const questionSchema = z.object({
   prompt: z.string().trim().min(3).max(500),
