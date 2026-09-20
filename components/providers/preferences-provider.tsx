@@ -7,13 +7,19 @@ type Theme="system"|"light"|"dark";
 type Preferences={language:Language;theme:Theme;emailNotifications:boolean;pushNotifications:boolean;profileVisible:boolean};
 
 const defaults:Preferences={language:"en",theme:"system",emailNotifications:true,pushNotifications:true,profileVisible:true};
-const PreferenceContext=createContext<{
- preferences:Preferences;
- language:Language;
- theme:Theme;
- setLanguage:(language:Language)=>void;
- setTheme:(theme:Theme)=>void;
-}>{preferences:defaults,language:"en",theme:"system",setLanguage:()=>{},setTheme:()=>{}};
+const PreferenceContext = createContext<{
+  preferences: Preferences;
+  language: Language;
+  theme: Theme;
+  setLanguage: (language: Language) => void;
+  setTheme: (theme: Theme) => void;
+}>({
+  preferences: defaults,
+  language: "en",
+  theme: "system",
+  setLanguage: () => {},
+  setTheme: () => {},
+});
 
 function applyTheme(theme:Theme){
   const dark=theme==="dark" || (theme==="system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
