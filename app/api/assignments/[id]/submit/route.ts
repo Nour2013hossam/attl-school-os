@@ -34,13 +34,10 @@ export async function POST(
     return NextResponse.json({ error: "Assignment not found." }, { status: 404 });
   }
 
-  const enrolled = await prisma.enrollment.findUnique({
+  const enrolled = await prisma.enrollment.findFirst({
     where: {
-      userId_subjectId_term: {
-        userId: session.user.id,
-        subjectId: assignment.subjectId,
-        term: "2026-2027",
-      },
+      userId: session.user.id,
+      subjectId: assignment.subjectId,
     },
     select: { id: true },
   });
