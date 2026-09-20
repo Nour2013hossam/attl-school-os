@@ -8,10 +8,10 @@ export const ROLE_DEFINITIONS = [
 ] as const;
 
 export const PERMISSION_MATRIX: Record<string, string[]> = {
-  STUDENT: ["profile:read", "profile:write", "academics:read", "learning:read", "learning:enroll", "projects:read", "projects:create", "projects:participate", "competitions:read", "competitions:apply", "events:read", "events:register", "community:read", "community:participate", "mentorship:request", "challenges:read", "challenges:participate", "attl:apply"],
-  ATTL_MEMBER: ["profile:*", "academics:read", "learning:read", "learning:enroll", "projects:*", "competitions:read", "competitions:apply", "events:*", "community:*", "mentorship:*", "challenges:*", "attl:read", "attl:operations"],
+  STUDENT: ["profile:read", "profile:write", "academics:read", "learning:read", "learning:enroll", "skills:read", "projects:read", "projects:create", "projects:participate", "competitions:read", "competitions:apply", "events:read", "events:register", "community:read", "community:participate", "skills:read", "mentorship:request", "challenges:read", "challenges:participate", "attl:apply"],
+  ATTL_MEMBER: ["profile:*", "academics:read", "learning:read", "learning:enroll", "skills:read", "projects:*", "competitions:read", "competitions:apply", "events:*", "community:*", "mentorship:*", "challenges:*", "attl:read", "attl:operations"],
   TRACK_LEAD: ["profile:*", "academics:read", "learning:*", "learning:enroll", "projects:*", "competitions:*", "events:*", "community:*", "mentorship:*", "challenges:*", "attl:read", "attl:review", "attl:tracks", "attl.tracks.manage", "attl.team.manage"],
-  TEACHER: ["profile:*", "academics:read", "academics:teaching", "academics:gradebook", "academics:attendance", "academics:assignments", "academics:exams", "learning:read", "learning:teaching", "messages:*", "mentorship:manage"],
+  TEACHER: ["profile:*", "academics:read", "skills:read", "academics:teaching", "academics:gradebook", "academics:attendance", "academics:assignments", "academics:exams", "learning:read", "learning:teaching", "messages:*", "mentorship:manage"],
   ADMIN: ["users:*", "roles:*", "permissions:*", "results:*", "academics:*", "attl:*", "projects:*", "competitions:*", "events:*", "analytics:*", "audit:read", "security:manage", "system:manage"],
   SUPER_ADMIN: ["*"],
 };
@@ -22,7 +22,7 @@ export const PERMISSION_CATALOG = [
   ["academics.read","View academic records","Academics"],["academics.grades.write","Enter and update grades","Academics"],
   ["academics.attendance.write","Manage attendance","Academics"],["academics.assignments.manage","Manage assignments","Academics"],
   ["academics.exams.manage","Manage exams","Academics"],["results.release","Release academic results","Academics"],
-  ["learning.read","Access learning content","Learning"],["learning.manage","Manage learning content","Learning"],["learning.enroll","Enroll in courses","Learning"],
+  ["learning.read","Access learning content","Learning"],["skills.read","View skills workspace","Development"],["learning.manage","Manage learning content","Learning"],["learning.enroll","Enroll in courses","Learning"],
   ["projects.read","View projects","Projects"],["projects.participate","Participate in projects","Projects"],["projects.create","Create projects","Projects"],["projects.manage","Manage projects","Projects"],
   ["projects.tasks.manage","Manage project tasks","Projects"],["projects.members.manage","Manage project members","Projects"],
   ["competitions.read","View competitions","Competitions"],["competitions.apply","Apply to competitions","Competitions"],["competitions.manage","Manage competitions","Competitions"],
