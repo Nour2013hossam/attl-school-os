@@ -35,7 +35,7 @@ export function CommandCenter() {
         command.label.toLowerCase().includes(value) ||
         command.description.toLowerCase().includes(value)
     );
-  }, [query]);
+  }, [query, permissionsReady, permissions, language]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
