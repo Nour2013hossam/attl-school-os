@@ -1,13 +1,5 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
+"use client";
 
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Admin OS"
-      title="Roles"
-      description="Manage the School OS role model."
-      icon="◆"
-      api="/api/admin/users"
-    />
-  );
-}
+import {useEffect,useState} from "react";
+type Role={role:string;label:string;scope:string};
+export default function RolesPage(){const[items,setItems]=useState<Role[]>([]);useEffect(()=>{fetch("/api/admin/roles",{cache:"no-store"}).then(r=>r.json()).then(d=>setItems(d.roles??[]));},[]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Admin OS</p><h1 className="mt-3 text-3xl font-semibold tracking-[-.05em] md:text-5xl">Roles</h1><p className="mt-3 max-w-2xl text-sm text-white/40">Review the live role model used by the School OS. Assignments are managed from Users.</p></section><section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{items.map(r=><article key={r.role} className="rounded-[26px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><span className="rounded-full bg-blue-500/10 px-3 py-1 text-[8px] font-semibold uppercase tracking-[.12em] text-blue-600">{r.role}</span><h2 className="mt-4 text-base font-semibold">{r.label}</h2><p className="mt-2 text-[10px] leading-5 text-black/40">{r.scope}</p></article>)}</section></div>
