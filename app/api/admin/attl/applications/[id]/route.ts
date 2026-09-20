@@ -83,7 +83,7 @@ export async function PATCH(
       }
     } else if (
       parsed.data.status &&
-      parsed.data.status !== existing.status &&
+      parsed.data.status !== existing.status
     ) {
       await tx.notification.create({
         data: {
