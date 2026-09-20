@@ -6,7 +6,7 @@ const modules=[
  {group:"Control",title:"Users",description:"Manage every account in the school.",href:"/dashboard/admin/users",icon:"◎",permission:"users.read"},
  {group:"Control",title:"Roles",description:"Create and manage custom roles.",href:"/dashboard/admin/roles",icon:"◈",permission:"roles.read"},
  {group:"Control",title:"Permissions",description:"Granular user access overrides.",href:"/dashboard/admin/permissions",icon:"⌘",permission:"permissions.read"},
- {group:"Control",title:"XP Control",description:"Adjust student XP and level progression from one place.",href:"/dashboard/admin/users",icon:"✦",permission:"xp.manage"},
+ {group:"Control",title:"XP Control",description:"Adjust student XP and level progression from one place.",href:"/dashboard/admin/xp",icon:"✦",permission:"xp.manage"},
  {group:"School",title:"School Control",description:"Configure the public school identity and academic year.",href:"/dashboard/admin/school",icon:"⌂",permission:"school.manage"},
  {group:"School",title:"Students",description:"Student records and academic profiles.",href:"/dashboard/admin/students",icon:"○",permission:"users.read"},
  {group:"School",title:"Teachers",description:"Teacher accounts and access.",href:"/dashboard/admin/teachers",icon:"◇",permission:"users.read"},
