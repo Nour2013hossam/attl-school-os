@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { projectSchema } from "@/lib/validation";
+import { hasPermission } from "@/lib/permissions";
 
 async function getAccess(id: string, userId: string, role: UserRole) {
   const project = await prisma.project.findUnique({
@@ -20,8 +21,8 @@ async function getAccess(id: string, userId: string, role: UserRole) {
 
   const member = project.ownerId === userId || project.members.some((item) => item.userId === userId);
   const canManage =
-    project.ownerId === userId ||
-    ([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(role);
+    (project.ownerId === userId || ([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(role)) &&
+    await hasPermission(userId, role, "projects.manage");
 
   return { project, member, canManage };
 }
@@ -49,7 +50,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  return NextResponse.json({ project, canManage: project.ownerId === session.user.id || ([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role) });
+  return NextResponse.json({ project, canManage: (project.ownerId === session.user.id || ([UserRole.ADMIN, UserRole.SUPER_ADMIN] as UserRole[]).includes(session.user.role)) && await hasPermission(session.user.id, session.user.role, "projects.manage") });
 }
 
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
