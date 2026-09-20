@@ -17,12 +17,19 @@ export default function AdminUsersPage(){
  const [busy,setBusy]=useState("");
  const [message,setMessage]=useState("");
  const [currentRole,setCurrentRole]=useState("");
- const [myRole,setMyRole]=useState("STUDENT");
+ const [myRole,setMyRole]=useState("STUDENT"); const [xpDrafts,setXpDrafts]=useState<Record<string,string>>({});
 
  async function load(){const res=await fetch("/api/admin/users",{cache:"no-store"});const data=await res.json();if(res.ok)setUsers(data.users??[]);else setMessage(data.error??"Unable to load users.");}
  useEffect(()=>{load(); fetch("/api/me/permissions",{cache:"no-store"}).then(r=>r.json()).then(d=>setMyRole(d.role??"STUDENT")); fetch("/api/admin/roles",{cache:"no-store"}).then(r=>r.json()).then(d=>setCustomRoles((d.customRoles??[]).filter((r:{active?:boolean})=>r.active!==false)));},[]);
 
  const filtered=useMemo(()=>users.filter(u=>[u.name,u.email,u.role,u.schoolId??""].join(" ").toLowerCase().includes(query.toLowerCase())),[users,query]);
+
+ async function adjustXp(id:string, mode:"delta"|"set", amount:number){
+  setBusy(id);setMessage("");
+  const res=await fetch("/api/admin/users/"+id+"/xp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode,amount,reason:"Admin adjustment"})});
+  const data=await res.json();setMessage(res.ok?"XP updated.":(data.error??"Could not update XP."));
+  if(res.ok) await load(); setBusy("");
+ }
 
  async function update(id:string, patch:Partial<User>){
   setBusy(id);setMessage("");
@@ -46,7 +53,8 @@ export default function AdminUsersPage(){
         {permissionsReady && can("roles.assign") && <select value={user.customRole?.id??""} disabled={busy===user.id} onChange={async e=>{setBusy(user.id);setMessage("");const res=await fetch("/api/admin/users/"+user.id+"/custom-role",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({customRoleId:e.target.value||null})});const d=await res.json();setMessage(res.ok?"Custom role updated.":(d.error??"Could not update custom role."));if(res.ok)await load();setBusy("");}} className="h-10 w-full rounded-[13px] border border-blue-500/10 bg-blue-500/[.04] px-3 text-[9px] outline-none"><option value="">No custom role</option>{customRoles.map(r=><option key={r.id} value={r.id}>{r.name}</option>)}</select>}
        </div>
        <div className="flex flex-wrap gap-2"><span className={user.isActive?"rounded-full bg-green-500/10 px-3 py-2 text-center text-[8px] font-semibold text-green-600":"rounded-full bg-black/[.04] px-3 py-2 text-center text-[8px] text-black/35"}>{user.isActive?"Active":"Disabled"}</span>{user.attlMembershipActive&&<span className="rounded-full bg-blue-500/10 px-3 py-2 text-center text-[8px] font-semibold text-blue-600">ATTL ACTIVE</span>}</div>
-       <div className="flex gap-2">
+       <div className="flex flex-wrap gap-2">
+        {permissionsReady && can("xp.manage") && <div className="flex items-center gap-1 rounded-[13px] bg-black/[.025] p-1"><input value={xpDrafts[user.id] ?? ""} onChange={e=>setXpDrafts(v=>({...v,[user.id]:e.target.value}))} type="number" placeholder="XP" className="h-8 w-16 rounded-[10px] bg-white px-2 text-[8px] outline-none"/><button disabled={busy===user.id || !xpDrafts[user.id]} onClick={()=>adjustXp(user.id,"set",Number(xpDrafts[user.id]))} className="rounded-[10px] bg-blue-500/10 px-2 py-2 text-[8px] font-semibold text-blue-600">Set</button><button disabled={busy===user.id} onClick={()=>adjustXp(user.id,"delta",100)} className="rounded-[10px] bg-black px-2 py-2 text-[8px] font-semibold text-white">+100</button><button disabled={busy===user.id} onClick={()=>adjustXp(user.id,"delta",-100)} className="rounded-[10px] bg-black/[.06] px-2 py-2 text-[8px] font-semibold text-black/50">−100</button></div>}
         {permissionsReady && can("permissions.manage") && <a href={"/dashboard/admin/users/"+user.id+"/permissions"} className="rounded-[13px] bg-blue-500/10 px-3 py-2.5 text-[9px] font-semibold text-blue-600">Access</a>}
         {permissionsReady && can("users.manage") && <button disabled={busy===user.id} onClick={()=>update(user.id,{isActive:!user.isActive})} className="rounded-[13px] bg-black/[.04] px-3 py-2.5 text-[9px] font-semibold text-black/50 transition hover:bg-black hover:text-white disabled:opacity-40">{busy===user.id?"Saving...":user.isActive?"Disable":"Activate"}</button>}
        </div>
