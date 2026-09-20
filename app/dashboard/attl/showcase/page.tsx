@@ -8,6 +8,7 @@ export default function Page() {
       description="Projects and work worth showcasing."
       icon="✦"
       api="/api/projects"
+      actions={[{ label: "All projects", href: "/dashboard/projects/all" }, { label: "Project showcase", href: "/dashboard/projects/showcase" }]}
     />
   );
 }
