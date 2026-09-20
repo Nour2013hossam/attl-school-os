@@ -7,6 +7,7 @@ import { DashboardSearch } from "@/components/layout/dashboard-search";
 import { SignOutButton } from "@/components/auth/signout-button";
 import { QuickPreferences } from "@/components/layout/quick-preferences";
 import { PermissionRouter } from "@/components/auth/permission-router";
+import { prisma } from "@/lib/prisma";
 
 export default async function DashboardLayout({
   children,
@@ -17,6 +18,18 @@ export default async function DashboardLayout({
   const displayName = session?.user?.name ?? "ATTL Student";
   const initial = displayName.trim().charAt(0).toUpperCase() || "A";
   const avatarUrl = session?.user?.image ?? null;
+  const account = session?.user?.id
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { xp: true, level: true },
+      })
+    : null;
+  const unreadNotifications = session?.user?.id
+    ? await prisma.notification.count({ where: { userId: session.user.id, readAt: null } })
+    : 0;
+  const xp = account?.xp ?? 0;
+  const level = account?.level ?? 1;
+  const xpProgress = Math.min(100, xp % 100);
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#eef2f7] text-[#08090b]">
@@ -64,10 +77,10 @@ export default async function DashboardLayout({
             <div className="mt-2 text-sm font-semibold">{displayName}</div>
 
             <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full w-[4%] rounded-full bg-white transition-all duration-700" />
+              <div className="h-full rounded-full bg-white transition-all duration-700" style={{ width: xpProgress + "%" }} />
             </div>
 
-            <div className="mt-2 text-[9px] text-white/30">0 / 100 XP</div>
+            <div className="mt-2 text-[9px] text-white/30">{xp} XP · Level {level}</div>
 
             <SignOutButton />
           </div>
