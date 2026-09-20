@@ -8,6 +8,7 @@ export default function Page() {
       description="Track experiments connected to innovation work."
       icon="△"
       api="/api/ideas"
+      actions={[{ label: "Browse ideas", href: "/dashboard/innovation/ideas" }, { label: "Submit idea", href: "/dashboard/innovation/submit" }]}
     />
   );
 }
