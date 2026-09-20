@@ -13,12 +13,18 @@ const managePermissions: Record<string, string> = {
 };
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
+  const session = await auth();
   const { id } = await context.params;
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const file = await prisma.fileAsset.findUnique({
     where: { id },
-    select: { id: true, fileName: true, mimeType: true, data: true },
+    select: { id: true, fileName: true, mimeType: true, data: true, entityType: true, entityId: true },
   });
   if (!file) return NextResponse.json({ error: "File not found." }, { status: 404 });
+  const permissionByEntity: Record<string, string> = { course: "learning.read", lesson: "learning.read", resource: "learning.read", project: "projects.read", event: "events.read", competition: "competitions.read" };
+  const permission = permissionByEntity[file.entityType];
+  if (!permission || !(await hasPermission(session.user.id, session.user.role, permission))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   return new Response(file.data, {
     headers: {
