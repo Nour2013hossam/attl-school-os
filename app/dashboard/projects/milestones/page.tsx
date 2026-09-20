@@ -1,13 +1,10 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Projects"
-      title="Milestones"
-      description="Track project milestones and delivery progress."
-      icon="◆"
-      api="/api/projects"
-    />
-  );
-}
+"use client";
+import{useEffect,useState}from"react";import Link from"next/link";
+type Project={id:string;title:string};type Milestone={id:string;title:string;description:string|null;dueAt:string|null;progress:number;status:string};
+export default function MilestonesPage(){const[projects,setProjects]=useState<Project[]>([]);const[id,setId]=useState("");const[items,setItems]=useState<Milestone[]>([]);const[title,setTitle]=useState("");const[dueAt,setDueAt]=useState("");const[msg,setMsg]=useState("");
+ useEffect(()=>{fetch("/api/projects",{cache:"no-store"}).then(r=>r.json()).then(d=>{const ps=d.projects??[];setProjects(ps);if(ps[0])setId(ps[0].id);});},[]);
+ async function load(){if(!id)return;const r=await fetch("/api/projects/"+id+"/milestones",{cache:"no-store"});const d=await r.json();if(r.ok)setItems(d.milestones??[]);else setMsg(d.error??"Could not load milestones.");}
+ useEffect(()=>{load();},[id]);
+ async function create(){if(!id||!title.trim())return;const r=await fetch("/api/projects/"+id+"/milestones",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title,dueAt:dueAt||null})});const d=await r.json();setMsg(r.ok?"Milestone created.":d.error??"Could not create milestone.");if(r.ok){setTitle("");setDueAt("");load();}}
+ async function change(m:Milestone,patch:Partial<Milestone>){const r=await fetch("/api/projects/"+id+"/milestones/"+m.id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(patch)});if(r.ok)load();else{const d=await r.json();setMsg(d.error??"Could not update milestone.");}}
+ return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Projects</p><h1 className="mt-3 text-3xl font-semibold md:text-5xl">Milestones</h1><p className="mt-3 text-sm text-white/40">Turn project delivery into clear checkpoints.</p></section><section className="grid gap-4 lg:grid-cols-[.8fr_1.2fr]"><div className="rounded-[28px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Project</p><select value={id} onChange={e=>setId(e.target.value)} className="mt-3 h-11 w-full rounded-[14px] border border-black/5 bg-white px-3 text-[10px] outline-none">{projects.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}</select><input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Milestone title" className="mt-3 h-11 w-full rounded-[14px] border border-black/5 bg-white px-3 text-[10px] outline-none"/><input value={dueAt} onChange={e=>setDueAt(e.target.value)} type="date" className="mt-2 h-11 w-full rounded-[14px] border border-black/5 bg-white px-3 text-[10px] outline-none"/><button onClick={create} className="mt-3 w-full rounded-[14px] bg-black py-3 text-[9px] font-semibold text-white">+ Add milestone</button>{msg&&<p className="mt-3 text-[9px] text-black/40">{msg}</p>}<Link href={id?"/dashboard/projects/"+id:"/dashboard/projects/all"} className="mt-4 block text-center text-[9px] text-blue-600">Open project workspace →</Link></div><div className="rounded-[28px] border border-white/80 bg-white/60 p-5 backdrop-blur-xl"><p className="text-[8px] uppercase tracking-[.18em] text-black/25">Delivery plan</p><div className="mt-4 space-y-2">{items.map(m=><article key={m.id} className="rounded-[18px] border border-black/5 bg-white/50 p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[10px] font-semibold">{m.title}</p><p className="mt-1 text-[8px] text-black/30">{m.dueAt?new Date(m.dueAt).toLocaleDateString():"No due date"} · {m.status}</p></div><span className="text-[9px] font-semibold">{m.progress}%</span></div><div className="mt-3 h-2 rounded-full bg-black/5"><div className="h-full rounded-full bg-black" style={{width:m.progress+"%"}}/></div><div className="mt-3 flex gap-2"><button onClick={()=>change(m,{progress:Math.min(100,m.progress+25),status:m.progress+25>=100?"Done":"In Progress"})} className="rounded-[12px] bg-black px-3 py-2 text-[8px] text-white">+25%</button><button onClick={()=>change(m,{status:"Planned",progress:0})} className="rounded-[12px] bg-black/[.04] px-3 py-2 text-[8px]">Reset</button></div></article>)}{items.length===0&&<p className="rounded-[18px] bg-black/[.025] p-8 text-center text-[9px] text-black/30">No milestones for this project yet.</p>}</div></div></section></div>}
