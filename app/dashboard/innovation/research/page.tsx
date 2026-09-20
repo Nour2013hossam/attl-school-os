@@ -8,6 +8,7 @@ export default function Page() {
       description="Organize research topics and innovation work."
       icon="⌕"
       api="/api/ideas"
+      actions={[{ label: "Explore ideas", href: "/dashboard/innovation/ideas" }, { label: "Innovation lab", href: "/dashboard/innovation/lab" }]}
     />
   );
 }
