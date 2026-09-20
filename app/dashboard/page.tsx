@@ -12,6 +12,9 @@ type DashboardData = {
   nextEvents: Array<{ id: string; title: string; description: string | null; startsAt: string; endsAt: string; location: string | null; capacity: number | null; _count: { registrations: number } }>;
   nextCompetitions: Array<{ id: string; title: string; description: string | null; organizer: string | null; startsAt: string | null; deadlineAt: string | null; location: string | null }>;
   attlMembers: Array<{ id: string; name: string; role: string; avatarUrl: string | null; gradeLevel: string | null }>;
+  featuredCourses: Array<{ id: string; title: string; description: string | null; level: string | null; _count: { lessons: number; resources: number; enrollments: number } }>;
+  activeChallenges: Array<{ id: string; title: string; description: string | null; xpReward: number; endsAt: string | null; _count: { entries: number } }>;
+  attlTracks: Array<{ id: string; name: string; description: string | null }>;
 };
 
 function formatDate(value: string | null, locale: string, withTime = false) {
@@ -33,26 +36,30 @@ export default function DashboardOverview() {
   const name = user?.name ?? (ar ? "طالب ATTL" : "ATTL Student");
   const initial = name.trim().charAt(0).toUpperCase() || "A";
 
-  const quickActions = useMemo(() => ar ? [
-    ["ابدأ مشروعًا", "أنشئ مساحة مشروع حقيقية.", "/dashboard/projects/create", "＋"],
-    ["استكشف التعلم", "ابحث عن دورات ومصادر.", "/dashboard/learning/explore", "◇"],
-    ["انضم إلى ATTL", "قدّم طلب الانضمام للفريق.", "/dashboard/attl/applications", "✦"],
-    ["اكتشف المسابقات", "تابع المسابقات والتحديات.", "/dashboard/competitions/explore", "★"],
-  ] : [
-    ["Build a Project", "Create a real project workspace.", "/dashboard/projects/create", "＋"],
-    ["Explore Learning", "Find courses and resources.", "/dashboard/learning/explore", "◇"],
-    ["Join ATTL", "Apply to become an ATTL member.", "/dashboard/attl/applications", "✦"],
-    ["Find Competitions", "Discover competitions and challenges.", "/dashboard/competitions/explore", "★"],
-  ].filter((item) => {
-    if (!permissionsReady) return false;
-    const permissionByPath: Record<string,string> = {
-      "/dashboard/projects/create":"projects.create",
-      "/dashboard/learning/explore":"learning.read",
-      "/dashboard/attl/applications":"attl.apply",
-      "/dashboard/competitions/explore":"competitions.read",
+  const quickActions = useMemo(() => {
+    const source = ar ? [
+      ["ابدأ مشروعًا", "أنشئ مساحة مشروع حقيقية.", "/dashboard/projects/create", "＋"],
+      ["استكشف التعلم", "ابحث عن دورات ومصادر.", "/dashboard/learning/explore", "◇"],
+      ["انضم إلى ATTL", "قدّم طلب الانضمام للفريق.", "/dashboard/attl/applications", "✦"],
+      ["اكتشف المسابقات", "تابع المسابقات والتحديات.", "/dashboard/competitions/explore", "★"],
+    ] : [
+      ["Build a Project", "Create a real project workspace.", "/dashboard/projects/create", "＋"],
+      ["Explore Learning", "Find courses and resources.", "/dashboard/learning/explore", "◇"],
+      ["Join ATTL", "Apply to become an ATTL member.", "/dashboard/attl/applications", "✦"],
+      ["Find Competitions", "Discover competitions and challenges.", "/dashboard/competitions/explore", "★"],
+    ];
+
+    if (!permissionsReady) return [];
+
+    const permissionByPath: Record<string, string> = {
+      "/dashboard/projects/create": "projects.create",
+      "/dashboard/learning/explore": "learning.read",
+      "/dashboard/attl/applications": "attl.apply",
+      "/dashboard/competitions/explore": "competitions.read",
     };
-    return can(permissionByPath[item[2]]);
-  }), [ar, can, permissionsReady]);
+
+    return source.filter((item) => can(permissionByPath[item[2]]));
+  }, [ar, can, permissionsReady]);
 
   return (
     <div className="space-y-5">
@@ -74,11 +81,13 @@ export default function DashboardOverview() {
             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/40">
               {ar ? "مشاريع المدرسة، الفعاليات، المسابقات، التعلم وفريق ATTL — في لوحة واحدة متصلة." : "Projects, school events, competitions, learning and the ATTL community — connected in one live workspace."}
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <Link href="/dashboard/projects/all" className="rounded-[15px] bg-white px-4 py-2.5 text-[9px] font-semibold text-black shadow-xl">{ar ? "مشاريع المدرسة" : "School projects"} →</Link>
-              <Link href="/dashboard/events/discover" className="rounded-[15px] border border-white/10 bg-white/[.06] px-4 py-2.5 text-[9px] font-semibold text-white/80 backdrop-blur-xl">{ar ? "الفعاليات" : "Events"} →</Link>
-              <Link href="/dashboard/competitions/explore" className="rounded-[15px] border border-white/10 bg-white/[.06] px-4 py-2.5 text-[9px] font-semibold text-white/80 backdrop-blur-xl">{ar ? "المسابقات" : "Competitions"} →</Link>
-            </div>
+            {permissionsReady && (
+              <div className="mt-6 flex flex-wrap gap-2">
+                {can("projects.read") && <Link href="/dashboard/projects/all" className="rounded-[15px] bg-white px-4 py-2.5 text-[9px] font-semibold text-black shadow-xl">{ar ? "مشاريع المدرسة" : "School projects"} →</Link>}
+                {can("events.read") && <Link href="/dashboard/events/discover" className="rounded-[15px] border border-white/10 bg-white/[.06] px-4 py-2.5 text-[9px] font-semibold text-white/80 backdrop-blur-xl">{ar ? "الفعاليات" : "Events"} →</Link>}
+                {can("competitions.read") && <Link href="/dashboard/competitions/explore" className="rounded-[15px] border border-white/10 bg-white/[.06] px-4 py-2.5 text-[9px] font-semibold text-white/80 backdrop-blur-xl">{ar ? "المسابقات" : "Competitions"} →</Link>}
+              </div>
+            )}
           </div>
           <Link href="/dashboard/student/profile" className="group rounded-[24px] border border-white/10 bg-white/[.065] p-4 backdrop-blur-2xl transition hover:bg-white/[.09]">
             <div className="flex items-center gap-4">
@@ -201,6 +210,82 @@ export default function DashboardOverview() {
           </div>
         </div>
       </section>
+
+      {permissionsReady && (can("learning.read") || can("challenges.read") || can("attl.read")) && (
+        <section className="grid gap-4 xl:grid-cols-[1.15fr_.85fr]">
+          {can("learning.read") && (
+            <div className="glass rounded-[30px] p-5 md:p-6">
+              <div className="flex items-end justify-between">
+                <div>
+                  <p className="text-[8px] font-semibold uppercase tracking-[.2em] text-black/30">{ar ? "التعلم" : "Learning"}</p>
+                  <h2 className="mt-1 text-2xl font-semibold tracking-[-.05em]">{ar ? "تعلم حاجة جديدة" : "Learn something new"}</h2>
+                </div>
+                <Link href="/dashboard/learning/courses" className="text-[8px] text-black/30">{ar ? "كل الكورسات" : "All courses"} →</Link>
+              </div>
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                {(data?.featuredCourses ?? []).map((course) => (
+                  <Link key={course.id} href={"/dashboard/learning/courses/" + course.id} className="rounded-[22px] border border-black/5 bg-white/45 p-5 transition hover:-translate-y-1 hover:bg-white">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="rounded-full bg-blue-500/10 px-3 py-1 text-[8px] font-semibold text-blue-600">{course.level ?? (ar ? "عام" : "General")}</span>
+                      <span className="text-[8px] text-black/25">{course._count.lessons} {ar ? "دروس" : "lessons"}</span>
+                    </div>
+                    <h3 className="mt-4 text-sm font-semibold">{course.title}</h3>
+                    <p className="mt-2 line-clamp-2 text-[9px] leading-5 text-black/35">{course.description || (ar ? "مسار تعلم متاح على School OS." : "A learning path available on School OS.")}</p>
+                    <div className="mt-4 flex items-center justify-between text-[8px] text-black/25"><span>{course._count.resources} {ar ? "مصادر" : "resources"}</span><span>{course._count.enrollments} {ar ? "مشترك" : "enrolled"}</span></div>
+                  </Link>
+                ))}
+                {data && data.featuredCourses.length === 0 && <div className="rounded-[22px] bg-black/[.025] p-7 text-center text-[10px] text-black/35 md:col-span-2">{ar ? "مفيش كورسات منشورة لسه." : "No published courses yet."}</div>}
+              </div>
+            </div>
+          )}
+
+          {can("challenges.read") && (
+            <div className="rounded-[30px] bg-black p-5 text-white md:p-6">
+              <div className="flex items-end justify-between">
+                <div>
+                  <p className="text-[8px] font-semibold uppercase tracking-[.2em] text-white/30">{ar ? "تحديات" : "Challenges"}</p>
+                  <h2 className="mt-1 text-2xl font-semibold tracking-[-.05em]">{ar ? "اختبر نفسك" : "Test yourself"}</h2>
+                </div>
+                <Link href="/dashboard/challenges/explore" className="text-[8px] text-white/35">{ar ? "استكشف" : "Explore"} →</Link>
+              </div>
+              <div className="mt-5 space-y-2">
+                {(data?.activeChallenges ?? []).map((challenge) => (
+                  <Link key={challenge.id} href="/dashboard/challenges/explore" className="block rounded-[20px] border border-white/10 bg-white/[.055] p-4 transition hover:bg-white/[.09]">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-[10px] font-semibold">{challenge.title}</p>
+                      <span className="text-[8px] text-blue-300">+{challenge.xpReward} XP</span>
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-[9px] leading-5 text-white/35">{challenge.description || (ar ? "تحدي جديد مستنيك." : "A new challenge is waiting.")}</p>
+                    <p className="mt-3 text-[8px] text-white/25">{challenge._count.entries} {ar ? "مشارك" : "participants"}</p>
+                  </Link>
+                ))}
+                {data && data.activeChallenges.length === 0 && <div className="rounded-[20px] bg-white/[.05] p-7 text-center text-[10px] text-white/35">{ar ? "مفيش تحديات نشطة حاليًا." : "No active challenges right now."}</div>}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {permissionsReady && can("attl.read") && (
+        <section className="glass rounded-[30px] p-5 md:p-6">
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-[8px] font-semibold uppercase tracking-[.2em] text-black/30">ATTL</p>
+              <h2 className="mt-1 text-2xl font-semibold tracking-[-.05em]">{ar ? "مسارات تصنع فيها حاجة حقيقية" : "Tracks built for real work"}</h2>
+            </div>
+            <Link href="/dashboard/attl/overview" className="text-[8px] text-black/30">{ar ? "عن ATTL" : "About ATTL"} →</Link>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {(data?.attlTracks ?? []).map((track) => (
+              <div key={track.id} className="rounded-[22px] border border-black/5 bg-white/45 p-5 transition hover:-translate-y-1 hover:bg-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-black text-white">A</div>
+                <h3 className="mt-4 text-sm font-semibold">{track.name}</h3>
+                <p className="mt-2 line-clamp-3 text-[9px] leading-5 text-black/35">{track.description || (ar ? "مسار داخل ATTL." : "A focused ATTL track.")}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="grid gap-4 lg:grid-cols-[1.15fr_.85fr]">
         <div className="glass rounded-[30px] p-6">
