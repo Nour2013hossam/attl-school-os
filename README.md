@@ -94,9 +94,10 @@ Before the first production launch:
 
 1. Run `npm install`.
 2. Run `npm run db:generate`.
-3. Apply the Prisma schema with your production migration process.
-4. Set the environment variables on the hosting platform.
-5. Deploy with `npm run build` and run with `npm start`.
+3. Run `npm run typecheck` to verify TypeScript locally.
+4. Apply the Prisma schema with your production migration process.
+5. Set the environment variables on the hosting platform.
+6. Deploy with `npm run build` and run with `npm start`.
 
 The repository CI runs Prisma generation and a full Next.js production build on every push to `main`.
 
