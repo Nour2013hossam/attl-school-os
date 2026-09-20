@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { hasPermission } from "@/lib/permissions";
 
 async function membership(userId: string, threadId: string) {
   return prisma.threadParticipant.findUnique({
@@ -17,6 +18,8 @@ export async function GET(
   const { threadId } = await context.params;
 
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await hasPermission(session.user.id, session.user.role, "messages.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await hasPermission(session.user.id, session.user.role, "messages.send"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   if (!(await membership(session.user.id, threadId))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const thread = await prisma.messageThread.findUnique({
