@@ -47,9 +47,16 @@ export async function PATCH(
     return NextResponse.json({ error: "Only a Super Admin can assign Super Admin." }, { status: 403 });
   }
 
+  const membershipPatch =
+    parsed.data.role === UserRole.ATTL_MEMBER || parsed.data.role === UserRole.TRACK_LEAD
+      ? { attlMembershipActive: true, attlActivatedAt: new Date() }
+      : parsed.data.role
+        ? { attlMembershipActive: false }
+        : {};
+
   const updated = await prisma.user.update({
     where: { id },
-    data: parsed.data,
+    data: { ...parsed.data, ...membershipPatch },
     select: {
       id: true,
       name: true,
@@ -60,6 +67,8 @@ export async function PATCH(
       className: true,
       xp: true,
       level: true,
+      attlMembershipActive: true,
+      attlActivatedAt: true,
     },
   });
 
