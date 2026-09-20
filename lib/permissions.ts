@@ -89,3 +89,12 @@ export async function getEffectivePermissions(userId: string, role: UserRole) {
 
   return map;
 }
+
+
+export async function hasAnyPermission(userId: string, role: UserRole, keys: string[]) {
+  if (role === "SUPER_ADMIN") return true;
+  for (const key of keys) {
+    if (await hasPermission(userId, role, key)) return true;
+  }
+  return false;
+}
