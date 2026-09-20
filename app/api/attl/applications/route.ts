@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
+import { hasPermission } from "@/lib/permissions";
 
 export async function GET() {
   const session = await auth();
@@ -10,9 +11,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const canReview = [UserRole.ATTL_MEMBER, UserRole.TRACK_LEAD, UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(
-    session.user.role
-  );
+  const canReview = await hasPermission(session.user.id, session.user.role, "attl.review");
 
   const applications = await prisma.attlApplication.findMany({
     where: canReview ? undefined : { userId: session.user.id },
@@ -37,6 +36,10 @@ export async function POST(request: Request) {
   const body = await request.json();
   const trackId = typeof body.trackId === "string" ? body.trackId : "";
   const answers = body.answers ?? {};
+
+  if (!(await hasPermission(session.user.id, session.user.role, "attl.apply"))) {
+    return NextResponse.json({ error: "You do not have permission to apply to ATTL." }, { status: 403 });
+  }
 
   if (!trackId) {
     return NextResponse.json({ error: "Track is required." }, { status: 400 });
