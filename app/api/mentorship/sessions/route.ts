@@ -1,5 +1,5 @@
-import{NextResponse}from"next/server";import{auth}from"@/auth";import{prisma}from"@/lib/prisma";import{hasPermission}from"@/lib/permissions";
-export async function GET(){const s=await auth();if(!s?.user?.id)return NextResponse.json({error:"Unauthorized"},{status:401});if(!(await hasPermission(s.user.id,s.user.role,"mentorship.request")))return NextResponse.json({error:"Forbidden"},{status:403});
+import{NextResponse}from"next/server";import{auth}from"@/auth";import{prisma}from"@/lib/prisma";import{hasPermission,hasAnyPermission}from"@/lib/permissions";
+export async function GET(){const s=await auth();if(!s?.user?.id)return NextResponse.json({error:"Unauthorized"},{status:401});if(!(await hasAnyPermission(s.user.id,s.user.role,["mentorship.request","mentorship.manage"])))return NextResponse.json({error:"Forbidden"},{status:403});
  const sessions=await prisma.mentorshipSession.findMany({where:{OR:[{menteeId:s.user.id},{mentorId:s.user.id}]},orderBy:{startsAt:"asc"},include:{mentor:{select:{id:true,name:true,avatarUrl:true}},mentee:{select:{id:true,name:true,avatarUrl:true}}}});
  return NextResponse.json({sessions});
 }
