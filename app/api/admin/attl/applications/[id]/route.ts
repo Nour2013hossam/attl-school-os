@@ -29,7 +29,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!reviewerRoles.includes(session.user.role) || !(await hasPermission(session.user.id, session.user.role, "attl.review"))) {
+  if (!(await hasPermission(session.user.id, session.user.role, "attl.review"))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
