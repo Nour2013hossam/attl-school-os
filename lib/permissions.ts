@@ -93,6 +93,11 @@ export async function getEffectivePermissions(userId: string, role: UserRole) {
 
   const map: Record<string, boolean> = {};
   for (const [key] of PERMISSION_CATALOG) {
+    if (role === "SUPER_ADMIN") {
+      map[key] = true;
+      continue;
+    }
+
     const blockedForStudent =
       role === "STUDENT" &&
       key !== "attl.apply" &&
@@ -104,8 +109,10 @@ export async function getEffectivePermissions(userId: string, role: UserRole) {
     );
   }
 
-  for (const item of overrides) {
-    map[item.permission.key] = item.granted;
+  if (role !== "SUPER_ADMIN") {
+    for (const item of overrides) {
+      map[item.permission.key] = item.granted;
+    }
   }
 
   return map;
