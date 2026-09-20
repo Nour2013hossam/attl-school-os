@@ -230,7 +230,7 @@ const sections = [
 
 export function DashboardNav({ role = "STUDENT" }: { role?: string }) {
   const pathname = usePathname();
-  const { language } = usePreferences();
+  const { language, permissions, permissionsReady } = usePreferences();
   const [permissions, setPermissions] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -242,45 +242,143 @@ export function DashboardNav({ role = "STUDENT" }: { role?: string }) {
 
   const requiredPermission = (href: string) => {
     const rules: Record<string,string> = {
+      "/dashboard/academics/overview":"academics.read",
+      "/dashboard/academics/grades":"academics.read",
+      "/dashboard/academics/subjects":"academics.read",
+      "/dashboard/academics/schedule":"academics.read",
+      "/dashboard/academics/exams":"academics.read",
+      "/dashboard/academics/attendance":"academics.read",
+      "/dashboard/academics/results":"academics.read",
+      "/dashboard/academics/transcript":"academics.read",
+      "/dashboard/academics/gpa":"academics.read",
+      "/dashboard/academics/assignments":"academics.read",
+      "/dashboard/academics/deadlines":"academics.read",
+      "/dashboard/academics/teachers":"academics.read",
+      "/dashboard/academics/calendar":"academics.read",
+      "/dashboard/academics/reports":"academics.read",
+
+      "/dashboard/learning/courses":"learning.read",
+      "/dashboard/learning/my-courses":"learning.read",
+      "/dashboard/learning/explore":"learning.read",
+      "/dashboard/learning/lessons":"learning.read",
+      "/dashboard/learning/resources":"learning.read",
+      "/dashboard/learning/roadmaps":"learning.read",
+      "/dashboard/learning/progress":"learning.read",
+      "/dashboard/learning/bookmarks":"learning.read",
+      "/dashboard/learning/certificates":"learning.read",
+      "/dashboard/learning/library":"learning.read",
+
+      "/dashboard/projects/all":"projects.read",
+      "/dashboard/projects/my-projects":"projects.read",
       "/dashboard/projects/create":"projects.create",
-      "/dashboard/projects/tasks":"projects.tasks.manage",
+      "/dashboard/projects/discover":"projects.read",
+      "/dashboard/projects/templates":"projects.read",
       "/dashboard/projects/teams":"projects.members.manage",
-      "/dashboard/innovation/submit":"innovation.submit",
-      "/dashboard/challenges/create":"challenges.manage",
-      "/dashboard/attl/applications":"attl.review",
-      "/dashboard/attl/recruitment":"attl.review",
-      "/dashboard/attl/tracks":"attl.tracks.manage",
+      "/dashboard/projects/tasks":"projects.tasks.manage",
+      "/dashboard/projects/milestones":"projects.manage",
+      "/dashboard/projects/showcase":"projects.read",
+      "/dashboard/projects/analytics":"projects.manage",
+
+      "/dashboard/competitions/explore":"competitions.read",
+      "/dashboard/competitions/upcoming":"competitions.read",
+      "/dashboard/competitions/my-competitions":"competitions.read",
+      "/dashboard/competitions/applications":"competitions.read",
+      "/dashboard/competitions/results":"competitions.read",
+      "/dashboard/competitions/challenges":"competitions.read",
+      "/dashboard/competitions/calendar":"competitions.read",
+      "/dashboard/competitions/archives":"competitions.read",
+
+      "/dashboard/attl/overview":"attl.read",
+      "/dashboard/attl/command-center":"attl.read",
       "/dashboard/attl/team":"attl.team.manage",
       "/dashboard/attl/members":"attl.team.manage",
+      "/dashboard/attl/tracks":"attl.tracks.manage",
+      "/dashboard/attl/applications":"attl.review",
+      "/dashboard/attl/recruitment":"attl.review",
+      "/dashboard/attl/projects":"attl.operations",
+      "/dashboard/attl/events":"attl.operations",
+      "/dashboard/attl/workshops":"attl.operations",
+      "/dashboard/attl/resources":"attl.operations",
+      "/dashboard/attl/showcase":"attl.operations",
+
+      "/dashboard/innovation/ideas":"innovation.submit",
+      "/dashboard/innovation/submit":"innovation.submit",
+      "/dashboard/innovation/experiments":"innovation.manage",
+      "/dashboard/innovation/research":"innovation.manage",
+      "/dashboard/innovation/lab":"innovation.manage",
+      "/dashboard/innovation/showcase":"innovation.manage",
+      "/dashboard/innovation/challenges":"challenges.read",
+
+      "/dashboard/community/feed":"community.read",
+      "/dashboard/community/discussions":"community.participate",
+      "/dashboard/community/groups":"community.participate",
+      "/dashboard/community/people":"community.read",
+      "/dashboard/community/messages":"messages.read",
+      "/dashboard/community/announcements":"community.read",
+      "/dashboard/community/polls":"community.participate",
+
       "/dashboard/mentorship/mentors":"mentorship.request",
+      "/dashboard/mentorship/requests":"mentorship.request",
+      "/dashboard/mentorship/sessions":"mentorship.request",
+      "/dashboard/mentorship/progress":"mentorship.request",
+      "/dashboard/mentorship/resources":"mentorship.request",
+
+      "/dashboard/events/calendar":"events.read",
+      "/dashboard/events/discover":"events.read",
+      "/dashboard/events/upcoming":"events.read",
+      "/dashboard/events/my-events":"events.read",
+      "/dashboard/events/history":"events.read",
+
+      "/dashboard/challenges/explore":"challenges.read",
+      "/dashboard/challenges/active":"challenges.read",
+      "/dashboard/challenges/my-challenges":"challenges.participate",
+      "/dashboard/challenges/completed":"challenges.read",
+      "/dashboard/challenges/leaderboard":"challenges.read",
+      "/dashboard/challenges/create":"challenges.manage",
+
+      "/dashboard/teacher/overview":"academics.teaching",
+      "/dashboard/teacher/schedule":"academics.teaching",
+      "/dashboard/teacher/classes":"academics.teaching",
+      "/dashboard/teacher/students":"academics.read",
+      "/dashboard/teacher/gradebook":"academics.grades.write",
+      "/dashboard/teacher/attendance":"academics.attendance.write",
+      "/dashboard/teacher/assignments":"academics.assignments.manage",
+      "/dashboard/teacher/exams":"academics.exams.manage",
+      "/dashboard/teacher/reports":"academics.read",
+      "/dashboard/teacher/messages":"messages.read",
+
+      "/dashboard/admin/overview":"analytics.read",
       "/dashboard/admin/users":"users.manage",
+      "/dashboard/admin/students":"users.read",
+      "/dashboard/admin/teachers":"users.read",
       "/dashboard/admin/roles":"roles.assign",
       "/dashboard/admin/permissions":"permissions.manage",
+      "/dashboard/admin/applications":"attl.review",
+      "/dashboard/admin/grades":"academics.grades.write",
+      "/dashboard/admin/results-release":"results.release",
+      "/dashboard/admin/projects":"projects.manage",
+      "/dashboard/admin/competitions":"competitions.manage",
+      "/dashboard/admin/events":"events.manage",
+      "/dashboard/admin/analytics":"analytics.read",
       "/dashboard/admin/audit-logs":"audit.read",
       "/dashboard/admin/security":"security.manage",
       "/dashboard/admin/system":"system.manage",
-      "/dashboard/admin/results-release":"results.release",
-      "/dashboard/admin/grades":"academics.grades.write",
-      "/dashboard/teacher/gradebook":"academics.grades.write",
-      "/dashboard/teacher/attendance":"academics.attendance.write",
-      "/dashboard/teacher/assignments":"academics.assignments.manage"
     };
     return rules[href];
   };
 
-  const visibleSections = sections.filter((section) => {
-    if (section.label === "ATTL") {
-      return ["ATTL_MEMBER", "TRACK_LEAD", "ADMIN", "SUPER_ADMIN"].includes(role);
-    }
-    if (section.label === "Admin") {
-      return ["ADMIN", "SUPER_ADMIN"].includes(role);
-    }
-    if (section.label === "Teacher") {
-      return role === "TEACHER";
-    }
-    return true;
-  });
+  const isAllowed = (item: { href: string }) => {
+    const permission = requiredPermission(item.href);
+    if (!permission) return true;
+    return permissionsReady && permissions[permission] === true;
+  };
 
+  const visibleSections = sections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter(isAllowed),
+    }))
+    .filter((section) => section.items.length > 0);
   const [openSections, setOpenSections] = useState<string[]>([]);
 
   useEffect(() => {
