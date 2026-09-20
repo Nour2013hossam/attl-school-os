@@ -38,7 +38,10 @@ export default function AdminUsersPage(){
        <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-xs font-semibold text-white">{user.name.trim().charAt(0).toUpperCase()}</div><div><p className="text-xs font-semibold">{user.name}</p><p className="mt-1 text-[9px] text-black/30">{user.email}</p></div></div>
        <select value={user.role} disabled={busy===user.id} onChange={e=>update(user.id,{role:e.target.value})} className="h-10 rounded-[13px] border border-black/5 bg-white px-3 text-[9px] outline-none">{roles.map(role=><option key={role}>{role}</option>)}</select>
        <span className={user.isActive?"rounded-full bg-green-500/10 px-3 py-2 text-center text-[8px] font-semibold text-green-600":"rounded-full bg-black/[.04] px-3 py-2 text-center text-[8px] text-black/35"}>{user.isActive?"Active":"Disabled"}</span>
-       <button disabled={busy===user.id} onClick={()=>update(user.id,{isActive:!user.isActive})} className="rounded-[13px] bg-black/[.04] px-3 py-2.5 text-[9px] font-semibold text-black/50 transition hover:bg-black hover:text-white disabled:opacity-40">{busy===user.id?"Saving...":user.isActive?"Disable":"Activate"}</button>
+       <div className="flex gap-2">
+        <a href={"/dashboard/admin/users/"+user.id+"/permissions"} className="rounded-[13px] bg-blue-500/10 px-3 py-2.5 text-[9px] font-semibold text-blue-600">Access</a>
+        <button disabled={busy===user.id} onClick={()=>update(user.id,{isActive:!user.isActive})} className="rounded-[13px] bg-black/[.04] px-3 py-2.5 text-[9px] font-semibold text-black/50 transition hover:bg-black hover:text-white disabled:opacity-40">{busy===user.id?"Saving...":user.isActive?"Disable":"Activate"}</button>
+       </div>
       </div>
     </article>)}
    </div>
