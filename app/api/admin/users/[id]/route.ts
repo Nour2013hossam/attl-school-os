@@ -27,8 +27,11 @@ export async function PATCH(
 
   const rawBody = await request.json();
 
-  if (id === session.user.id && rawBody.role === UserRole.STUDENT) {
-    return NextResponse.json({ error: "You cannot remove your own admin role." }, { status: 400 });
+  if (id === session.user.id && rawBody.role && rawBody.role !== UserRole.SUPER_ADMIN) {
+    return NextResponse.json({ error: "The primary Super Admin account cannot lower its own role." }, { status: 400 });
+  }
+  if (id === session.user.id && rawBody.isActive === false) {
+    return NextResponse.json({ error: "The primary Super Admin account cannot disable itself." }, { status: 400 });
   }
 
   const parsed = updateSchema.safeParse(rawBody);
