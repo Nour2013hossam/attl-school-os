@@ -197,6 +197,7 @@ const sections = [
       { label: "Users", href: "/dashboard/admin/users", icon: "●" },
       { label: "Students", href: "/dashboard/admin/students", icon: "♙" },
       { label: "Teachers", href: "/dashboard/admin/teachers", icon: "♙" },
+      { label: "School", href: "/dashboard/admin/school", icon: "⌂" },
       { label: "Roles", href: "/dashboard/admin/roles", icon: "◇" },
       { label: "Permissions", href: "/dashboard/admin/permissions", icon: "◈" },
       { label: "Applications", href: "/dashboard/admin/applications", icon: "□" },
