@@ -7,7 +7,7 @@ export default function Page() {
       title="Messages"
       description="Teacher communication workspace."
       icon="✉"
-      api="/api/mentorship/requests"
+      api="/api/messages"
     />
   );
 }
