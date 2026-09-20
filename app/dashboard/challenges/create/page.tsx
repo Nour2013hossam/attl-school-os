@@ -1,9 +1,11 @@
 "use client";
 
 import { FormEvent,useState } from "react";
+import { usePreferences } from "@/components/providers/preferences-provider";
 import Link from "next/link";
 
 export default function CreateChallengePage(){
+ const { can, permissionsReady } = usePreferences();
  const [title,setTitle]=useState(""); const [description,setDescription]=useState(""); const [xpReward,setXpReward]=useState("100"); const [message,setMessage]=useState(""); const [saving,setSaving]=useState(false);
  async function submit(e:FormEvent){e.preventDefault();setSaving(true);const res=await fetch("/api/challenges",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title,description,xpReward:Number(xpReward)})});const data=await res.json();setMessage(res.ok?"Challenge saved as draft.":(data.error??"Could not create challenge."));setSaving(false);}
  return <div className="space-y-6">
