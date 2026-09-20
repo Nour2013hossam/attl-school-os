@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { goalSchema } from "@/lib/validation";
+import { hasPermission } from "@/lib/permissions";
 
 export async function GET() {
   const session = await auth();
@@ -9,6 +10,8 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  if (!(await hasPermission(session.user.id, session.user.role, "profile.read"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const goals = await prisma.goal.findMany({
     where: { userId: session.user.id },
@@ -24,6 +27,8 @@ export async function POST(request: Request) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  if (!(await hasPermission(session.user.id, session.user.role, "goals.manage"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const parsed = goalSchema.safeParse(await request.json());
 
