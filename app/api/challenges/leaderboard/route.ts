@@ -1,4 +1,4 @@
-import {NextResponse}from"next/server";import{auth}from"@/auth";import{prisma}from"@/lib/prisma";
+import {NextResponse}from"next/server";import{auth}from"@/auth";import{prisma}from"@/lib/prisma";import{hasPermission}from"@/lib/permissions";
 export async function GET(){const s=await auth();if(!s?.user?.id)return NextResponse.json({error:"Unauthorized"},{status:401});if(!(await hasPermission(s.user.id,s.user.role,"challenges.read")))return NextResponse.json({error:"Forbidden"},{status:403});
  const entries=await prisma.challengeParticipation.findMany({where:{progress:{gt:0}},include:{user:{select:{id:true,name:true,avatarUrl:true,role:true}},challenge:{select:{xpReward:true}}}});
  const map=new Map<string,{id:string;name:string;avatarUrl:string|null;role:string;completed:number;progress:number;xp:number}>();
