@@ -1,13 +1,4 @@
-import { LiveWorkspace } from "@/components/shared/live-workspace";
-
-export default function Page() {
-  return (
-    <LiveWorkspace
-      eyebrow="Challenges"
-      title="Explore"
-      description="Discover active School OS challenges."
-      icon="⌕"
-      api="/api/challenges"
-    />
-  );
-}
+"use client";
+import Link from "next/link"; import {useEffect,useState} from "react";
+type Challenge={id:string;title:string;description:string|null;status:string;xpReward:number;_count:{entries:number}};
+export default function ChallengesExplore(){const [items,setItems]=useState<Challenge[]>([]);useEffect(()=>{fetch("/api/challenges",{cache:"no-store"}).then(r=>r.json()).then(d=>setItems(d.challenges??[]));},[]);return <div className="space-y-6"><section className="rounded-[32px] bg-black p-7 text-white md:p-9"><p className="text-[9px] uppercase tracking-[.2em] text-blue-300">Challenges</p><h1 className="mt-3 text-3xl font-semibold tracking-[-.05em] md:text-5xl">Explore challenges</h1><p className="mt-3 max-w-2xl text-sm text-white/40">Discover active and completed challenges from the live School OS database.</p></section><section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{items.map(c=><article key={c.id} className="rounded-[26px] border border-white/80 bg-white/65 p-5 backdrop-blur-xl"><div className="flex justify-between"><span className="rounded-full bg-blue-500/10 px-3 py-1 text-[8px] text-blue-600">{c.status}</span><span className="text-[9px] text-black/30">+{c.xpReward} XP</span></div><h2 className="mt-4 text-base font-semibold">{c.title}</h2><p className="mt-2 text-[10px] leading-5 text-black/40">{c.description??"No description provided."}</p><div className="mt-5 flex items-center justify-between text-[9px] text-black/30"><span>{c._count.entries} participants</span><Link href="/dashboard/challenges/my-challenges" className="text-blue-600">Open →</Link></div></article>)}{items.length===0&&<div className="rounded-[24px] border border-dashed border-black/10 p-10 text-center text-[10px] text-black/30 md:col-span-2 xl:col-span-3">No active challenges yet.</div>}</section></div>}
