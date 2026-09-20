@@ -8,6 +8,7 @@ export default function Page() {
       description="Projects connected to ATTL members."
       icon="▣"
       api="/api/projects"
+      actions={[{ label: "All projects", href: "/dashboard/projects/all" }, { label: "ATTL command center", href: "/dashboard/attl/command-center" }]}
     />
   );
 }
