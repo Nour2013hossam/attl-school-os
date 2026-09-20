@@ -207,6 +207,7 @@ const sections = [
       { label: "Analytics", href: "/dashboard/admin/analytics", icon: "▥" },
       { label: "Audit Logs", href: "/dashboard/admin/audit-logs", icon: "◌" },
       { label: "Security", href: "/dashboard/admin/security", icon: "◇" },
+      { label: "School Control", href: "/dashboard/admin/school", icon: "⌂" },
       { label: "System", href: "/dashboard/admin/system", icon: "⚙" },
     ],
   },
@@ -378,6 +379,7 @@ export function DashboardNav({}: { role?: string }) {
       "/dashboard/admin/analytics":"analytics.read",
       "/dashboard/admin/audit-logs":"audit.read",
       "/dashboard/admin/security":"security.manage",
+      "/dashboard/admin/school":"school.manage",
       "/dashboard/admin/system":"system.manage",
     };
     return rules[href];
