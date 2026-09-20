@@ -435,6 +435,7 @@ model Project {
   owner       User           @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   members     ProjectMember[]
   tasks       ProjectTask[]
+  milestones  ProjectMilestone[]
 
   @@index([ownerId, status])
 }
@@ -722,6 +723,7 @@ model Poll {
 
   creator User       @relation("PollCreator", fields: [creatorId], references: [id], onDelete: Cascade)
   options PollOption[]
+  votes PollVote[]
 
   @@index([active, createdAt])
 }
