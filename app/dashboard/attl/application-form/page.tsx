@@ -44,8 +44,7 @@ export default function ApplicationFormPage() {
     setBusy("create");
     setMessage("");
     const needsOptions = type === "select" || type === "multiselect";
-    const values = options.split("
-").map((item) => item.trim()).filter(Boolean);
+    const values = options.split("\n").map((item) => item.trim()).filter(Boolean);
     const r = await fetch("/api/attl/questions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
