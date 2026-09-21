@@ -19,8 +19,12 @@ export default function AttlAiLauncher() {
             className="interactive-glass flex h-12 w-12 items-center justify-center rounded-[17px] border border-white/70 bg-white/70 shadow-[0_8px_30px_rgba(20,30,50,.10)] transition hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/15"
           >
             <span className="relative flex h-8 w-8 items-center justify-center rounded-[11px] bg-black text-white shadow-lg">
-              <span className="absolute inset-[5px] rounded-[7px] border border-white/25" />
-              <span className="relative text-[13px] leading-none">✦</span>
+              <svg viewBox="0 0 32 32" aria-hidden="true" className="h-[18px] w-[18px]">
+                <rect x="7" y="9" width="18" height="15" rx="6" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M11 15h.01M21 15h.01M12 19h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <path d="M16 5v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <circle cx="16" cy="4" r="1.5" fill="currentColor" />
+              </svg>
               <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,.9)]" />
             </span>
           </Link>
