@@ -16,34 +16,39 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
 
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    const payload = await response.json();
+      const payload = await response.json().catch(() => ({}));
 
-    if (!response.ok) {
-      setError(payload.error ?? "Could not create your account.");
+      if (!response.ok) {
+        setError(payload.error ?? "Could not create your account.");
+        setLoading(false);
+        return;
+      }
+
+      const result = await signIn("credentials", {
+        email: email.trim().toLowerCase(),
+        password,
+        redirect: false,
+        redirectTo: "/dashboard",
+      });
+
+      if (result?.error) {
+        window.location.assign("/login?registered=1");
+        return;
+      }
+
+      window.location.assign(result?.url ?? "/dashboard");
+    } catch (error) {
+      console.error("Registration request failed", error);
+      setError("Could not reach ATTL right now. Please try again.");
       setLoading(false);
-      return;
     }
-
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-      redirectTo: "/dashboard",
-    });
-
-    if (result?.error) {
-      setError("Account created. Please sign in.");
-      setLoading(false);
-      return;
-    }
-
-    window.location.assign(result?.url ?? "/dashboard");
   };
 
   return (
