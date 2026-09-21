@@ -102,7 +102,8 @@ export async function POST(request: Request) {
   }
 
   if (
-    [UserRole.ADMIN, UserRole.SUPER_ADMIN].includes(requestedRole) &&
+    (requestedRole === UserRole.ADMIN ||
+      requestedRole === UserRole.SUPER_ADMIN) &&
     session.user.role !== UserRole.SUPER_ADMIN
   ) {
     return NextResponse.json(
@@ -126,11 +127,10 @@ export async function POST(request: Request) {
 
   try {
     const passwordHash = await bcrypt.hash(parsed.data.password, 12);
-    const shouldCreateStudentProfile = [
-      UserRole.STUDENT,
-      UserRole.ATTL_MEMBER,
-      UserRole.TRACK_LEAD,
-    ].includes(requestedRole);
+    const shouldCreateStudentProfile =
+      requestedRole === UserRole.STUDENT ||
+      requestedRole === UserRole.ATTL_MEMBER ||
+      requestedRole === UserRole.TRACK_LEAD;
     const shouldCreateTeacherProfile = requestedRole === UserRole.TEACHER;
 
     const user = await prisma.user.create({
@@ -141,14 +141,14 @@ export async function POST(request: Request) {
         role: requestedRole,
         gradeLevel: parsed.data.gradeLevel?.trim() || null,
         className: parsed.data.className?.trim() || null,
-        attlMembershipActive: [UserRole.ATTL_MEMBER, UserRole.TRACK_LEAD].includes(
-          requestedRole
-        ),
-        attlActivatedAt: [UserRole.ATTL_MEMBER, UserRole.TRACK_LEAD].includes(
-          requestedRole
-        )
-          ? new Date()
-          : null,
+        attlMembershipActive:
+          requestedRole === UserRole.ATTL_MEMBER ||
+          requestedRole === UserRole.TRACK_LEAD,
+        attlActivatedAt:
+          requestedRole === UserRole.ATTL_MEMBER ||
+          requestedRole === UserRole.TRACK_LEAD
+            ? new Date()
+            : null,
         ...(shouldCreateStudentProfile
           ? { studentProfile: { create: {} } }
           : {}),
