@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     "unknown";
 
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const parsed = registerSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -27,8 +27,6 @@ export async function POST(request: Request) {
     const email = parsed.data.email.trim().toLowerCase();
     const name = parsed.data.name.trim();
 
-    // Rate-limit by both IP and email so one Vercel instance cannot block
-    // every student when the proxy does not provide a stable client IP.
     const rate = rateLimit(
       `register:${ip}:${email}`,
       5,
@@ -44,10 +42,8 @@ export async function POST(request: Request) {
 
     const passwordHash = await bcrypt.hash(parsed.data.password, 12);
 
-    let user: { id: string; name: string; email: string };
-
     try {
-      user = await prisma.user.create({
+      const user = await prisma.user.create({
         data: {
           name,
           email,
@@ -63,39 +59,59 @@ export async function POST(request: Request) {
           email: true,
         },
       });
+
+      try {
+        await prisma.auditLog.create({
+          data: {
+            actorId: user.id,
+            action: "ACCOUNT_CREATED",
+            entity: "User",
+            entityId: user.id,
+            metadata: { source: "registration" },
+            ip,
+          },
+        });
+      } catch (error) {
+        console.error("Registration audit log error", error);
+      }
+
+      return NextResponse.json(
+        { user, created: true },
+        {
+          status: 201,
+          headers: { "Cache-Control": "no-store" },
+        }
+      );
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
         return NextResponse.json(
-          { error: "An account with this email already exists." },
+          { error: "An account with this email already exists.", code: "EMAIL_EXISTS" },
           { status: 409 }
         );
       }
 
-      throw error;
-    }
+      if (error instanceof Prisma.PrismaClientInitializationError) {
+        console.error("Registration database initialization error", error);
+        return NextResponse.json(
+          {
+            error: "The database is temporarily unavailable. Please try again shortly.",
+            code: "DATABASE_UNAVAILABLE",
+          },
+          { status: 503 }
+        );
+      }
 
-    // Audit logging must never make a successfully-created account appear to fail.
-    try {
-      await prisma.auditLog.create({
-        data: {
-          actorId: user.id,
-          action: "ACCOUNT_CREATED",
-          entity: "User",
-          entityId: user.id,
-          metadata: { source: "registration" },
-          ip,
-        },
-      });
-    } catch (error) {
-      console.error("Registration audit log error", error);
+      console.error("Registration database error", error);
+      return NextResponse.json(
+        { error: "We could not save your account right now. Please try again." },
+        { status: 500 }
+      );
     }
-
-    return NextResponse.json({ user }, { status: 201 });
   } catch (error) {
-    console.error("Registration error", error);
+    console.error("Registration request error", error);
     return NextResponse.json(
       { error: "Could not create the account. Please try again." },
       { status: 500 }
