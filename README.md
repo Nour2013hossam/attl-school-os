@@ -27,7 +27,7 @@ npm install
 Copy-Item .env.example .env.local
 ```
 
-3. Set `DATABASE_URL` and `AUTH_SECRET`.
+3. Set `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `AUTH_SECRET`. For Neon, keep the pooled URL in `DATABASE_URL` for application traffic and the direct/unpooled URL in `DATABASE_URL_UNPOOLED` for Prisma CLI operations.
 
 4. Generate Prisma Client:
 
@@ -79,16 +79,39 @@ Authentication, registration, current-user profile, schedule, grades/results, as
 The frontend contains a larger route inventory by design. Remaining pages can be connected progressively to these domain models without changing their public URLs.
 
 
+## Move the existing local database to Neon
+
+The Git repository stores the application code and Prisma schema, not the PostgreSQL rows. To preserve the records already in the local PostgreSQL database, create a database dump locally and restore that dump into the Neon database.
+
+On Windows, the repository includes a PowerShell migration helper:
+
+```powershell
+npm run db:migrate-local-to-neon
+```
+
+The script:
+- checks the local and Neon connections;
+- creates a timestamped backup under `backups/`;
+- restores the full PostgreSQL dump into Neon;
+- never commits the dump because `backups/` is ignored by Git.
+
+Run it with `-ReplaceExisting` only when you intentionally want the Neon database's existing objects/data replaced. Keep the backup until you verify the deployed application.
+
+For a serverless deployment, Neon recommends a pooled connection for application traffic and a direct connection for Prisma CLI operations.
+
 ## Production deployment
 
 ATTL School OS is a dynamic Next.js application. Deploy it to a Node-compatible host such as Vercel, not GitHub Pages.
 
 Set these production environment variables:
 
-- `DATABASE_URL` — PostgreSQL connection string with SSL enabled.
+- `DATABASE_URL` — Neon pooled PostgreSQL connection string with SSL enabled.
+- `DATABASE_URL_UNPOOLED` — Neon direct/unpooled PostgreSQL connection string for Prisma CLI operations.
 - `AUTH_SECRET` — long random production secret.
 - `NEXT_PUBLIC_APP_URL` — the public HTTPS URL of the deployed app.
 - `SEED_PASSWORD` — only for controlled development/staging seed runs; do not use a shared default in production.
+- `OPENAI_API_KEY` — server-side key for ATTL AI.
+- `OPENAI_MODEL` — optional AI model override.
 
 Before the first production launch:
 
