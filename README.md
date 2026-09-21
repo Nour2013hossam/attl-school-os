@@ -97,7 +97,7 @@ The script:
 
 Run it with `-ReplaceExisting` only when you intentionally want the Neon database's existing objects/data replaced. Keep the backup until you verify the deployed application.
 
-For a serverless deployment, Neon recommends a pooled connection for application traffic and a direct connection for Prisma CLI operations. citeturn330828search0turn330828search8
+For a serverless deployment, Neon recommends a pooled connection for application traffic and a direct connection for Prisma CLI operations.
 
 ## Production deployment
 
@@ -105,10 +105,13 @@ ATTL School OS is a dynamic Next.js application. Deploy it to a Node-compatible 
 
 Set these production environment variables:
 
-- `DATABASE_URL` — PostgreSQL connection string with SSL enabled.
+- `DATABASE_URL` — Neon pooled PostgreSQL connection string with SSL enabled.
+- `DATABASE_URL_UNPOOLED` — Neon direct/unpooled PostgreSQL connection string for Prisma CLI operations.
 - `AUTH_SECRET` — long random production secret.
 - `NEXT_PUBLIC_APP_URL` — the public HTTPS URL of the deployed app.
 - `SEED_PASSWORD` — only for controlled development/staging seed runs; do not use a shared default in production.
+- `OPENAI_API_KEY` — server-side key for ATTL AI.
+- `OPENAI_MODEL` — optional AI model override.
 
 Before the first production launch:
 
