@@ -24,6 +24,7 @@ const sections = [
       { label: "Notifications", href: "/dashboard/notifications", icon: "●" },
       { label: "Messages", href: "/dashboard/messages", icon: "✉" },
       { label: "Search", href: "/dashboard/search", icon: "⌕" },
+      { label: "ATTL AI", href: "/dashboard/ai", icon: "✦" },
       { label: "Calendar", href: "/dashboard/calendar", icon: "□" },
     ],
   },
