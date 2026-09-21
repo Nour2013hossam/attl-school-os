@@ -27,7 +27,7 @@ npm install
 Copy-Item .env.example .env.local
 ```
 
-3. Set `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `AUTH_SECRET`. For Neon, keep the pooled URL in `DATABASE_URL` for application traffic and the direct/unpooled URL in `DATABASE_URL_UNPOOLED` for Prisma CLI operations. citeturn330828search0turn330828search8
+3. Set `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `AUTH_SECRET`. For Neon, keep the pooled URL in `DATABASE_URL` for application traffic and the direct/unpooled URL in `DATABASE_URL_UNPOOLED` for Prisma CLI operations.
 
 4. Generate Prisma Client:
 
