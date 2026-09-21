@@ -8,7 +8,7 @@ export default function AttlAiLauncher() {
   const ar = language === "ar";
 
   return (
-    <div className="fixed bottom-5 right-5 z-[60] md:bottom-7 md:right-7" dir="ltr">
+    <div className="fixed bottom-24 right-4 z-[60] sm:bottom-5 sm:right-5 lg:bottom-7 lg:right-[290px]" dir="ltr">
       <div className="group relative">
         <div className="pointer-events-none absolute -inset-2 rounded-[23px] bg-blue-400/10 blur-xl opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
 
