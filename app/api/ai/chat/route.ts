@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 
   const input: any[] = [
     { role: "developer", content: [{ type: "input_text", text: developer }] },
-    ...messages.map((m) => ({ role: m.role, content: [{ type: "input_text", text: m.content.slice(0, 10000) }] })),
+    ...messages.slice(0, -1).map((m) => ({ role: m.role, content: [{ type: "input_text", text: m.content.slice(0, 10000) }] })),
   ];
   if (latestUser || image) input.push({ role: "user", content: inputContent });
 
