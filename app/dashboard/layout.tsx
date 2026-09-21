@@ -7,6 +7,7 @@ import { DashboardSearch } from "@/components/layout/dashboard-search";
 import { SignOutButton } from "@/components/auth/signout-button";
 import { QuickPreferences } from "@/components/layout/quick-preferences";
 import { PermissionRouter } from "@/components/auth/permission-router";
+import AttlAiLauncher from "@/components/ai/attl-ai-launcher";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardLayout({
@@ -150,6 +151,7 @@ export default async function DashboardLayout({
 
       <MobileDock />
       <CommandCenter />
+      <AttlAiLauncher />
     </div>
   );
 }
