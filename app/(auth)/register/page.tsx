@@ -10,11 +10,13 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
   const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError("");
+    setNotice("");
 
     try {
       const response = await fetch("/api/auth/register", {
@@ -39,7 +41,8 @@ export default function RegisterPage() {
       });
 
       if (result?.error) {
-        window.location.assign("/login?registered=1");
+        setNotice("Your account was created. Please sign in with your new account.");
+        setLoading(false);
         return;
       }
 
@@ -123,11 +126,17 @@ export default function RegisterPage() {
               </div>
 
               {error && (
-                <div
-                  role="alert"
-                  className="rounded-[14px] bg-red-50 px-4 py-3 text-[10px] text-red-600"
-                >
+                <div role="alert" className="rounded-[14px] bg-red-50 px-4 py-3 text-[10px] text-red-600">
                   {error}
+                </div>
+              )}
+
+              {notice && (
+                <div role="status" className="rounded-[14px] bg-blue-50 px-4 py-3 text-[10px] text-blue-700">
+                  {notice}{" "}
+                  <Link href="/login" className="font-medium underline underline-offset-2">
+                    Sign in
+                  </Link>
                 </div>
               )}
 

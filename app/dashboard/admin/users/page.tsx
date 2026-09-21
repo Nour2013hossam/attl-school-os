@@ -18,11 +18,23 @@ export default function AdminUsersPage(){
  const [message,setMessage]=useState("");
  const [currentRole,setCurrentRole]=useState("");
  const [myRole,setMyRole]=useState("STUDENT"); const [xpDrafts,setXpDrafts]=useState<Record<string,string>>({});
+ const [createOpen,setCreateOpen]=useState(false);
+ const [createForm,setCreateForm]=useState({name:"",email:"",password:"",role:"STUDENT",gradeLevel:"",className:""});
+ const [creating,setCreating]=useState(false);
 
  async function load(){const res=await fetch("/api/admin/users",{cache:"no-store"});const data=await res.json();if(res.ok)setUsers(data.users??[]);else setMessage(data.error??"Unable to load users.");}
  useEffect(()=>{load(); fetch("/api/me/permissions",{cache:"no-store"}).then(r=>r.json()).then(d=>setMyRole(d.role??"STUDENT")); fetch("/api/admin/roles",{cache:"no-store"}).then(r=>r.json()).then(d=>setCustomRoles((d.customRoles??[]).filter((r:{active?:boolean})=>r.active!==false)));},[]);
 
  const filtered=useMemo(()=>users.filter(u=>[u.name,u.email,u.role,u.schoolId??""].join(" ").toLowerCase().includes(query.toLowerCase())),[users,query]);
+
+ async function createUser(event:React.FormEvent<HTMLFormElement>){
+  event.preventDefault(); setCreating(true); setMessage("");
+  const res=await fetch("/api/admin/users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(createForm)});
+  const data=await res.json().catch(()=>({}));
+  if(res.ok){ setMessage("Account created successfully."); setCreateOpen(false); setCreateForm({name:"",email:"",password:"",role:"STUDENT",gradeLevel:"",className:""}); await load(); }
+  else setMessage(data.error??"Could not create account.");
+  setCreating(false);
+ }
 
  async function adjustXp(id:string, mode:"delta"|"set", amount:number){
   setBusy(id);setMessage("");
@@ -40,6 +52,24 @@ export default function AdminUsersPage(){
 
  return <div className="space-y-6">
   <section className="relative overflow-hidden rounded-[32px] bg-black p-7 text-white md:p-8"><div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-blue-500/25 blur-[110px]"/><div className="relative"><p className="text-[9px] uppercase tracking-[.2em] text-white/35">Administration</p><h1 className="mt-2 text-3xl font-semibold tracking-[-.05em] md:text-5xl">Users</h1><p className="mt-3 max-w-xl text-sm text-white/40">Manage accounts, roles and active status from the protected Admin OS.</p></div></section>
+
+  <section className="rounded-[30px] border border-white/80 bg-white/60 p-5 backdrop-blur-2xl">
+   <div className="flex items-center justify-between gap-3">
+    <div><div className="text-[9px] font-semibold uppercase tracking-[.18em] text-black/30">Account creation</div><div className="mt-1 text-sm font-semibold">Create a user directly</div></div>
+    {permissionsReady && can("users.manage") && <button onClick={()=>setCreateOpen(v=>!v)} className="rounded-[13px] bg-black px-4 py-2.5 text-[9px] font-semibold text-white">{createOpen?"Close":"Create account"}</button>}
+   </div>
+   {createOpen && permissionsReady && can("users.manage") && <form onSubmit={createUser} className="mt-4 grid gap-3 md:grid-cols-2">
+    <input required minLength={2} maxLength={120} value={createForm.name} onChange={e=>setCreateForm(v=>({...v,name:e.target.value}))} placeholder="Full name" className="h-11 rounded-[13px] border border-black/5 bg-white/80 px-3 text-[10px] outline-none"/>
+    <input required type="email" value={createForm.email} onChange={e=>setCreateForm(v=>({...v,email:e.target.value}))} placeholder="Email" className="h-11 rounded-[13px] border border-black/5 bg-white/80 px-3 text-[10px] outline-none"/>
+    <input required minLength={8} maxLength={128} type="password" value={createForm.password} onChange={e=>setCreateForm(v=>({...v,password:e.target.value}))} placeholder="Temporary password" className="h-11 rounded-[13px] border border-black/5 bg-white/80 px-3 text-[10px] outline-none"/>
+    <select value={createForm.role} onChange={e=>setCreateForm(v=>({...v,role:e.target.value}))} className="h-11 rounded-[13px] border border-black/5 bg-white/80 px-3 text-[10px] outline-none">
+      {roles.filter(role=>role!=="SUPER_ADMIN"||myRole==="SUPER_ADMIN").map(role=><option key={role}>{role}</option>)}
+    </select>
+    <input value={createForm.gradeLevel} onChange={e=>setCreateForm(v=>({...v,gradeLevel:e.target.value}))} placeholder="Grade level (optional)" className="h-11 rounded-[13px] border border-black/5 bg-white/80 px-3 text-[10px] outline-none"/>
+    <input value={createForm.className} onChange={e=>setCreateForm(v=>({...v,className:e.target.value}))} placeholder="Class (optional)" className="h-11 rounded-[13px] border border-black/5 bg-white/80 px-3 text-[10px] outline-none"/>
+    <button disabled={creating} type="submit" className="md:col-span-2 h-11 rounded-[13px] bg-blue-500 text-[10px] font-semibold text-white disabled:opacity-50">{creating?"Creating...":"Create account"}</button>
+   </form>}
+  </section>
 
   <section className="rounded-[30px] border border-white/80 bg-white/60 p-5 backdrop-blur-2xl">
    <div className="flex flex-col gap-3 md:flex-row"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search name, email or role..." className="h-11 flex-1 rounded-[14px] border border-black/5 bg-white/75 px-4 text-xs outline-none"/><span className="rounded-[14px] bg-black px-4 py-3 text-center text-[9px] font-semibold text-white">{filtered.length} users</span></div>
