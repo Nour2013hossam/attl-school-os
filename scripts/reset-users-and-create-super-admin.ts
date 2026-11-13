@@ -20,7 +20,7 @@ async function main() {
   if (password.length < 14) {
     throw new Error("ADMIN_PASSWORD must be at least 14 characters.");
   }
-  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw new Error("ADMIN_EMAIL must be a valid email address.");
   }
 
