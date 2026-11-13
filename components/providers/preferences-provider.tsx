@@ -4,10 +4,10 @@ import {createContext,useContext,useEffect,useMemo,useState} from "react";
 import { translateUiText, type UiLanguage } from "@/lib/i18n";
 
 type Language=UiLanguage;
-type Theme="system"|"light"|"dark";
+type Theme="light"|"dark";
 type Preferences={language:Language;theme:Theme;emailNotifications:boolean;pushNotifications:boolean;profileVisible:boolean};
 
-const defaults:Preferences={language:"en",theme:"system",emailNotifications:true,pushNotifications:true,profileVisible:true};
+const defaults:Preferences={language:"en",theme:"light",emailNotifications:true,pushNotifications:true,profileVisible:true};
 const PreferenceContext = createContext<{
   preferences: Preferences;
   language: Language;
@@ -21,7 +21,7 @@ const PreferenceContext = createContext<{
 }>({
   preferences: defaults,
   language: "en",
-  theme: "system",
+  theme: "light",
   setLanguage: () => {},
   setTheme: () => {},
   updatePreferences: async () => {},
@@ -31,7 +31,7 @@ const PreferenceContext = createContext<{
 });
 
 function applyTheme(theme:Theme){
-  const dark=theme==="dark" || (theme==="system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const dark=theme==="dark";
   document.documentElement.classList.toggle("dark",dark);
   document.documentElement.style.colorScheme=dark?"dark":"light";
 }
@@ -90,7 +90,7 @@ export function PreferencesProvider({children}:{children:React.ReactNode}){
 
  useEffect(()=>{
    const stored=localStorage.getItem("attl-preferences");
-   if(stored){try{const p={...defaults,...JSON.parse(stored)};setPreferences(p);applyTheme(p.theme);applyLanguage(p.language);}catch{}}
+   if(stored){try{const p={...defaults,...JSON.parse(stored)};if(p.theme==="system")p.theme="light";setPreferences(p);applyTheme(p.theme);applyLanguage(p.language);}catch{}}
    Promise.all([
      fetch("/api/settings",{cache:"no-store"}).then(r=>r.ok?r.json():null),
      fetch("/api/me/permissions",{cache:"no-store"}).then(r=>r.ok?r.json():null),
@@ -125,13 +125,6 @@ export function PreferencesProvider({children}:{children:React.ReactNode}){
    observer.observe(document.body, { childList: true, subtree: true });
    return () => observer.disconnect();
  }, [preferences.language, preferences.theme, ready]);
-
- useEffect(()=>{
-   const media=window.matchMedia("(prefers-color-scheme: dark)");
-   const fn=()=>{if(preferences.theme==="system")applyTheme("system");};
-   media.addEventListener?.("change",fn);
-   return()=>media.removeEventListener?.("change",fn);
- },[preferences.theme]);
 
  async function update(patch:Partial<Preferences>){
    const next={...preferences,...patch}; setPreferences(next);
