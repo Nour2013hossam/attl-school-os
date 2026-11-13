@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const settingsSchema = z.object({
   language: z.enum(["en","ar"]),
-  theme: z.enum(["system", "light", "dark"]),
+  theme: z.enum(["light", "dark"]),
   emailNotifications: z.boolean(),
   pushNotifications: z.boolean(),
   profileVisible: z.boolean(),
@@ -23,8 +23,11 @@ export async function GET() {
     update: {},
     create: { userId: session.user.id },
   });
+  const normalizedPreferences = preferences.theme === "system"
+    ? await prisma.userPreference.update({ where: { userId: session.user.id }, data: { theme: "light" } })
+    : preferences;
 
-  return NextResponse.json({ preferences });
+  return NextResponse.json({ preferences: normalizedPreferences });
 }
 
 export async function PATCH(request: Request) {
