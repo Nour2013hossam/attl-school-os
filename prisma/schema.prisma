@@ -982,7 +982,7 @@ model UserPreference {
   id                   String   @id @default(cuid())
   userId               String   @unique
   language             String   @default("en")
-  theme                String   @default("system")
+  theme                String   @default("light")
   emailNotifications   Boolean  @default(true)
   pushNotifications    Boolean  @default(true)
   profileVisible       Boolean  @default(true)
